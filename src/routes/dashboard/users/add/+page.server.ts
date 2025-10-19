@@ -1,16 +1,51 @@
 import axios from '$lib/api';
-import type { Actions } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { redirect, fail } from '@sveltejs/kit';
+import type { Actions } from '@sveltejs/kit';
 
 export const actions: Actions = {
-    default: async ({ request }) => {
+    default: async ({ request, cookies }) => {
         const fd = await request.formData();
-        const payload = {
-            email: fd.get('email'),
-            password: fd.get('password'),
-            role_id: Number(fd.get('role_id'))
+
+        // Get form data
+        const email = fd.get('email') as string;
+        const password = fd.get('password') as string;
+        const roleId = Number(fd.get('role_id'));
+        const fullName = fd.get('full_name') as string;
+        const phone = fd.get('phone') as string;
+        const address = fd.get('address') as string;
+
+        // Basic validation
+        if (!email || !password || !roleId) {
+            return fail(400, {
+                error: 'Email, password, dan role harus diisi'
+            });
+        }
+
+        if (password.length < 6) {
+            return fail(400, {
+                error: 'Password minimal 6 karakter'
+            });
+        }
+
+        const payload: any = {
+            email,
+            password,
+            role_id: roleId
         };
-        await axios.post('/register', payload);
-        throw redirect(303, '/dashboard/users');
+
+        // Add optional fields
+        if (fullName) payload.full_name = fullName;
+        if (phone) payload.phone = phone;
+        if (address) payload.address = address;
+
+        try {
+            await axios.post('/users', payload);
+            throw redirect(303, '/dashboard/users');
+        } catch (error: any) {
+            console.error('Create user error:', error.response?.data);
+            return fail(400, {
+                error: error.response?.data?.message || 'Gagal membuat user baru'
+            });
+        }
     }
 };

@@ -2,38 +2,58 @@
     import { page } from "$app/stores";
     export let data;
     $: user = data.user;
-    console.log(data.user.role.name);
-    console.log("Here 123");
-    console.log("uyy");
+
+    // Check user permissions
+    $: canManageUsers =
+        user?.role?.name === "admin" || user?.role?.name === "super_admin";
+    $: isSuper = user?.role?.name === "super_admin";
+    $: isAdmin = user?.role?.name === "admin";
+    $: isMember = user?.role?.name === "member";
 </script>
 
 <nav class="bg-indigo-700 text-white p-4 flex justify-between">
-    <span>Koperasi Backoffice</span>
-    <span>{data.user.email} | {data.user.role.name}</span>
+    <div class="flex items-center space-x-4">
+        <span class="font-bold">Koperasi Backoffice</span>
+        <div class="flex space-x-2">
+            <a href="/dashboard" class="hover:bg-indigo-600 px-3 py-1 rounded"
+                >Dashboard</a
+            >
+
+            {#if canManageUsers}
+                <a
+                    href="/dashboard/users"
+                    class="hover:bg-indigo-600 px-3 py-1 rounded">Kelola User</a
+                >
+            {/if}
+
+            {#if isSuper}
+                <a
+                    href="/dashboard/super"
+                    class="hover:bg-indigo-600 px-3 py-1 rounded">Super Admin</a
+                >
+            {/if}
+
+            <a
+                href="/dashboard/profile"
+                class="hover:bg-indigo-600 px-3 py-1 rounded">Profile</a
+            >
+        </div>
+    </div>
+
+    <div class="flex items-center space-x-4">
+        <span class="text-sm">
+            {user.full_name || user.email}
+            <span class="text-indigo-200">({user.role.name})</span>
+        </span>
+        <a
+            href="/logout"
+            class="bg-indigo-800 hover:bg-indigo-900 px-3 py-1 rounded text-sm"
+        >
+            Logout
+        </a>
+    </div>
 </nav>
 
 <main class="p-6">
-    {#if data.user.role.name === "super_admin"}
-        <a href="/dashboard/super" class="btn">Super Dashboard</a>
-        <a href="/dashboard/users" class="btn ml-2">Kelola User</a>
-    {:else if data.user.role.name === "admin"}
-        <a href="/dashboard/admin" class="btn">Admin Dashboard</a>
-    {/if}
-    <hr class="my-4" />
     <slot />
 </main>
-
-<style>
-    .btn {
-        background-color: white;
-        color: #3730a3; /* Tailwind's indigo-700 */
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-        padding-top: 0.25rem;
-        padding-bottom: 0.25rem;
-        border-radius: 0.25rem;
-    }
-    .ml-2 {
-        margin-left: 0.5rem;
-    }
-</style>
