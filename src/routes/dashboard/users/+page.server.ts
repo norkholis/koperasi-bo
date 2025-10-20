@@ -1,5 +1,5 @@
 import axios from '$lib/api';
-import type { User } from '$lib/types';
+import type { User, ApiResponse } from '$lib/types';
 import { error } from '@sveltejs/kit';
 
 export const load = async ({ parent }: { parent: any }) => {
@@ -13,18 +13,49 @@ export const load = async ({ parent }: { parent: any }) => {
 
     try {
         console.log('🔍 Attempting to fetch users...');
-        console.log('Current user:', user.email, 'Role:', user.role.name);
+        console.log('Current user:', user.email, 'Role:', user.role.name, 'ID:', user.id);
 
         // server-side call -> no CORS preflight
-        const response = await axios.get<User[]>('/users');
+        const response = await axios.get<ApiResponse<User[]>>('/users');
         console.log('✅ Users API response received');
         console.log('Response data:', response.data);
-        console.log('Number of users:', Array.isArray(response.data) ? response.data.length : 'Not an array');
 
-        return {
-            users: response.data || [],
+        let users = response.data.data || [];
+        console.log('Number of users before filtering:', users.length);
+
+        // Role-based filtering
+        if (user.role.name === 'admin') {
+            // Admin can only see users under their admin_id
+            users = users.filter(u => u.admin_id === user.id || u.id === user.id);
+            console.log('🔒 Admin filtering applied. Users after filtering:', users.length);
+        } else if (user.role.name === 'super_admin') {
+            // Super admin can see all users
+            console.log('👑 Super admin - showing all users');
+        }
+
+        // Add role information to users for display
+        const usersWithRoles = users.map(u => ({
+            ...u,
+            role: {
+                id: u.role_id,
+                name: u.role_id === 1 ? 'super_admin' : u.role_id === 2 ? 'admin' : 'member'
+            },
+            // Add created_at fallback if missing
+            created_at: u.created_at || new Date().toISOString(),
+            // Ensure is_active has a default
+            is_active: u.is_active !== false
+        }));
+
+        console.log('Final users to display:', usersWithRoles.length);
+        console.log('Sample user after mapping:', usersWithRoles[0]);
+
+        const returnData = {
+            users: usersWithRoles,
             user
         };
+
+        console.log('📤 RETURNING TO FRONTEND:', JSON.stringify(returnData, null, 2));
+        return returnData;
     } catch (err: any) {
         console.error('❌ Server load users error:', err);
         console.error('Error response:', err.response?.data);
@@ -39,9 +70,7 @@ export const load = async ({ parent }: { parent: any }) => {
         }
         throw error(500, `Failed to load users data: ${err.message}`);
     }
-};
-
-import type { Actions } from '@sveltejs/kit';
+}; import type { Actions } from '@sveltejs/kit';
 
 export const actions: Actions = {
     delete: async ({ request }) => {

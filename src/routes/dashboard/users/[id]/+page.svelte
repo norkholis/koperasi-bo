@@ -94,7 +94,7 @@
                         id="full_name"
                         name="full_name"
                         type="text"
-                        value={user.full_name || ''}
+                        value={user.name || ''}
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>
@@ -108,7 +108,7 @@
                         id="phone"
                         name="phone"
                         type="tel"
-                        value={user.phone || ''}
+                        value={user.phone_number || ''}
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>
@@ -138,10 +138,10 @@
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                         {#if isSuper}
-                            <option value="1" selected={user.role.id === 1}>Super Admin</option>
+                            <option value="1" selected={user.role?.id === 1}>Super Admin</option>
                         {/if}
-                        <option value="2" selected={user.role.id === 2}>Admin</option>
-                        <option value="3" selected={user.role.id === 3}>Member</option>
+                        <option value="2" selected={user.role?.id === 2}>Admin</option>
+                        <option value="3" selected={user.role?.id === 3}>Member</option>
                     </select>
                 </div>
 
@@ -172,7 +172,7 @@
                     </div>
                     <div>
                         <span class="font-medium text-gray-600">Terdaftar:</span>
-                        <span class="ml-2">{new Date(user.created_at).toLocaleDateString('id-ID')}</span>
+                        <span class="ml-2">{new Date(user.created_at || "").toLocaleDateString('id-ID')}</span>
                     </div>
                     {#if user.updated_at}
                         <div class="col-span-2">

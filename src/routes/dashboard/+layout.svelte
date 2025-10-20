@@ -42,8 +42,8 @@
 
     <div class="flex items-center space-x-4">
         <span class="text-sm">
-            {user.full_name || user.email}
-            <span class="text-indigo-200">({user.role.name})</span>
+            {user.name || user.email}
+            <span class="text-indigo-200">({user.role?.name})</span>
         </span>
         <a
             href="/logout"

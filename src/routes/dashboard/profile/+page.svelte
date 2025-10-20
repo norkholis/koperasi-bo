@@ -118,7 +118,7 @@
                         <div>
                             <span class="font-medium text-gray-600">Role:</span>
                             <span class="ml-2 capitalize"
-                                >{user.role.name.replace("_", " ")}</span
+                                >{user.role?.name.replace("_", " ")}</span
                             >
                         </div>
                         <div class="col-span-2">
@@ -126,7 +126,7 @@
                                 >Terdaftar:</span
                             >
                             <span class="ml-2"
-                                >{new Date(user.created_at).toLocaleDateString(
+                                >{new Date(user.created_at || "").toLocaleDateString(
                                     "id-ID",
                                 )}</span
                             >
@@ -163,7 +163,7 @@
                         id="full_name"
                         name="full_name"
                         type="text"
-                        value={user.full_name || ""}
+                        value={user.name || ""}
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>
@@ -179,7 +179,7 @@
                         id="phone"
                         name="phone"
                         type="tel"
-                        value={user.phone || ""}
+                        value={user.phone_number || ""}
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>

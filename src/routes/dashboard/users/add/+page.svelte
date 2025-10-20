@@ -23,6 +23,18 @@
     function goBack() {
         goto("/dashboard/users");
     }
+
+    // NIK input formatting - only allow numbers
+    function handleNikInput(event: Event) {
+        const input = event.target as HTMLInputElement;
+        // Remove all non-digit characters
+        input.value = input.value.replace(/\D/g, "");
+        // Limit to 16 digits
+        console.log("Current NIK input length:", input.value.length);
+        if (input.value.length > 16) {
+            input.value = input.value.slice(0, 16);
+        }
+    }
 </script>
 
 <div class="max-w-2xl mx-auto">
@@ -106,16 +118,16 @@
                 <!-- Full Name -->
                 <div>
                     <label
-                        for="full_name"
+                        for="name"
                         class="block text-sm font-medium text-gray-700 mb-2"
                     >
-                        Nama Lengkap
+                        Nama Lengkap *
                     </label>
                     <input
-                        id="full_name"
-                        name="full_name"
+                        id="name"
+                        name="name"
                         type="text"
-                        placeholder="Nama lengkap pengguna"
+                        required
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>
@@ -123,20 +135,39 @@
                 <!-- Phone -->
                 <div>
                     <label
-                        for="phone"
+                        for="phone_number"
                         class="block text-sm font-medium text-gray-700 mb-2"
                     >
-                        No. Telepon
+                        No. Telepon *
                     </label>
                     <input
-                        id="phone"
-                        name="phone"
+                        id="phone_number"
+                        name="phone_number"
                         type="tel"
-                        placeholder="08123456789"
+                        required
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>
 
+                <!-- NIK -->
+                <div class="md:col-span-2">
+                    <label
+                        for="nik"
+                        class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                        NIK (Nomor Induk Kependudukan)
+                    </label>
+                    <input
+                        id="nik"
+                        name="nik"
+                        type="text"
+                        title="NIK harus 16 digit angka (opsional)"
+                        maxlength="16"
+                        placeholder="Masukkan 16 digit NIK (opsional)"
+                        on:input={handleNikInput}
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                </div>
                 <!-- Address -->
                 <div class="md:col-span-2">
                     <label
