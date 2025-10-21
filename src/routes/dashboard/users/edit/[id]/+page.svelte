@@ -4,7 +4,6 @@
     import { enhance } from "$app/forms";
 
     export let data;
-    export let form;
 
     const user: User = data.user;
     const roles: Role[] = data.roles;

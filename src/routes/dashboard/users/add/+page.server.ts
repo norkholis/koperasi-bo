@@ -54,12 +54,33 @@ export const actions: Actions = {
 
         try {
             await axios.post('/users', payload);
-            throw redirect(303, '/dashboard/users');
         } catch (error: any) {
             console.error('Add user error:', error.response?.data);
-            return fail(400, {
-                error: error.response?.data?.message || 'Gagal menambahkan user'
-            });
+
+            // Handle specific database errors
+            let errorMessage = 'Gagal menambahkan user';
+
+            if (error.response?.data?.error) {
+                const dbError = error.response.data.error;
+
+                // Handle duplicate NIK constraint
+                if (dbError.includes('duplicate key value violates unique constraint "uni_users_nik"')) {
+                    errorMessage = 'NIK sudah terdaftar dalam sistem. Silakan gunakan NIK yang berbeda.';
+                }
+                // Handle duplicate email constraint
+                else if (dbError.includes('duplicate key') && dbError.includes('email')) {
+                    errorMessage = 'Email sudah terdaftar dalam sistem. Silakan gunakan email yang berbeda.';
+                }
+                // Handle other specific errors
+                else if (error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+            }
+
+            return fail(400, { error: errorMessage });
         }
+
+        // If we reach here, the user was created successfully
+        throw redirect(303, '/dashboard/users?success=User berhasil ditambahkan');
     }
 };
