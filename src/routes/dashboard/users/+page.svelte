@@ -206,6 +206,8 @@
                 </svg>
                 <p class="text-green-800 font-medium">{successMessage}</p>
                 <button
+                    type="button"
+                    aria-label="Close success message"
                     on:click={() => (showSuccessMessage = false)}
                     class="ml-auto text-green-400 hover:text-green-600"
                 >
