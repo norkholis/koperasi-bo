@@ -6,7 +6,7 @@
         BalanceAdjustment,
     } from "$lib/types";
     import { page } from "$app/stores";
-    import { invalidateAll } from "$app/navigation";
+    import { invalidateAll, goto } from "$app/navigation";
     import axios from "$lib/api";
     import { onMount } from "svelte";
     import WalletDebugger from "$lib/components/WalletDebugger.svelte";
@@ -20,11 +20,25 @@
     const selectedUserId = data.selectedUserId;
 
     // Debug logging (only if needed)
+    console.log("🚀 Simpanan page loaded");
+    console.log(
+        "👤 Current user:",
+        currentUser?.email,
+        currentUser?.role?.name,
+    );
+    console.log("🎯 Selected User ID:", selectedUserId);
+    console.log("💼 Wallets count:", wallets.length);
+
     if (wallets.length > 0) {
         console.log("✅ Wallets loaded successfully:", wallets.length);
         console.log("🔍 First wallet:", wallets[0]);
     } else {
         console.log("⚠️ No wallets found");
+    }
+
+    // Check for errors
+    if (data.error) {
+        console.error("❌ Page data error:", data.error);
     }
 
     // Permission checks
@@ -36,6 +50,9 @@
     // Success message handling
     let successMessage = "";
     let showSuccessMessage = false;
+
+    // Loading states
+    let isNavigating = false;
 
     // Modal states
     let showTopupModal = false;
@@ -243,6 +260,26 @@
         transactionHistory = [];
     }
 
+    // Navigate to user-specific wallet view
+    async function viewUserWallets(wallet: Wallet) {
+        console.log("🔍 Viewing wallets for user:", wallet.user_id);
+        console.log("📊 Wallet details:", wallet);
+
+        isNavigating = true;
+
+        try {
+            // Use SvelteKit's goto for proper navigation
+            const url = `/dashboard/simpanan?user_id=${wallet.user_id}`;
+            console.log("🚀 Navigating to:", url);
+            await goto(url);
+            console.log("✅ Navigation successful");
+        } catch (error) {
+            console.error("❌ Navigation error:", error);
+        } finally {
+            isNavigating = false;
+        }
+    }
+
     // Top-up operations (Members)
     async function requestTopup() {
         try {
@@ -272,8 +309,7 @@
         }
 
         // Try to find the wallet ID from different possible field names
-        const walletId =
-            selectedWallet.id;
+        const walletId = selectedWallet.id;
 
         if (!walletId) {
             console.error("Selected wallet has no ID:", selectedWallet);
@@ -299,7 +335,7 @@
 
             // Update local wallet data
             wallets = wallets.map((w) =>
-                (w.id) === walletId
+                w.id === walletId
                     ? {
                           ...w,
                           balance:
@@ -714,12 +750,18 @@
                                         >
                                             Riwayat
                                         </button>
-                                        <a
-                                            href="/dashboard/simpanan?user_id={wallet.user_id}"
-                                            class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                        <button
+                                            on:click={() =>
+                                                viewUserWallets(wallet)}
+                                            disabled={isNavigating}
+                                            class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            Lihat Detail
-                                        </a>
+                                            {#if isNavigating}
+                                                Loading...
+                                            {:else}
+                                                Lihat Detail
+                                            {/if}
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
