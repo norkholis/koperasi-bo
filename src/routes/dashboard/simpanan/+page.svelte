@@ -273,9 +273,7 @@
 
         // Try to find the wallet ID from different possible field names
         const walletId =
-            selectedWallet.id ||
-            selectedWallet.simpanan_id ||
-            selectedWallet.wallet_id;
+            selectedWallet.id;
 
         if (!walletId) {
             console.error("Selected wallet has no ID:", selectedWallet);
@@ -301,7 +299,7 @@
 
             // Update local wallet data
             wallets = wallets.map((w) =>
-                (w.id || w.simpanan_id || w.wallet_id) === walletId
+                (w.id) === walletId
                     ? {
                           ...w,
                           balance:
