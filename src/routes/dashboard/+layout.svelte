@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from "$app/stores";
+    import DebugPanel from "$lib/components/DebugPanel.svelte";
     export let data;
     $: user = data.user;
 
@@ -25,6 +26,11 @@
                     class="hover:bg-indigo-600 px-3 py-1 rounded">Kelola User</a
                 >
             {/if}
+
+            <a
+                href="/dashboard/simpanan"
+                class="hover:bg-indigo-600 px-3 py-1 rounded">Simpanan</a
+            >
 
             {#if isSuper}
                 <a
@@ -57,3 +63,6 @@
 <main class="p-6">
     <slot />
 </main>
+
+<!-- Debug Panel for API Testing -->
+<DebugPanel />

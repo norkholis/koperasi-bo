@@ -52,3 +52,46 @@ export interface UserProfile {
     phone_number?: string;
     nik?: string;
 }
+
+// Simpanan (Wallet) Types
+export interface Wallet {
+    id: number;
+    user_id: number;
+    type: 'pokok' | 'wajib' | 'sukarela';
+    balance: number;
+    description: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface WalletTransaction {
+    id: number;
+    simpanan_id: number;
+    simpanan?: {
+        id: number;
+        user_id: number;
+        type: 'pokok' | 'wajib' | 'sukarela';
+    };
+    type: 'topup' | 'adjustment';
+    amount: number;
+    description: string;
+    status: 'pending' | 'verified' | 'rejected';
+    verified_by_id?: number;
+    verified_at?: string;
+    created_at: string;
+}
+
+export interface TopupRequest {
+    type: 'pokok' | 'wajib' | 'sukarela';
+    amount: number;
+    description: string;
+}
+
+export interface BalanceAdjustment {
+    amount: number;
+    description: string;
+}
+
+export interface TransactionVerification {
+    approve: boolean;
+}
