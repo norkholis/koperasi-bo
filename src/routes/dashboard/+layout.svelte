@@ -37,6 +37,11 @@
                 class="hover:bg-indigo-600 px-3 py-1 rounded">Pinjaman</a
             >
 
+            <a
+                href="/dashboard/shu"
+                class="hover:bg-indigo-600 px-3 py-1 rounded">Laporan SHU</a
+            >
+
             {#if isSuper}
                 <a
                     href="/dashboard/super"

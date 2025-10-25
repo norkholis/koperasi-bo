@@ -184,3 +184,137 @@ export interface LoanStatusUpdate {
     status: 'proses' | 'disetujui' | 'lunas' | 'macet';
     sisa_angsuran?: number;
 }
+
+// SHU (Annual Profit Sharing) Types
+export interface SHUMemberDetail {
+    user_id: number;
+    email: string;
+    total_simpanan: number;
+    total_penjualan: number;
+    jasa_modal: number;
+    jasa_usaha: number;
+    total_shu_anggota: number;
+}
+
+export interface SHUReport {
+    tahun: number;
+    total_shu_koperasi: number;
+    persen_jasa_modal: number;
+    persen_jasa_usaha: number;
+    total_simpanan_all: number;
+    total_penjualan_all: number;
+    tanggal_hitung: string;
+    detail_anggota: SHUMemberDetail[];
+}
+
+export interface SHURecord {
+    id: number;
+    tahun: number;
+    total_shu: number;
+    status: 'draft' | 'final';
+    created_at: string;
+    updated_at: string;
+    shu_report?: SHUReport;
+}
+
+export interface SHUGenerateRequest {
+    tahun: number;
+    total_shu_koperasi: number;
+}
+
+// Enhanced SHU interfaces for automated generation
+export interface SHUAutoGenerateRequest {
+    tahun: number;
+    beban_operasional: number;
+    beban_non_operasional: number;
+    beban_pajak: number;
+}
+
+export interface SHUAutoReport {
+    tahun: number;
+    pendapatan_operasional: number;
+    pendapatan_non_operasional: number;
+    beban_operasional: number;
+    beban_non_operasional: number;
+    beban_pajak: number;
+    total_shu_koperasi: number;
+    persen_jasa_modal: number;
+    persen_jasa_usaha: number;
+    total_simpanan_all: number;
+    total_penjualan_all: number;
+    tanggal_hitung: string;
+    detail_anggota: SHUMemberDetail[];
+}
+
+export interface SHUAutoSaveRequest {
+    tahun: number;
+    pendapatan_operasional: number;
+    pendapatan_non_operasional: number;
+    beban_operasional: number;
+    beban_non_operasional: number;
+    beban_pajak: number;
+    total_shu: number;
+    status: 'draft' | 'final';
+}
+
+export interface SHUUserReport {
+    user_id: number;
+    email: string;
+    total_simpanan: number;
+    total_penjualan: number;
+    jasa_modal: number;
+    jasa_usaha: number;
+    total_shu_anggota: number;
+}
+
+export interface SHUUserGenerateRequest {
+    tahun: number;
+    total_shu_koperasi: number;
+}
+
+export interface SHUSaveRequest {
+    tahun: number;
+    total_shu: number;
+    status: 'draft' | 'final';
+}
+
+export interface SHUUpdateRequest {
+    total_shu?: number;
+    status?: 'draft' | 'final';
+}
+
+// SHU Anggota (Individual Member SHU Records) Types
+export interface SHUAnggotaSaveRequest {
+    tahun: number;
+}
+
+export interface SHUAnggotaRecord {
+    id_shu_anggota: number;
+    id_shu: number;
+    id_anggota: number;
+    jumlah_modal: number;
+    jumlah_usaha: number;
+    shu_diterima: number;
+    created_at: string;
+    updated_at: string;
+    shu?: {
+        id_shu?: number;
+        tahun: number;
+        total_shu: number;
+        status: 'draft' | 'final';
+    };
+    user?: {
+        id: number;
+        email: string;
+        name: string;
+    };
+}
+
+export interface SHUAnggotaSaveResponse {
+    message: string;
+    data: SHUAnggotaRecord;
+}
+
+export interface SHUAnggotaHistoryResponse {
+    data: SHUAnggotaRecord[];
+}
