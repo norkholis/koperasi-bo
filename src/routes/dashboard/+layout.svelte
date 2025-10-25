@@ -32,6 +32,11 @@
                 class="hover:bg-indigo-600 px-3 py-1 rounded">Simpanan</a
             >
 
+            <a
+                href="/dashboard/pinjaman"
+                class="hover:bg-indigo-600 px-3 py-1 rounded">Pinjaman</a
+            >
+
             {#if isSuper}
                 <a
                     href="/dashboard/super"

@@ -95,3 +95,92 @@ export interface BalanceAdjustment {
 export interface TransactionVerification {
     approve: boolean;
 }
+
+// Pinjaman (Loan) Types - API Structure
+export interface Pinjaman {
+    ID: number;
+    CreatedAt: string;
+    KodePinjaman: string;
+    UserID: number;
+    TanggalPinjam: string;
+    JumlahPinjaman: number;
+    BungaPersen: number;
+    LamaBulan: number;
+    JumlahAngsuran: number;
+    SisaAngsuran: number;
+    Status: 'proses' | 'disetujui' | 'lunas' | 'macet';
+    User?: User;
+}
+
+// Frontend-friendly loan interface (snake_case)
+export interface Loan {
+    id: number;
+    created_at: string;
+    kode_pinjaman: string;
+    user_id: number;
+    tanggal_pinjam: string;
+    jumlah_pinjaman: number;
+    bunga_persen: number;
+    lama_bulan: number;
+    jumlah_angsuran: number;
+    sisa_angsuran: number;
+    status: 'proses' | 'disetujui' | 'lunas' | 'macet';
+    user?: User;
+}
+
+export interface LoanRequest {
+    jumlah_pinjaman: number;
+    bunga_persen: number;
+    lama_bulan: number;
+    jumlah_angsuran: number;
+    user_id?: number;
+}
+
+// Angsuran (Installment) Types - API Structure
+export interface Angsuran {
+    ID: number;
+    PinjamanID: number;
+    AngsuranKe: number;
+    TanggalBayar: string;
+    Pokok: number;
+    Bunga: number;
+    Denda: number;
+    TotalBayar: number;
+    UserID: number;
+    Status: 'proses' | 'verified' | 'kurang' | 'lebih';
+    Pinjaman?: Pinjaman;
+    User?: User;
+}
+
+// Frontend-friendly installment interface (snake_case)
+export interface Installment {
+    id: number;
+    pinjaman_id: number;
+    angsuran_ke: number;
+    tanggal_bayar: string;
+    pokok: number;
+    bunga: number;
+    denda: number;
+    total_bayar: number;
+    user_id: number;
+    status: 'proses' | 'verified' | 'kurang' | 'lebih';
+    pinjaman?: Loan;
+    user?: User;
+}
+
+export interface InstallmentRequest {
+    pinjaman_id: number;
+    angsuran_ke: number;
+    pokok: number;
+    bunga: number;
+    denda?: number;
+}
+
+export interface InstallmentVerification {
+    status: 'verified' | 'kurang' | 'lebih';
+}
+
+export interface LoanStatusUpdate {
+    status: 'proses' | 'disetujui' | 'lunas' | 'macet';
+    sisa_angsuran?: number;
+}
