@@ -176,13 +176,17 @@
     }
 </script>
 
-<div class="p-6">
-    <div class="flex items-center justify-between mb-4">
-        <h1 class="text-2xl font-bold">User Management</h1>
+<div class="p-4 sm:p-6">
+    <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6"
+    >
+        <h1 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-0">
+            User Management
+        </h1>
         {#if canManageUsers}
             <button
                 on:click={() => goto("/dashboard/users/add")}
-                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                class="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
             >
                 Add User
             </button>
@@ -228,64 +232,99 @@
     {/if}
 
     <!-- Users Table -->
-    <div class="bg-white shadow rounded">
-        <table class="w-full">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-4 py-2 text-left">ID</th>
-                    <th class="px-4 py-2 text-left">Email</th>
-                    <th class="px-4 py-2 text-left">Name</th>
-                    <th class="px-4 py-2 text-left">Role</th>
-                    <th class="px-4 py-2 text-left">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {#each users as user}
-                    <tr class="border-t hover:bg-gray-50">
-                        <td class="px-4 py-2">{user.id}</td>
-                        <td class="px-4 py-2">{user.email}</td>
-                        <td class="px-4 py-2">{user.name || "Empty"}</td>
-                        <td class="px-4 py-2">
-                            <span
-                                class="px-2 py-1 text-xs rounded-full {user.role
-                                    ?.name === 'super_admin'
-                                    ? 'bg-purple-100 text-purple-800'
-                                    : user.role?.name === 'admin'
-                                      ? 'bg-blue-100 text-blue-800'
-                                      : 'bg-green-100 text-green-800'}"
+    <div class="bg-white shadow rounded overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >ID</th
+                        >
+                        <th
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >Email</th
+                        >
+                        <th
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >Name</th
+                        >
+                        <th
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >Role</th
+                        >
+                        <th
+                            class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                            >Actions</th
+                        >
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {#each users as user}
+                        <tr class="hover:bg-gray-50">
+                            <td
+                                class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
+                                >{user.id}</td
                             >
-                                {user.role?.name || user.role_id || "Unknown"}
-                            </span>
-                        </td>
-                        <td class="px-4 py-2">
-                            <div class="flex gap-2">
-                                <button
-                                    on:click={() => editUser(user)}
-                                    class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                                    disabled={!canManageUsers}
+                            <td
+                                class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
+                                >{user.email}</td
+                            >
+                            <td
+                                class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
+                                >{user.name || "Empty"}</td
+                            >
+                            <td
+                                class="px-4 py-2 whitespace-nowrap text-sm text-gray-900"
+                            >
+                                <span
+                                    class="px-2 py-1 text-xs rounded-full {user
+                                        .role?.name === 'super_admin'
+                                        ? 'bg-purple-100 text-purple-800'
+                                        : user.role?.name === 'admin'
+                                          ? 'bg-blue-100 text-blue-800'
+                                          : 'bg-green-100 text-green-800'}"
                                 >
-                                    Edit
-                                </button>
-                                <button
-                                    on:click={() => confirmDelete(user)}
-                                    class="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                                    disabled={!canManageUsers ||
-                                        user.id === currentUser.id}
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                {:else}
-                    <tr class="bg-red-100">
-                        <td colspan="5" class="px-4 py-2 text-center">
-                            No users found
-                        </td>
-                    </tr>
-                {/each}
-            </tbody>
-        </table>
+                                    {user.role?.name ||
+                                        user.role_id ||
+                                        "Unknown"}
+                                </span>
+                            </td>
+                            <td
+                                class="px-4 py-2 whitespace-nowrap text-sm font-medium"
+                            >
+                                <div class="flex gap-2">
+                                    <button
+                                        on:click={() => editUser(user)}
+                                        class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                        disabled={!canManageUsers}
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        on:click={() => confirmDelete(user)}
+                                        class="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                        disabled={!canManageUsers ||
+                                            user.id === currentUser.id}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {:else}
+                        <tr class="bg-red-100">
+                            <td
+                                colspan="5"
+                                class="px-4 py-2 text-center text-sm text-gray-900"
+                            >
+                                No users found
+                            </td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

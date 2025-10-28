@@ -816,7 +816,7 @@
     {#if canManageSHU}
         <!-- Admin/Super Admin View: SHU Records Management -->
         <div class="bg-white rounded-lg shadow">
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
                 <h2 class="text-xl font-semibold">Daftar Laporan SHU</h2>
             </div>
 
@@ -966,7 +966,7 @@
         <!-- Member View: Personal SHU History -->
         <div class="bg-white rounded-lg shadow">
             <div
-                class="p-6 border-b border-gray-200 flex justify-between items-center"
+                class="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center"
             >
                 <div>
                     <h2 class="text-xl font-semibold">Riwayat SHU Saya</h2>
@@ -979,14 +979,14 @@
                         on:click={() => {
                             showUserSaveModal = true;
                         }}
-                        class="px-3 py-1 text-sm bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-md transition-colors"
+                        class="px-3 py-2 sm:py-1 text-sm bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-md transition-colors"
                         disabled={savingUserSHU}
                     >
                         💾 Simpan SHU
                     </button>
                     <button
                         on:click={refreshUserData}
-                        class="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                        class="px-3 py-2 sm:py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
                     >
                         🔄 Refresh
                     </button>
@@ -1181,13 +1181,13 @@
         <div
             class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         >
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold">Generate Laporan SHU</h3>
             </div>
 
             <form
                 on:submit|preventDefault={generateSHUReport}
-                class="p-6 space-y-4"
+                class="p-4 sm:p-6 space-y-4"
             >
                 <div>
                     <label
@@ -1225,17 +1225,17 @@
                     />
                 </div>
 
-                <div class="flex justify-end space-x-3 pt-4">
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
                     <button
                         type="button"
                         on:click={closeModals}
-                        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                        class="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
                     >
                         Batal
                     </button>
                     <button
                         type="submit"
-                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        class="w-full sm:w-auto px-4 py-3 sm:py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
                     >
                         Generate
                     </button>
@@ -1244,12 +1244,12 @@
 
             <!-- Generated Report Display -->
             {#if generatedReport}
-                <div class="p-6 border-t border-gray-200 bg-gray-50">
+                <div class="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
                     <h4 class="text-lg font-semibold mb-4">
                         Hasil Generate SHU
                     </h4>
 
-                    <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <p class="text-sm text-gray-600">Tahun</p>
                             <p class="font-semibold">{generatedReport.tahun}</p>
@@ -1400,7 +1400,7 @@
         <div
             class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto"
         >
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold">Generate SHU Otomatis</h3>
                 <p class="text-sm text-gray-600 mt-1">
                     Masukkan data keuangan untuk perhitungan SHU otomatis
@@ -1409,9 +1409,9 @@
 
             <form
                 on:submit|preventDefault={generateAutoSHUReport}
-                class="p-6 space-y-4"
+                class="p-4 sm:p-6 space-y-4"
             >
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
                     <div>
                         <label
                             for="tahun_auto"
@@ -1513,17 +1513,17 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end space-x-3 pt-4">
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
                     <button
                         type="button"
                         on:click={closeModals}
-                        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                        class="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
                     >
                         Batal
                     </button>
                     <button
                         type="submit"
-                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                        class="w-full sm:w-auto px-4 py-3 sm:py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
                     >
                         Generate Otomatis
                     </button>
@@ -1532,12 +1532,12 @@
 
             <!-- Auto Generated Report Display -->
             {#if autoGeneratedReport}
-                <div class="p-6 border-t border-gray-200 bg-green-50">
+                <div class="p-4 sm:p-6 border-t border-gray-200 bg-green-50">
                     <h4 class="text-lg font-semibold mb-4">
                         🎉 Hasil Generate SHU Otomatis
                     </h4>
 
-                    <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <p class="text-sm text-gray-600">Tahun</p>
                             <p class="font-semibold">
@@ -1599,7 +1599,7 @@
                     <div class="mb-4">
                         <h5 class="font-semibold mb-2">Detail Keuangan:</h5>
                         <div
-                            class="grid grid-cols-2 gap-2 text-sm bg-white p-3 rounded"
+                            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 text-sm bg-white p-3 rounded"
                         >
                             <div class="flex justify-between">
                                 <span class="text-green-700"
@@ -1759,7 +1759,7 @@
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
     >
         <div class="bg-white rounded-lg max-w-md w-full">
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold">Generate SHU Pribadi</h3>
                 <p class="text-sm text-gray-600 mt-1">
                     Generate laporan SHU berdasarkan aktivitas simpan-pinjam
@@ -1767,7 +1767,7 @@
                 </p>
             </div>
 
-            <div class="p-6">
+            <div class="p-4 sm:p-6">
                 <div class="mb-4 p-4 bg-purple-50 rounded-lg">
                     <h5 class="font-semibold text-purple-800 mb-2">
                         Informasi
@@ -1785,18 +1785,18 @@
                     </ul>
                 </div>
 
-                <div class="flex justify-end space-x-3">
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
                     <button
                         type="button"
                         on:click={closeModals}
-                        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                        class="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
                     >
                         Batal
                     </button>
                     <button
                         type="button"
                         on:click={generateUserSHU}
-                        class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+                        class="w-full sm:w-auto px-4 py-3 sm:py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
                     >
                         Generate SHU Saya
                     </button>
@@ -1812,14 +1812,14 @@
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
     >
         <div class="bg-white rounded-lg max-w-md w-full">
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold">Simpan SHU Pribadi</h3>
                 <p class="text-sm text-gray-600 mt-1">
                     Simpan laporan SHU Anda ke dalam database
                 </p>
             </div>
 
-            <div class="p-6">
+            <div class="p-4 sm:p-6">
                 <div class="mb-4">
                     <label
                         for="userSaveTahun"
@@ -1857,11 +1857,11 @@
                     </ul>
                 </div>
 
-                <div class="flex justify-end space-x-3">
+                <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
                     <button
                         type="button"
                         on:click={closeModals}
-                        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+                        class="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
                         disabled={savingUserSHU}
                     >
                         Batal
@@ -1874,7 +1874,7 @@
                             savingUserSHU = false;
                             closeModals();
                         }}
-                        class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors disabled:opacity-50"
+                        class="w-full sm:w-auto px-4 py-3 sm:py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors disabled:opacity-50"
                         disabled={savingUserSHU || !userSaveTahun}
                     >
                         {savingUserSHU ? "Menyimpan..." : "Simpan SHU"}
@@ -1893,14 +1893,14 @@
         <div
             class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
         >
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-4 sm:p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold">
                     Detail Laporan SHU {selectedSHU.tahun}
                 </h3>
             </div>
 
-            <div class="p-6 space-y-6">
-                <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 sm:p-6 space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
                     <div>
                         <p class="text-sm text-gray-600">Tahun</p>
                         <p class="font-semibold">{selectedSHU.tahun}</p>
@@ -1936,7 +1936,7 @@
                             Detail Perhitungan
                         </h4>
 
-                        <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mb-6">
                             <div>
                                 <p class="text-sm text-gray-600">
                                     Persentase Jasa Modal

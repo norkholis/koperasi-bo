@@ -503,11 +503,13 @@
     <title>Pinjaman - Koperasi Backoffice</title>
 </svelte:head>
 
-<div class="p-6">
+<div class="p-4 sm:p-6">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-4">
-            <h1 class="text-2xl font-bold">
+    <div
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4"
+    >
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <h1 class="text-xl sm:text-2xl font-bold">
                 {isMember ? "Pinjaman Saya" : "Manajemen Pinjaman"}
             </h1>
             {#if selectedUserId && isAdmin}
@@ -539,12 +541,14 @@
     <!-- Member Dashboard -->
     {#if isMember || selectedUserId}
         <div class="mb-8">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-semibold">Pinjaman Aktif</h2>
+            <div
+                class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3"
+            >
+                <h2 class="text-lg sm:text-xl font-semibold">Pinjaman Aktif</h2>
                 {#if isMember}
                     <button
                         on:click={openLoanRequestModal}
-                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                        class="w-full sm:w-auto bg-blue-500 text-white px-4 py-3 sm:py-2 rounded hover:bg-blue-600 transition-colors"
                     >
                         Ajukan Pinjaman
                     </button>
@@ -656,117 +660,30 @@
 
         <!-- All Loans History -->
         <div class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">Riwayat Pinjaman</h2>
+            <h2 class="text-lg sm:text-xl font-semibold mb-4">
+                Riwayat Pinjaman
+            </h2>
 
             <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Kode</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Jumlah</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Tenor</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Status</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Tanggal</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Aksi</th
-                            >
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {#each loans as loan}
-                            <tr class="hover:bg-gray-50">
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                                >
-                                    {loan.kode_pinjaman}
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                >
-                                    {formatCurrency(loan.jumlah_pinjaman)}
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                >
-                                    {loan.lama_bulan} bulan
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 py-1 text-xs rounded-full border {getStatusColor(
-                                            loan.status,
-                                        )}"
-                                    >
-                                        {getStatusText(loan.status)}
-                                    </span>
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                >
-                                    {formatDate(loan.created_at)}
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                >
-                                    <button
-                                        on:click={() =>
-                                            openLoanDetailModal(loan)}
-                                        class="text-blue-600 hover:text-blue-900 mr-2"
-                                    >
-                                        Detail
-                                    </button>
-                                </td>
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    {/if}
-
-    <!-- Admin Dashboard -->
-    {#if isAdmin && !selectedUserId}
-        <!-- Pending Approvals -->
-        {#if pendingInstallments.length > 0}
-            <div class="mb-8">
-                <h2 class="text-xl font-semibold mb-4">
-                    Angsuran Menunggu Verifikasi
-                </h2>
-
-                <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >User</th
+                                    >Kode</th
                                 >
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Pinjaman</th
+                                    >Jumlah</th
                                 >
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Angsuran Ke</th
+                                    >Tenor</th
                                 >
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Total</th
+                                    >Status</th
                                 >
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -779,77 +696,173 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            {#each pendingInstallments as installment}
+                            {#each loans as loan}
                                 <tr class="hover:bg-gray-50">
                                     <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                     >
-                                        {installment.user?.name ||
-                                            installment.user?.email ||
-                                            `User #${installment.user_id}`}
+                                        {loan.kode_pinjaman}
                                     </td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                     >
-                                        {installment.pinjaman?.kode_pinjaman ||
-                                            `#${installment.pinjaman_id}`}
+                                        {formatCurrency(loan.jumlah_pinjaman)}
                                     </td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                     >
-                                        {installment.angsuran_ke}
+                                        {loan.lama_bulan} bulan
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="px-2 py-1 text-xs rounded-full border {getStatusColor(
+                                                loan.status,
+                                            )}"
+                                        >
+                                            {getStatusText(loan.status)}
+                                        </span>
                                     </td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                     >
-                                        {formatCurrency(
-                                            installment.total_bayar,
-                                        )}
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        {formatDate(installment.tanggal_bayar)}
+                                        {formatDate(loan.created_at)}
                                     </td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap text-sm font-medium"
                                     >
-                                        <div class="flex gap-2">
-                                            <button
-                                                on:click={() =>
-                                                    openInstallmentDetailModal(
-                                                        installment,
-                                                    )}
-                                                class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                                            >
-                                                Detail
-                                            </button>
-                                            <button
-                                                on:click={() =>
-                                                    verifyInstallment(
-                                                        installment.id,
-                                                        "verified",
-                                                    )}
-                                                class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                                            >
-                                                Verifikasi
-                                            </button>
-                                            <button
-                                                on:click={() =>
-                                                    verifyInstallment(
-                                                        installment.id,
-                                                        "kurang",
-                                                    )}
-                                                class="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
-                                            >
-                                                Kurang
-                                            </button>
-                                        </div>
+                                        <button
+                                            on:click={() =>
+                                                openLoanDetailModal(loan)}
+                                            class="text-blue-600 hover:text-blue-900 mr-2"
+                                        >
+                                            Detail
+                                        </button>
                                     </td>
                                 </tr>
                             {/each}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    <!-- Admin Dashboard -->
+    {#if isAdmin && !selectedUserId}
+        <!-- Pending Approvals -->
+        {#if pendingInstallments.length > 0}
+            <div class="mb-8">
+                <h2 class="text-lg sm:text-xl font-semibold mb-4">
+                    Angsuran Menunggu Verifikasi
+                </h2>
+
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >User</th
+                                    >
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >Pinjaman</th
+                                    >
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >Angsuran Ke</th
+                                    >
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >Total</th
+                                    >
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >Tanggal</th
+                                    >
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >Aksi</th
+                                    >
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {#each pendingInstallments as installment}
+                                    <tr class="hover:bg-gray-50">
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                        >
+                                            {installment.user?.name ||
+                                                installment.user?.email ||
+                                                `User #${installment.user_id}`}
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                        >
+                                            {installment.pinjaman
+                                                ?.kode_pinjaman ||
+                                                `#${installment.pinjaman_id}`}
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                        >
+                                            {installment.angsuran_ke}
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                        >
+                                            {formatCurrency(
+                                                installment.total_bayar,
+                                            )}
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                        >
+                                            {formatDate(
+                                                installment.tanggal_bayar,
+                                            )}
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                                        >
+                                            <div class="flex gap-2">
+                                                <button
+                                                    on:click={() =>
+                                                        openInstallmentDetailModal(
+                                                            installment,
+                                                        )}
+                                                    class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                                >
+                                                    Detail
+                                                </button>
+                                                <button
+                                                    on:click={() =>
+                                                        verifyInstallment(
+                                                            installment.id,
+                                                            "verified",
+                                                        )}
+                                                    class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                                >
+                                                    Verifikasi
+                                                </button>
+                                                <button
+                                                    on:click={() =>
+                                                        verifyInstallment(
+                                                            installment.id,
+                                                            "kurang",
+                                                        )}
+                                                    class="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+                                                >
+                                                    Kurang
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/each}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         {/if}
@@ -859,128 +872,228 @@
             <h2 class="text-xl font-semibold mb-4">Semua Pinjaman</h2>
 
             <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Kode</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >User</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Jumlah</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Status</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Sisa</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Tanggal</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Aksi</th
-                            >
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {#each loans as loan}
-                            <tr class="hover:bg-gray-50">
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                <!-- Desktop Table -->
+                <div class="hidden md:block overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >Kode</th
                                 >
-                                    {loan.kode_pinjaman}
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >User</th
                                 >
-                                    {loan.user?.name ||
-                                        loan.user?.email ||
-                                        `User #${loan.user_id}`}
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >Jumlah</th
                                 >
-                                    {formatCurrency(loan.jumlah_pinjaman)}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 py-1 text-xs rounded-full border {getStatusColor(
-                                            loan.status,
-                                        )}"
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >Status</th
+                                >
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >Sisa</th
+                                >
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >Tanggal</th
+                                >
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >Aksi</th
+                                >
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {#each loans as loan}
+                                <tr class="hover:bg-gray-50">
+                                    <td
+                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                     >
-                                        {getStatusText(loan.status)}
-                                    </span>
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                        {loan.kode_pinjaman}
+                                    </td>
+                                    <td
+                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                    >
+                                        {loan.user?.name ||
+                                            loan.user?.email ||
+                                            `User #${loan.user_id}`}
+                                    </td>
+                                    <td
+                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                    >
+                                        {formatCurrency(loan.jumlah_pinjaman)}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span
+                                            class="px-2 py-1 text-xs rounded-full border {getStatusColor(
+                                                loan.status,
+                                            )}"
+                                        >
+                                            {getStatusText(loan.status)}
+                                        </span>
+                                    </td>
+                                    <td
+                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                    >
+                                        {loan.sisa_angsuran}
+                                    </td>
+                                    <td
+                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                    >
+                                        {formatDate(loan.created_at)}
+                                    </td>
+                                    <td
+                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                                    >
+                                        <div class="flex gap-2">
+                                            {#if loan.status === "proses"}
+                                                <button
+                                                    on:click={() =>
+                                                        updateLoanStatus(
+                                                            loan.id,
+                                                            "disetujui",
+                                                        )}
+                                                    class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                                >
+                                                    Setujui
+                                                </button>
+                                                <button
+                                                    on:click={() =>
+                                                        updateLoanStatus(
+                                                            loan.id,
+                                                            "macet",
+                                                        )}
+                                                    class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                                >
+                                                    Tolak
+                                                </button>
+                                            {/if}
+                                            <button
+                                                on:click={() =>
+                                                    openLoanDetailModal(loan)}
+                                                class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                            >
+                                                Detail
+                                            </button>
+                                            <button
+                                                on:click={() =>
+                                                    viewUserLoans(loan)}
+                                                disabled={isNavigating}
+                                                class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {#if isNavigating}
+                                                    Loading...
+                                                {:else}
+                                                    Lihat Detail
+                                                {/if}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/each}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Card View -->
+                <div class="md:hidden divide-y divide-gray-200">
+                    {#each loans as loan}
+                        <div class="p-4 bg-white hover:bg-gray-50">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h3
+                                        class="text-sm font-medium text-gray-900"
+                                    >
+                                        {loan.kode_pinjaman}
+                                    </h3>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        {loan.user?.name ||
+                                            loan.user?.email ||
+                                            `User #${loan.user_id}`}
+                                    </p>
+                                    <p
+                                        class="text-lg font-semibold text-blue-600 mt-1"
+                                    >
+                                        {formatCurrency(loan.jumlah_pinjaman)}
+                                    </p>
+                                </div>
+                                <span
+                                    class="px-2 py-1 text-xs rounded-full border {getStatusColor(
+                                        loan.status,
+                                    )}"
                                 >
-                                    {loan.sisa_angsuran}
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                >
+                                    {getStatusText(loan.status)}
+                                </span>
+                            </div>
+
+                            <div
+                                class="grid grid-cols-2 gap-3 text-sm text-gray-600 mb-4"
+                            >
+                                <div>
+                                    <span class="font-medium"
+                                        >Sisa angsuran:</span
+                                    >
+                                    {loan.sisa_angsuran} kali
+                                </div>
+                                <div>
+                                    <span class="font-medium">Tanggal:</span>
                                     {formatDate(loan.created_at)}
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                >
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                {#if loan.status === "proses"}
                                     <div class="flex gap-2">
-                                        {#if loan.status === "proses"}
-                                            <button
-                                                on:click={() =>
-                                                    updateLoanStatus(
-                                                        loan.id,
-                                                        "disetujui",
-                                                    )}
-                                                class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                                            >
-                                                Setujui
-                                            </button>
-                                            <button
-                                                on:click={() =>
-                                                    updateLoanStatus(
-                                                        loan.id,
-                                                        "macet",
-                                                    )}
-                                                class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                                            >
-                                                Tolak
-                                            </button>
-                                        {/if}
                                         <button
                                             on:click={() =>
-                                                openLoanDetailModal(loan)}
-                                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                                updateLoanStatus(
+                                                    loan.id,
+                                                    "disetujui",
+                                                )}
+                                            class="flex-1 px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm"
                                         >
-                                            Detail
+                                            ✓ Setujui
                                         </button>
                                         <button
-                                            on:click={() => viewUserLoans(loan)}
-                                            disabled={isNavigating}
-                                            class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            on:click={() =>
+                                                updateLoanStatus(
+                                                    loan.id,
+                                                    "macet",
+                                                )}
+                                            class="flex-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
                                         >
-                                            {#if isNavigating}
-                                                Loading...
-                                            {:else}
-                                                Lihat Detail
-                                            {/if}
+                                            ✗ Tolak
                                         </button>
                                     </div>
-                                </td>
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
+                                {/if}
+                                <div class="flex gap-2">
+                                    <button
+                                        on:click={() =>
+                                            openLoanDetailModal(loan)}
+                                        class="flex-1 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+                                    >
+                                        Detail
+                                    </button>
+                                    <button
+                                        on:click={() => viewUserLoans(loan)}
+                                        disabled={isNavigating}
+                                        class="flex-1 px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                    >
+                                        {#if isNavigating}
+                                            Loading...
+                                        {:else}
+                                            Lihat Detail
+                                        {/if}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {/each}
+                </div>
             </div>
         </div>
     {/if}
@@ -1485,7 +1598,10 @@
                     </button>
                     <button
                         on:click={() =>
-                            verifyInstallment(selectedInstallment?.id || 0, "kurang")}
+                            verifyInstallment(
+                                selectedInstallment?.id || 0,
+                                "kurang",
+                            )}
                         class="flex-1 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
                     >
                         Kurang
