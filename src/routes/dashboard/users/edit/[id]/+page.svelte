@@ -2,6 +2,7 @@
     import type { User, Role } from "$lib/types";
     import { goto } from "$app/navigation";
     import { enhance } from "$app/forms";
+    import { showSuccess, showError } from "$lib/stores/notifications";
 
     export let data;
 
@@ -25,10 +26,10 @@
             isSubmitting = false;
             if (result.type === "success") {
                 if (result.data?.success) {
-                    alert("User updated successfully!");
+                    showSuccess("User updated successfully!");
                     goto("/dashboard/users");
                 } else {
-                    alert(result.data?.message || "Failed to update user");
+                    showError(result.data?.message || "Failed to update user");
                 }
             }
         };

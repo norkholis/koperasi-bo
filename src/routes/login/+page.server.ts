@@ -1,5 +1,6 @@
 import type { Actions } from './$types';
 import axios from '$lib/api';
+import { extractErrorMessage } from '$lib/errorUtils';
 
 export const actions: Actions = {
     default: async ({ request, cookies }) => {
@@ -18,7 +19,9 @@ export const actions: Actions = {
             });
             return { token }; // akan dibaca di +page.svelte
         } catch (e: any) {
-            return { error: e.response?.data?.error || 'Login gagal' };
+            // Use the new error extraction utility
+            const errorMessage = extractErrorMessage(e);
+            return { error: errorMessage };
         }
     }
 };

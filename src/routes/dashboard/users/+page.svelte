@@ -4,6 +4,8 @@
     import { page } from "$app/stores";
     import axios from "$lib/api";
     import { onMount } from "svelte";
+    import { extractErrorMessage } from "$lib/errorUtils";
+    import { showSuccess, showError } from "$lib/stores/notifications";
 
     export let data;
     // Handle both server load format and API response format
@@ -124,19 +126,12 @@
             userToEdit = null;
 
             // Show success message
-            successMessage = "User berhasil diperbarui!";
-            showSuccessMessage = true;
-            setTimeout(() => {
-                showSuccessMessage = false;
-            }, 5000);
+            showSuccess("User berhasil diperbarui!");
         } catch (error: any) {
             console.error("Error updating user:", error);
             console.error("Error response:", error.response);
-            const errorMessage =
-                error.response?.data?.message ||
-                error.message ||
-                "Failed to update user";
-            alert(`Error: ${errorMessage}`);
+            const errorMessage = extractErrorMessage(error);
+            showError(errorMessage, "Update Failed");
         }
     }
 
@@ -164,14 +159,11 @@
             userToDelete = null;
 
             // Show success message
-            successMessage = "User berhasil dihapus!";
-            showSuccessMessage = true;
-            setTimeout(() => {
-                showSuccessMessage = false;
-            }, 5000);
-        } catch (error) {
+            showSuccess("User berhasil dihapus!");
+        } catch (error: any) {
             console.error("Error deleting user:", error);
-            alert("Gagal menghapus user. Silakan coba lagi.");
+            const errorMessage = extractErrorMessage(error);
+            showError(errorMessage, "Delete Failed");
         }
     }
 </script>

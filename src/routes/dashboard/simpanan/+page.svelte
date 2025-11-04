@@ -10,6 +10,11 @@
     import axios from "$lib/api";
     import { onMount } from "svelte";
     import WalletDebugger from "$lib/components/WalletDebugger.svelte";
+    import {
+        showSuccess,
+        showError,
+        showWarning,
+    } from "$lib/stores/notifications";
 
     export let data;
 
@@ -246,7 +251,7 @@
             showTransactionHistoryModal = true;
         } catch (error) {
             console.error("❌ Error loading transaction history:", error);
-            alert("Gagal memuat riwayat transaksi");
+            showError("Gagal memuat riwayat transaksi");
         }
     }
 
@@ -294,7 +299,7 @@
             }, 1000);
         } catch (error: any) {
             console.error("Error requesting topup:", error);
-            alert(
+            showError(
                 `Gagal mengajukan top-up: ${error.response?.data?.message || error.message}`,
             );
         }
@@ -304,7 +309,7 @@
     async function adjustWalletBalance() {
         if (!selectedWallet) {
             console.error("No wallet selected for adjustment");
-            alert("Tidak ada wallet yang dipilih");
+            showError("Tidak ada wallet yang dipilih");
             return;
         }
 
@@ -314,7 +319,7 @@
         if (!walletId) {
             console.error("Selected wallet has no ID:", selectedWallet);
             console.error("Available fields:", Object.keys(selectedWallet));
-            alert("Wallet ID tidak ditemukan. Check console for details.");
+            showError("Wallet ID tidak ditemukan. Check console for details.");
             return;
         }
 
@@ -350,7 +355,7 @@
         } catch (error: any) {
             console.error("Error adjusting wallet balance:", error);
             console.error("Error details:", error.response?.data);
-            alert(
+            showError(
                 `Gagal menyesuaikan saldo: ${error.response?.data?.message || error.message}`,
             );
         }
@@ -381,7 +386,7 @@
             }
         } catch (error: any) {
             console.error("Error verifying transaction:", error);
-            alert(
+            showError(
                 `Gagal memverifikasi transaksi: ${error.response?.data?.message || error.message}`,
             );
         }

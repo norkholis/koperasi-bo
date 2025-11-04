@@ -9,6 +9,11 @@
     import { invalidateAll, goto } from "$app/navigation";
     import axios from "$lib/api";
     import { onMount } from "svelte";
+    import {
+        showSuccess,
+        showError,
+        showWarning,
+    } from "$lib/stores/notifications";
 
     export let data;
 
@@ -257,7 +262,7 @@
             showLoanDetailModal = true;
         } catch (error) {
             console.error("❌ Error loading loan installments:", error);
-            alert("Gagal memuat detail pinjaman");
+            showError("Gagal memuat detail pinjaman");
         }
     }
 
@@ -344,7 +349,7 @@
             showSuccessNotification("Pengajuan pinjaman berhasil dikirim!");
         } catch (error: any) {
             console.error("Error requesting loan:", error);
-            alert(
+            showError(
                 `Gagal mengajukan pinjaman: ${error.response?.data?.message || error.message}`,
             );
         }
@@ -353,7 +358,7 @@
     // Installment operations (Members)
     async function submitInstallment() {
         if (!selectedLoan) {
-            alert("Pinjaman tidak ditemukan");
+            showError("Pinjaman tidak ditemukan");
             return;
         }
 
@@ -394,7 +399,7 @@
         } catch (error: any) {
             console.error("❌ Error submitting installment:", error);
             console.error("❌ Error response:", error.response?.data);
-            alert(
+            showError(
                 `Gagal mengirim angsuran: ${error.response?.data?.message || error.message}`,
             );
         }
@@ -435,7 +440,7 @@
             );
         } catch (error: any) {
             console.error("Error updating loan status:", error);
-            alert(
+            showError(
                 `Gagal memproses pinjaman: ${error.response?.data?.message || error.message}`,
             );
         }
@@ -468,7 +473,7 @@
             );
         } catch (error: any) {
             console.error("Error verifying installment:", error);
-            alert(
+            showError(
                 `Gagal memverifikasi angsuran: ${error.response?.data?.message || error.message}`,
             );
         }

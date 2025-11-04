@@ -1,6 +1,8 @@
 import Axios from 'axios';
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
+import { extractErrorMessage, isErrorResponse } from './errorUtils';
+import { showError } from '$lib/stores/notifications';
 
 const axios = Axios.create({
     baseURL: import.meta.env.PUBLIC_API_URL,
@@ -12,10 +14,28 @@ axios.interceptors.request.use((config) => {
     const isServer = !browser;
     const timestamp = new Date().toISOString();
 
-    // Add token
+    // Add token and sync between localStorage and cookies
     if (browser) {
-        const t = localStorage.getItem('token');
-        if (t) config.headers.Authorization = `Bearer ${t}`;
+        const tokenFromStorage = localStorage.getItem('token');
+        const tokenFromCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('token='))
+            ?.split('=')[1];
+
+        const token = tokenFromStorage || tokenFromCookie;
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+
+            // Sync tokens if they exist
+            if (tokenFromStorage && !tokenFromCookie) {
+                // Set cookie from localStorage
+                document.cookie = `token=${tokenFromStorage}; path=/; max-age=${60 * 60 * 24}`;
+            } else if (tokenFromCookie && !tokenFromStorage) {
+                // Set localStorage from cookie
+                localStorage.setItem("token", tokenFromCookie);
+            }
+        }
     }
 
     // Enhanced logging
@@ -47,6 +67,26 @@ axios.interceptors.response.use(
         console.log('📊 Response Data:', res.data);
         console.log('─'.repeat(50));
 
+        // Check if response has error format or non-200 status
+        if (isErrorResponse(res)) {
+            const timestamp = new Date().toISOString();
+            console.error(`🌐 [${isServer ? 'SERVER' : 'CLIENT'}] ${timestamp}`);
+            console.error(`❌ API Error ${res.status} ${res.config.method?.toUpperCase()} ${res.config.url}`);
+            console.error('💥 Error Response:', res.data);
+            console.error('─'.repeat(50));
+
+            // Extract error message using utility function
+            const errorMessage = extractErrorMessage({ response: res });
+
+            // Create a proper error object
+            const error = new Error(errorMessage);
+            (error as any).response = res;
+            (error as any).status = res.status;
+            (error as any).data = res.data;
+
+            return Promise.reject(error);
+        }
+
         return res;
     },
     (err) => {
@@ -60,7 +100,13 @@ axios.interceptors.response.use(
 
         if (err.response?.status === 401 && browser) {
             localStorage.removeItem('token');
+            document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            showError('Session expired. Please login again.', 'Authentication Error');
             goto('/login');
+        } else if (browser) {
+            // Show error notification for other errors
+            const errorMessage = extractErrorMessage(err);
+            showError(errorMessage, 'Request Failed');
         }
         return Promise.reject(err);
     }

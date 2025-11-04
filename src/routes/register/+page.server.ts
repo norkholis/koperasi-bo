@@ -1,6 +1,7 @@
 import type { Actions } from './$types';
 import axios from '$lib/api';
 import { redirect } from '@sveltejs/kit';
+import { extractErrorMessage } from '$lib/errorUtils';
 
 export const actions: Actions = {
     default: async ({ request }) => {
@@ -15,8 +16,10 @@ export const actions: Actions = {
             await axios.post('/register', payload);
             throw redirect(303, '/login?registered=true');
         } catch (e: any) {
+            // Use the new error extraction utility
+            const errorMessage = extractErrorMessage(e);
             return {
-                error: e.response?.data?.error || 'Registrasi gagal',
+                error: errorMessage,
                 values: { email: payload.email, role_id: payload.role_id }
             };
         }
