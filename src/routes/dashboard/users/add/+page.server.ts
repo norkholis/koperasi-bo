@@ -53,34 +53,86 @@ export const actions: Actions = {
         }
 
         try {
-            await axios.post('/users', payload);
+            console.log('🚀 Making API request to create user...');
+            const response = await axios.post('/users', payload);
+            console.log('✅ API Response Status:', response.status);
+            console.log('✅ API Response Data:', response.data);
+            
+            // Check for successful response (2xx status codes)
+            if (response.status >= 200 && response.status < 300) {
+                if (response.data?.data) {
+                    const newUser = response.data.data;
+                    console.log('👤 New user created with ID:', newUser.id, 'Email:', newUser.email);
+                } else {
+                    console.log('✅ User created successfully (no data field in response)');
+                }
+                
+                // Successful creation - redirect with success message
+                throw redirect(303, '/dashboard/users?success=User berhasil ditambahkan');
+            } else {
+                // This shouldn't happen since axios would throw for non-2xx
+                console.warn('⚠️ Unexpected response status:', response.status);
+                throw redirect(303, '/dashboard/users?success=User berhasil ditambahkan');
+            }
         } catch (error: any) {
-            console.error('Add user error:', error.response?.data);
+            // Check if this is a redirect (success case)
+            if (error.status === 303) {
+                throw error; // Re-throw the redirect
+            }
+            
+            console.error('❌ Add user error:', error.response?.data);
+            console.error('🔍 Full error object:', error);
+            console.log('📊 Error status:', error.response?.status);
 
-            // Handle specific database errors
+            // Handle specific API errors based on new response format
             let errorMessage = 'Gagal menambahkan user';
 
-            if (error.response?.data?.error) {
-                const dbError = error.response.data.error;
-
-                // Handle duplicate NIK constraint
-                if (dbError.includes('duplicate key value violates unique constraint "uni_users_nik"')) {
+            // Check for specific status codes
+            if (error.response?.status === 409) {
+                // 409 Conflict - typically means duplicate resource
+                errorMessage = 'Email sudah terdaftar dalam sistem. Silakan gunakan email yang berbeda.';
+            }
+            else if (error.response?.data?.error) {
+                const apiError = error.response.data.error;
+                console.log('🔍 API Error received:', apiError);
+                
+                // Handle specific error messages from the new API format
+                if (apiError === 'NIK already exists') {
                     errorMessage = 'NIK sudah terdaftar dalam sistem. Silakan gunakan NIK yang berbeda.';
                 }
-                // Handle duplicate email constraint
-                else if (dbError.includes('duplicate key') && dbError.includes('email')) {
+                else if (apiError === 'Email already exists' || apiError.includes('email already') || apiError.includes('Email already')) {
                     errorMessage = 'Email sudah terdaftar dalam sistem. Silakan gunakan email yang berbeda.';
                 }
-                // Handle other specific errors
-                else if (error.response.data.message) {
-                    errorMessage = error.response.data.message;
+                else if (apiError === 'Invalid role' || apiError.includes('role')) {
+                    errorMessage = 'Role yang dipilih tidak valid.';
+                }
+                else if (apiError.includes('password')) {
+                    errorMessage = 'Password tidak memenuhi kriteria. Minimal 6 karakter.';
+                }
+                else if (apiError.includes('validation')) {
+                    errorMessage = 'Data yang dikirim tidak valid. Silakan periksa kembali form.';
+                }
+                else {
+                    // Use the error message as-is for other cases, but make it user-friendly
+                    errorMessage = `Gagal membuat user: ${apiError}`;
                 }
             }
+            // Fallback for other error formats
+            else if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+            // Handle network or other errors
+            else if (error.message) {
+                errorMessage = `Terjadi kesalahan koneksi: ${error.message}`;
+            }
 
-            return fail(400, { error: errorMessage });
+            console.log('💬 About to return error message:', errorMessage);
+            console.log('🔍 Error response status:', error.response?.status);
+            
+            // Return a simple fail response
+            return fail(400, { 
+                error: errorMessage
+            });
         }
-
-        // If we reach here, the user was created successfully
-        throw redirect(303, '/dashboard/users?success=User berhasil ditambahkan');
     }
 };

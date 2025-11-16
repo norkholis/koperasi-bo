@@ -155,10 +155,27 @@ export const load: PageServerLoad = async ({ parent, url, cookies }) => {
             }
         }
 
+        // Fetch active bunga options for loan forms
+        let activeBungaOptions: any[] = [];
+        try {
+            console.log("📊 Fetching active bunga options");
+            const bungaResponse = await axios.get("/bunga-options", {
+                params: { active: true }
+            });
+            console.log("📦 Raw bunga options response:", bungaResponse.data);
+
+            activeBungaOptions = bungaResponse.data.data || [];
+            console.log("✅ Active bunga options loaded:", activeBungaOptions.length);
+        } catch (error) {
+            console.error("❌ Error fetching bunga options:", error);
+            activeBungaOptions = [];
+        }
+
         console.log("✅ Pinjaman page data loaded successfully");
         console.log("📊 Final data:", {
             loansCount: loans.length,
             pendingInstallmentsCount: pendingInstallments.length,
+            activeBungaOptionsCount: activeBungaOptions.length,
             selectedUserId
         });
 
@@ -166,6 +183,7 @@ export const load: PageServerLoad = async ({ parent, url, cookies }) => {
             currentUser,
             loans,
             pendingInstallments,
+            activeBungaOptions,
             selectedUserId: selectedUserId ? parseInt(selectedUserId) : null
         };
 

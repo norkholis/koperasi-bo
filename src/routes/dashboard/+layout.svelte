@@ -13,6 +13,7 @@
 
     // Mobile menu state
     let showMobileMenu = false;
+    let showPinjamanDropdown = false;
 
     function toggleMobileMenu() {
         showMobileMenu = !showMobileMenu;
@@ -20,6 +21,22 @@
 
     function closeMobileMenu() {
         showMobileMenu = false;
+    }
+
+    function togglePinjamanDropdown() {
+        showPinjamanDropdown = !showPinjamanDropdown;
+    }
+
+    function closePinjamanDropdown() {
+        showPinjamanDropdown = false;
+    }
+
+    // Close dropdown when clicking outside
+    function handleClickOutside(event: MouseEvent) {
+        const target = event.target as HTMLElement;
+        if (!target.closest(".relative")) {
+            showPinjamanDropdown = false;
+        }
     }
 </script>
 
@@ -51,6 +68,14 @@
                     href="/dashboard/pinjaman"
                     class="hover:bg-indigo-600 px-3 py-1 rounded">Pinjaman</a
                 >
+
+                {#if canManageUsers}
+                    <a
+                        href="/dashboard/pinjaman/bunga"
+                        class="hover:bg-indigo-600 px-3 py-1 rounded"
+                        >Kelola Bunga</a
+                    >
+                {/if}
 
                 <a
                     href="/dashboard/shu"
@@ -158,8 +183,18 @@
                         class="block px-3 py-2 rounded-md hover:bg-indigo-600 transition-colors"
                         on:click={closeMobileMenu}
                     >
-                        Pinjaman
+                        Kelola Pinjaman
                     </a>
+
+                    {#if canManageUsers}
+                        <a
+                            href="/dashboard/pinjaman/bunga"
+                            class="block px-3 py-2 rounded-md hover:bg-indigo-600 transition-colors ml-4"
+                            on:click={closeMobileMenu}
+                        >
+                            Kelola Bunga
+                        </a>
+                    {/if}
 
                     <a
                         href="/dashboard/shu"

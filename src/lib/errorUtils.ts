@@ -53,5 +53,10 @@ export function extractErrorMessage(error: any): string {
  * Check if a response should be treated as an error
  */
 export function isErrorResponse(response: any): boolean {
-    return response.status !== 200 || (response.data && response.data.type === 'failure');
+    // Consider only actual error status codes as errors
+    // 2xx status codes are success (200, 201, 202, 204, etc.)
+    const isSuccessStatus = response.status >= 200 && response.status < 300;
+    const hasFailureType = response.data && response.data.type === 'failure';
+    
+    return !isSuccessStatus || hasFailureType;
 }

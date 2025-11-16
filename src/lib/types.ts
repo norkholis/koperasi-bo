@@ -96,6 +96,33 @@ export interface TransactionVerification {
     approve: boolean;
 }
 
+// Bunga Option (Interest Rate) Types
+export interface BungaOption {
+    id: number;
+    nama: string;
+    persen: number;
+    deskripsi: string;
+    is_active: boolean;
+    created_by: number;
+    created_by_user?: {
+        id: number;
+        name: string;
+        email: string;
+    };
+    created_at: string;
+    updated_at?: string;
+}
+
+export interface BungaOptionRequest {
+    nama: string;
+    persen: number;
+    deskripsi: string;
+}
+
+export interface BungaOptionStatusRequest {
+    is_active: boolean;
+}
+
 // Pinjaman (Loan) Types - API Structure
 export interface Pinjaman {
     ID: number;
@@ -130,10 +157,14 @@ export interface Loan {
 
 export interface LoanRequest {
     jumlah_pinjaman: number;
-    bunga_persen: number;
+    bunga_option_id: number;
     lama_bulan: number;
     jumlah_angsuran: number;
     user_id?: number;
+    no_rekening_pencairan: string;
+    bank_name: string;
+    kode_pinjaman?: string;
+    status?: string;
 }
 
 // Angsuran (Installment) Types - API Structure

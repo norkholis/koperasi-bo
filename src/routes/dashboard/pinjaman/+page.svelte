@@ -4,6 +4,7 @@
         Installment,
         LoanRequest,
         InstallmentRequest,
+        BungaOption,
     } from "$lib/types";
     import { page } from "$app/stores";
     import { invalidateAll, goto } from "$app/navigation";
@@ -19,6 +20,7 @@
 
     let loans: Loan[] = data.loans || [];
     let pendingInstallments: Installment[] = data.pendingInstallments || [];
+    let activeBungaOptions: BungaOption[] = data.activeBungaOptions || [];
     const currentUser = data.currentUser;
     const selectedUserId = data.selectedUserId;
 
@@ -91,10 +93,14 @@
     // Form data
     let loanRequestForm: LoanRequest = {
         jumlah_pinjaman: 0,
-        bunga_persen: 2.5,
+        bunga_option_id: 0,
         lama_bulan: 12,
         jumlah_angsuran: 0,
+        no_rekening_pencairan: "",
+        bank_name: "",
     };
+
+    let selectedBungaOption: BungaOption | null = null;
 
     let installmentForm: InstallmentRequest = {
         pinjaman_id: 0,
@@ -196,16 +202,30 @@
     function calculateInstallment() {
         if (
             loanRequestForm.jumlah_pinjaman > 0 &&
-            loanRequestForm.lama_bulan > 0
+            loanRequestForm.lama_bulan > 0 &&
+            selectedBungaOption
         ) {
             const principal =
                 loanRequestForm.jumlah_pinjaman / loanRequestForm.lama_bulan;
             const interest =
-                (loanRequestForm.jumlah_pinjaman *
-                    loanRequestForm.bunga_persen) /
+                (loanRequestForm.jumlah_pinjaman * selectedBungaOption.persen) /
                 100 /
                 loanRequestForm.lama_bulan;
             loanRequestForm.jumlah_angsuran = Math.ceil(principal + interest);
+        }
+    }
+
+    // Handle bunga option selection
+    function onBungaOptionChange() {
+        if (loanRequestForm.bunga_option_id > 0) {
+            selectedBungaOption =
+                activeBungaOptions.find(
+                    (bunga) => bunga.id === loanRequestForm.bunga_option_id,
+                ) || null;
+            calculateInstallment();
+        } else {
+            selectedBungaOption = null;
+            loanRequestForm.jumlah_angsuran = 0;
         }
     }
 
@@ -213,10 +233,13 @@
     function openLoanRequestModal() {
         loanRequestForm = {
             jumlah_pinjaman: 0,
-            bunga_persen: 2.5,
+            bunga_option_id: 0,
             lama_bulan: 12,
             jumlah_angsuran: 0,
+            no_rekening_pencairan: "",
+            bank_name: "",
         };
+        selectedBungaOption = null;
         showLoanRequestModal = true;
     }
 
@@ -330,12 +353,14 @@
         try {
             console.log("📝 Requesting loan:", loanRequestForm);
 
-            // Transform to API format (try PascalCase for interest rate)
+            // Transform to API format using new bunga option structure
             const apiPayload = {
                 jumlah_pinjaman: loanRequestForm.jumlah_pinjaman,
-                BungaPersen: loanRequestForm.bunga_persen, // Try PascalCase
-                bunga_persen: loanRequestForm.bunga_persen, // Also send snake_case
+                bunga_option_id: loanRequestForm.bunga_option_id,
                 lama_bulan: loanRequestForm.lama_bulan,
+                jumlah_angsuran: loanRequestForm.jumlah_angsuran,
+                no_rekening_pencairan: loanRequestForm.no_rekening_pencairan,
+                bank_name: loanRequestForm.bank_name,
             };
 
             console.log("🔄 API Payload:", apiPayload);
@@ -1155,20 +1180,63 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Bunga (%)
+                        Pilih Bunga
                     </label>
-                    <input
-                        type="number"
-                        bind:value={loanRequestForm.bunga_persen}
-                        min="0"
-                        step="0.1"
+                    <select
+                        bind:value={loanRequestForm.bunga_option_id}
+                        on:change={onBungaOptionChange}
                         required
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value={0}>Pilih opsi bunga...</option>
+                        {#each activeBungaOptions as bunga (bunga.id)}
+                            <option value={bunga.id}>
+                                {bunga.nama} - {bunga.persen}%
+                                {#if bunga.deskripsi}
+                                    ({bunga.deskripsi})
+                                {/if}
+                            </option>
+                        {/each}
+                    </select>
+                    {#if selectedBungaOption}
+                        <p class="text-xs text-gray-500 mt-1">
+                            {selectedBungaOption.deskripsi || ""}
+                        </p>
+                    {/if}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        No. Rekening Pencairan
+                    </label>
+                    <input
+                        type="text"
+                        bind:value={loanRequestForm.no_rekening_pencairan}
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Nomor rekening untuk pencairan dana"
                     />
                 </div>
 
-                {#if loanRequestForm.jumlah_pinjaman > 0 && loanRequestForm.lama_bulan > 0}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Nama Bank
+                    </label>
+                    <input
+                        type="text"
+                        bind:value={loanRequestForm.bank_name}
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Nama bank (contoh: Bank BCA)"
+                    />
+                </div>
+
+                {#if loanRequestForm.jumlah_pinjaman > 0 && loanRequestForm.lama_bulan > 0 && selectedBungaOption}
                     <div class="bg-gray-50 p-3 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-2">
+                            <span class="font-medium">Bunga yang dipilih:</span>
+                            {selectedBungaOption.nama} ({selectedBungaOption.persen}%)
+                        </p>
                         <p class="text-sm text-gray-600">
                             <span class="font-medium"
                                 >Estimasi angsuran per bulan:</span

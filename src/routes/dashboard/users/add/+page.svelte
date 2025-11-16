@@ -9,13 +9,51 @@
     const isSuper = currentUser?.role?.name === "super_admin";
 
     let loading = false;
+    let errorMessage = '';
+    let showError = false;
 
     function handleSubmit() {
         loading = true;
+        errorMessage = '';
+        showError = false;
+        
         return async ({ result }: { result: any }) => {
             loading = false;
+            console.log('📥 Form submission result:', result);
+            console.log('📋 Result type:', result.type);
+            console.log('📋 Result status:', result.status);
+            console.log('📋 Result data:', result.data);
+            
             if (result.type === "redirect") {
                 goto(result.location);
+            } else if (result.type === "failure") {
+                console.log('❌ Form submission failed');
+                
+                // Extract error message from the complex data structure
+                if (result.data) {
+                    try {
+                        if (typeof result.data === 'string') {
+                            // Try to parse the data string if it's JSON
+                            const parsed = JSON.parse(result.data);
+                            if (Array.isArray(parsed) && parsed.length > 1) {
+                                errorMessage = parsed[1];
+                            } else {
+                                errorMessage = result.data;
+                            }
+                        } else if (result.data.error) {
+                            errorMessage = result.data.error;
+                        } else {
+                            errorMessage = 'Gagal menambahkan user';
+                        }
+                    } catch (e) {
+                        errorMessage = 'Gagal menambahkan user';
+                    }
+                } else {
+                    errorMessage = 'Gagal menambahkan user';
+                }
+                
+                showError = true;
+                console.log('🔍 Extracted error message:', errorMessage);
             }
         };
     }
@@ -49,7 +87,7 @@
         <p class="text-gray-600 mt-2">Buat akun pengguna baru untuk sistem</p>
     </div>
 
-    {#if form?.error}
+    {#if showError || form?.error}
         <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
             <div class="flex">
                 <div class="flex-shrink-0">
@@ -66,7 +104,7 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-red-700">{form.error}</p>
+                    <p class="text-sm text-red-700">{errorMessage || form?.error}</p>
                 </div>
             </div>
         </div>
