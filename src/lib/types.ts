@@ -195,16 +195,22 @@ export interface Installment {
     total_bayar: number;
     user_id: number;
     status: 'proses' | 'verified' | 'kurang' | 'lebih';
+    image_bukti_transfer?: string; // Transfer receipt image path
+    no_rekening?: string; // Account number used for payment
+    bank_name?: string; // Bank name used for payment
     pinjaman?: Loan;
     user?: User;
 }
 
 export interface InstallmentRequest {
     pinjaman_id: number;
-    angsuran_ke: number;
+    angsuran_ke?: number; // Optional, auto-generated if not provided
     pokok: number;
     bunga: number;
     denda?: number;
+    image_bukti_transfer: string; // Required - path/URL to transfer receipt
+    no_rekening: string; // Required - account number used for payment
+    bank_name: string; // Required - bank name used for payment
 }
 
 export interface InstallmentVerification {

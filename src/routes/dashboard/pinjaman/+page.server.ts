@@ -48,10 +48,18 @@ function transformInstallment(angsuran: any): Installment {
         tanggal_bayar: angsuran.tanggal_bayar || angsuran.TanggalBayar,
         pokok: angsuran.pokok || angsuran.Pokok,
         bunga: angsuran.bunga || angsuran.Bunga,
-        denda: angsuran.denda || angsuran.Denda,
-        total_bayar: angsuran.total_bayar || angsuran.TotalBayar,
-        user_id: angsuran.user_id || angsuran.UserID,
-        status: angsuran.status || angsuran.Status,
+        denda: angsuran.denda || angsuran.Denda || 0,
+        total_bayar: angsuran.total_bayar || angsuran.TotalBayar || (
+            (angsuran.pokok || angsuran.Pokok || 0) +
+            (angsuran.bunga || angsuran.Bunga || 0) +
+            (angsuran.denda || angsuran.Denda || 0)
+        ),
+        user_id: angsuran.user_id || angsuran.UserID || (angsuran.User && (angsuran.User.ID || angsuran.User.id)) || 0,
+        status: angsuran.status || angsuran.Status || 'proses',
+        // New fields from API: ImageBuktiTransfer / image_bukti_transfer, NoRekening / no_rekening, BankName / bank_name
+        image_bukti_transfer: angsuran.image_bukti_transfer || angsuran.ImageBuktiTransfer || angsuran.ImageBukti || undefined,
+        no_rekening: angsuran.no_rekening || angsuran.NoRekening || angsuran.NoRek || undefined,
+        bank_name: angsuran.bank_name || angsuran.BankName || angsuran.Bank || undefined,
         pinjaman: angsuran.pinjaman ? transformLoan(angsuran.pinjaman) : undefined,
         user: angsuran.user || angsuran.User
     };
