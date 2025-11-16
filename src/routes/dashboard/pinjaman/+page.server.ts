@@ -88,16 +88,28 @@ export const load: PageServerLoad = async ({ parent, url, cookies }) => {
 
         // Load loans based on user role and selected user
         try {
-            if (isMember || selectedUserId) {
-                // For members, load their own loans
-                // For admins viewing specific user, load that user's loans
-                const targetUserId = selectedUserId || currentUser.id.toString();
-                console.log("📊 Fetching loans for user:", targetUserId);
-                const response = await axios.get(`/pinjaman?user_id=${targetUserId}`);
-                console.log("📦 Raw loans response:", response.data);
+            if (selectedUserId) {
+                // Admin viewing specific user's loans
+                console.log("📊 Fetching loans for specific user:", selectedUserId);
+                const response = await axios.get(`/pinjaman?user_id=${selectedUserId}`);
+                console.log("📦 Raw loans response for user:", response.data);
 
                 const rawLoans = response.data.data || [];
-                console.log("🔍 Raw loans array:", rawLoans);
+                console.log("🔍 Raw loans array for user:", rawLoans);
+                loans = rawLoans.map((loan: any) => {
+                    console.log("🔄 Transforming loan:", loan);
+                    const transformed = transformLoan(loan);
+                    console.log("✅ Transformed result:", transformed);
+                    return transformed;
+                });
+            } else if (isMember) {
+                // Members see only their own loans
+                console.log("📊 Fetching loans for member user:", currentUser.id);
+                const response = await axios.get(`/pinjaman?user_id=${currentUser.id}`);
+                console.log("📦 Raw loans response for member:", response.data);
+
+                const rawLoans = response.data.data || [];
+                console.log("🔍 Raw loans array for member:", rawLoans);
                 loans = rawLoans.map((loan: any) => {
                     console.log("🔄 Transforming loan:", loan);
                     const transformed = transformLoan(loan);
@@ -105,19 +117,49 @@ export const load: PageServerLoad = async ({ parent, url, cookies }) => {
                     return transformed;
                 });
             } else if (isAdmin) {
-                // Admin loads all loans
-                console.log("📊 Fetching all loans");
-                const response = await axios.get("/pinjaman");
-                console.log("📦 Raw loans response:", response.data);
+                // Admin loads all loans from all users
+                console.log("📊 Fetching ALL loans for admin");
+                console.log("🔗 API URL:", "/pinjaman");
 
-                const rawLoans = response.data.data || [];
-                console.log("🔍 Raw loans array:", rawLoans);
-                loans = rawLoans.map((loan: any) => {
-                    console.log("🔄 Transforming loan:", loan);
-                    const transformed = transformLoan(loan);
-                    console.log("✅ Transformed result:", transformed);
-                    return transformed;
-                });
+                try {
+                    const response = await axios.get("/pinjaman");
+                    console.log("📦 Raw ALL loans response status:", response.status);
+                    console.log("📦 Raw ALL loans response data:", response.data);
+                    console.log("📦 Response data type:", typeof response.data);
+                    console.log("📦 Response data structure:", Object.keys(response.data || {}));
+
+                    const rawLoans = response.data.data || [];
+                    console.log("🔍 Raw ALL loans array:", rawLoans.length, "loans");
+                    console.log("🔍 Raw loans array type:", Array.isArray(rawLoans));
+
+                    if (rawLoans.length > 0) {
+                        console.log("🔍 Sample loan from API:", rawLoans[0]);
+                        console.log("🔍 Sample loan keys:", Object.keys(rawLoans[0] || {}));
+                    } else {
+                        console.log("⚠️ API returned empty loans array");
+                        console.log("🔍 Full API response:", JSON.stringify(response.data, null, 2));
+                    }
+
+                    loans = rawLoans.map((loan: any) => {
+                        console.log("🔄 Transforming loan:", loan);
+                        const transformed = transformLoan(loan);
+                        console.log("✅ Transformed result:", transformed);
+                        return transformed;
+                    });
+
+                    console.log("✅ Total loans loaded for admin:", loans.length);
+                } catch (apiError) {
+                    console.error("❌ API Error fetching all loans:", apiError);
+                    if (apiError && typeof apiError === 'object' && 'response' in apiError) {
+                        const axiosError = apiError as any;
+                        console.error("❌ API error status:", axiosError.response?.status);
+                        console.error("❌ API error data:", axiosError.response?.data);
+                        console.error("❌ API error headers:", axiosError.response?.headers);
+                    }
+                    if (apiError && typeof apiError === 'object' && 'message' in apiError) {
+                        console.error("❌ API error message:", (apiError as Error).message);
+                    }
+                }
             }
 
             console.log("✅ Transformed loans:", loans.length);
@@ -164,8 +206,27 @@ export const load: PageServerLoad = async ({ parent, url, cookies }) => {
             });
             console.log("📦 Raw bunga options response:", bungaResponse.data);
 
-            activeBungaOptions = bungaResponse.data.data || [];
-            console.log("✅ Active bunga options loaded:", activeBungaOptions.length);
+            const rawBungaOptions = bungaResponse.data.data || [];
+
+            // Transform bunga options to match frontend interface (same as bunga page)
+            activeBungaOptions = rawBungaOptions.map((item: any) => ({
+                id: item.ID,
+                nama: item.nama,
+                persen: item.persen,
+                deskripsi: item.deskripsi,
+                is_active: item.is_active,
+                created_by: item.created_by,
+                created_by_user: item.created_by_user ? {
+                    id: item.created_by_user.ID,
+                    name: item.created_by_user.Name || item.created_by_user.Email,
+                    email: item.created_by_user.Email
+                } : undefined,
+                created_at: item.CreatedAt,
+                updated_at: item.UpdatedAt
+            }));
+
+            console.log("✅ Active bunga options loaded and transformed:", activeBungaOptions.length);
+            console.log("🔍 First bunga option after transformation:", activeBungaOptions[0]);
         } catch (error) {
             console.error("❌ Error fetching bunga options:", error);
             activeBungaOptions = [];

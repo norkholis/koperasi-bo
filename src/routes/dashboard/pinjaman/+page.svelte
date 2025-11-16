@@ -125,6 +125,61 @@
         calculateInstallment();
     });
 
+    // Debug function to test API calls directly
+    async function debugApiCalls() {
+        console.log("🧪 Starting API debug test...");
+
+        try {
+            console.log("🔍 Testing /pinjaman endpoint...");
+            const loansResponse = await axios.get("/pinjaman");
+            console.log("✅ Loans API response:", loansResponse.data);
+            console.log("📊 Loans data:", loansResponse.data.data);
+            console.log(
+                "📊 Loans count:",
+                loansResponse.data.data?.length || 0,
+            );
+
+            if (loansResponse.data.data && loansResponse.data.data.length > 0) {
+                console.log(
+                    "🔍 First loan from direct API call:",
+                    loansResponse.data.data[0],
+                );
+            } else {
+                console.log("⚠️ No loans returned from direct API call");
+            }
+        } catch (error) {
+            console.error("❌ Error in direct loans API call:", error);
+            if (error && typeof error === "object" && "response" in error) {
+                const axiosError = error as any;
+                console.error(
+                    "❌ Direct API error status:",
+                    axiosError.response?.status,
+                );
+                console.error(
+                    "❌ Direct API error data:",
+                    axiosError.response?.data,
+                );
+            }
+        }
+
+        try {
+            console.log("🔍 Testing /bunga-options endpoint...");
+            const bungaResponse = await axios.get("/bunga-options", {
+                params: { active: true },
+            });
+            console.log("✅ Bunga API response:", bungaResponse.data);
+            console.log("📊 Bunga data:", bungaResponse.data.data);
+            console.log(
+                "📊 Bunga count:",
+                bungaResponse.data.data?.length || 0,
+            );
+        } catch (error) {
+            console.error("❌ Error in direct bunga API call:", error);
+        }
+
+        console.log("🧪 API debug test completed");
+    }
+
     // Format currency
     function formatCurrency(amount: number | null | undefined): string {
         console.log("💰 formatCurrency called with:", amount, typeof amount);
@@ -200,6 +255,11 @@
 
     // Calculate monthly installment
     function calculateInstallment() {
+        console.log("🧮 Calculating installment...");
+        console.log("  - Loan amount:", loanRequestForm.jumlah_pinjaman);
+        console.log("  - Duration (months):", loanRequestForm.lama_bulan);
+        console.log("  - Selected bunga:", selectedBungaOption);
+
         if (
             loanRequestForm.jumlah_pinjaman > 0 &&
             loanRequestForm.lama_bulan > 0 &&
@@ -211,22 +271,61 @@
                 (loanRequestForm.jumlah_pinjaman * selectedBungaOption.persen) /
                 100 /
                 loanRequestForm.lama_bulan;
+
+            console.log("  - Principal per month:", principal);
+            console.log("  - Interest per month:", interest);
+            console.log("  - Bunga percentage:", selectedBungaOption.persen);
+
             loanRequestForm.jumlah_angsuran = Math.ceil(principal + interest);
+            console.log(
+                "  - Calculated installment:",
+                loanRequestForm.jumlah_angsuran,
+            );
+        } else {
+            console.log("❌ Cannot calculate installment - missing data:");
+            console.log(
+                "  - Has loan amount?",
+                loanRequestForm.jumlah_pinjaman > 0,
+            );
+            console.log("  - Has duration?", loanRequestForm.lama_bulan > 0);
+            console.log("  - Has selected bunga?", !!selectedBungaOption);
+            loanRequestForm.jumlah_angsuran = 0;
         }
     }
 
     // Handle bunga option selection
     function onBungaOptionChange() {
+        console.log(
+            "🔄 Bunga option changed to ID:",
+            loanRequestForm.bunga_option_id,
+            typeof loanRequestForm.bunga_option_id,
+        );
+        console.log("📋 Available bunga options:", activeBungaOptions);
+
         if (loanRequestForm.bunga_option_id > 0) {
+            // Convert to number to ensure proper comparison
+            const selectedId = Number(loanRequestForm.bunga_option_id);
+            console.log("🔍 Looking for bunga with ID:", selectedId);
+
             selectedBungaOption =
-                activeBungaOptions.find(
-                    (bunga) => bunga.id === loanRequestForm.bunga_option_id,
-                ) || null;
+                activeBungaOptions.find((bunga) => {
+                    console.log(
+                        `  Comparing ${bunga.id} (${typeof bunga.id}) === ${selectedId} (${typeof selectedId})`,
+                    );
+                    return Number(bunga.id) === selectedId;
+                }) || null;
+
+            console.log("✅ Selected bunga option:", selectedBungaOption);
             calculateInstallment();
         } else {
             selectedBungaOption = null;
             loanRequestForm.jumlah_angsuran = 0;
+            console.log("❌ No bunga option selected");
         }
+        console.log(
+            "💰 Calculated installment:",
+            loanRequestForm.jumlah_angsuran,
+        );
     }
 
     // Modal functions
@@ -351,19 +450,176 @@
     // Loan request operations (Members)
     async function requestLoan() {
         try {
-            console.log("📝 Requesting loan:", loanRequestForm);
+            console.log("📝 === LOAN REQUEST DEBUG ===");
+            console.log("Form data:", JSON.stringify(loanRequestForm, null, 2));
+            console.log("Selected bunga option:", selectedBungaOption);
+            console.log("Active bunga options:", activeBungaOptions);
+            console.log(
+                "Bunga option ID type:",
+                typeof loanRequestForm.bunga_option_id,
+            );
 
-            // Transform to API format using new bunga option structure
+            // Let's try a different approach - find the bunga option regardless of selectedBungaOption state
+            let bungaToUse = selectedBungaOption;
+
+            if (!bungaToUse && loanRequestForm.bunga_option_id) {
+                console.log("🔍 Searching for bunga option...");
+                const selectedId = Number(loanRequestForm.bunga_option_id);
+                console.log("Looking for ID:", selectedId);
+
+                bungaToUse = activeBungaOptions.find((bunga) => {
+                    const bungaId = Number(bunga.id);
+                    console.log(
+                        `Comparing: ${bungaId} === ${selectedId} ? ${bungaId === selectedId}`,
+                    );
+                    return bungaId === selectedId;
+                });
+                console.log("Found bunga:", bungaToUse);
+            }
+
+            // Basic validation
+            if (!bungaToUse) {
+                console.log("❌ VALIDATION FAILED - No bunga found");
+                console.log(
+                    "bunga_option_id:",
+                    loanRequestForm.bunga_option_id,
+                );
+                console.log("selectedBungaOption:", selectedBungaOption);
+                console.log(
+                    "Available options:",
+                    activeBungaOptions.map((b) => ({ id: b.id, nama: b.nama })),
+                );
+                showError("Silakan pilih bunga terlebih dahulu");
+                return;
+            }
+
+            if (
+                !loanRequestForm.jumlah_pinjaman ||
+                loanRequestForm.jumlah_pinjaman <= 0
+            ) {
+                console.log("❌ Invalid loan amount");
+                showError("Jumlah pinjaman harus lebih dari 0");
+                return;
+            }
+
+            if (
+                !loanRequestForm.jumlah_angsuran ||
+                loanRequestForm.jumlah_angsuran <= 0
+            ) {
+                console.log("❌ Invalid installment amount - recalculating...");
+                // Try to recalculate the installment
+                calculateInstallment();
+                if (
+                    !loanRequestForm.jumlah_angsuran ||
+                    loanRequestForm.jumlah_angsuran <= 0
+                ) {
+                    showError(
+                        "Jumlah angsuran tidak valid. Pastikan jumlah pinjaman dan bunga sudah dipilih",
+                    );
+                    return;
+                }
+            }
+
+            // Validate the bunga percentage
+            if (!bungaToUse.persen || bungaToUse.persen <= 0) {
+                console.log("❌ Invalid bunga percentage:", bungaToUse.persen);
+                showError(
+                    "Bunga yang dipilih tidak memiliki persentase yang valid",
+                );
+                return;
+            }
+
+            console.log("✅ All validations passed!");
+            console.log("  - Loan amount:", loanRequestForm.jumlah_pinjaman);
+            console.log(
+                "  - Installment amount:",
+                loanRequestForm.jumlah_angsuran,
+            );
+            console.log("  - Bunga percentage:", bungaToUse.persen);
+            console.log("  - Duration:", loanRequestForm.lama_bulan);
+
+            // Transform to API format according to the API documentation
             const apiPayload = {
-                jumlah_pinjaman: loanRequestForm.jumlah_pinjaman,
-                bunga_option_id: loanRequestForm.bunga_option_id,
-                lama_bulan: loanRequestForm.lama_bulan,
-                jumlah_angsuran: loanRequestForm.jumlah_angsuran,
-                no_rekening_pencairan: loanRequestForm.no_rekening_pencairan,
-                bank_name: loanRequestForm.bank_name,
+                jumlah_pinjaman: Number(loanRequestForm.jumlah_pinjaman),
+                bunga_option_id: Number(loanRequestForm.bunga_option_id),
+                lama_bulan: Number(loanRequestForm.lama_bulan),
+                jumlah_angsuran: Number(loanRequestForm.jumlah_angsuran),
+                user_id: Number(currentUser?.id || 0), // Add user_id from current user
+                no_rekening_pencairan:
+                    loanRequestForm.no_rekening_pencairan || "",
+                bank_name: loanRequestForm.bank_name || "",
             };
 
-            console.log("🔄 API Payload:", apiPayload);
+            // Final validation of the payload
+            console.log("🔍 FINAL PAYLOAD VALIDATION:");
+            console.log(
+                "  - jumlah_pinjaman:",
+                apiPayload.jumlah_pinjaman,
+                typeof apiPayload.jumlah_pinjaman,
+            );
+            console.log(
+                "  - bunga_option_id:",
+                apiPayload.bunga_option_id,
+                typeof apiPayload.bunga_option_id,
+            );
+            console.log(
+                "  - lama_bulan:",
+                apiPayload.lama_bulan,
+                typeof apiPayload.lama_bulan,
+            );
+            console.log(
+                "  - jumlah_angsuran:",
+                apiPayload.jumlah_angsuran,
+                typeof apiPayload.jumlah_angsuran,
+            );
+            console.log(
+                "  - user_id:",
+                apiPayload.user_id,
+                typeof apiPayload.user_id,
+            );
+            console.log(
+                "  - no_rekening_pencairan:",
+                apiPayload.no_rekening_pencairan,
+            );
+            console.log("  - bank_name:", apiPayload.bank_name);
+
+            if (
+                !apiPayload.jumlah_pinjaman ||
+                apiPayload.jumlah_pinjaman <= 0
+            ) {
+                console.log("❌ jumlah_pinjaman is invalid");
+                showError("Jumlah pinjaman tidak valid");
+                return;
+            }
+
+            if (
+                !apiPayload.bunga_option_id ||
+                apiPayload.bunga_option_id <= 0
+            ) {
+                console.log("❌ bunga_option_id is invalid");
+                showError("ID bunga tidak valid");
+                return;
+            }
+
+            if (
+                !apiPayload.jumlah_angsuran ||
+                apiPayload.jumlah_angsuran <= 0
+            ) {
+                console.log("❌ jumlah_angsuran is invalid");
+                showError("Jumlah angsuran tidak valid");
+                return;
+            }
+
+            if (!apiPayload.user_id || apiPayload.user_id <= 0) {
+                console.log("❌ user_id is invalid");
+                showError("User ID tidak valid");
+                return;
+            }
+
+            console.log(
+                "✅ VALIDATION PASSED - Sending payload:",
+                JSON.stringify(apiPayload, null, 2),
+            );
             const response = await axios.post("/pinjaman", apiPayload);
             console.log("✅ Loan creation response:", response.data);
 
@@ -373,9 +629,9 @@
             closeModals();
             showSuccessNotification("Pengajuan pinjaman berhasil dikirim!");
         } catch (error: any) {
-            console.error("Error requesting loan:", error);
+            console.error("❌ Error requesting loan:", error);
             showError(
-                `Gagal mengajukan pinjaman: ${error.response?.data?.message || error.message}`,
+                `Gagal mengajukan pinjaman: ${error.response?.data?.error || error.response?.data?.message || error.message}`,
             );
         }
     }
@@ -549,6 +805,15 @@
                 >
                     ← Kembali ke Semua Pinjaman
                 </a>
+            {/if}
+            <!-- Debug button for testing API calls -->
+            {#if isAdmin}
+                <button
+                    on:click={debugApiCalls}
+                    class="px-3 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+                >
+                    🧪 Debug API
+                </button>
             {/if}
         </div>
 
@@ -1247,6 +1512,36 @@
                 {/if}
 
                 <div class="flex gap-3 pt-4">
+                    <!-- Debug Button -->
+                    <button
+                        type="button"
+                        on:click={() => {
+                            console.log("🐛 DEBUG STATE:");
+                            console.log(
+                                "Form:",
+                                JSON.stringify(loanRequestForm, null, 2),
+                            );
+                            console.log("Selected Bunga:", selectedBungaOption);
+                            console.log(
+                                "Available Bungas:",
+                                activeBungaOptions.map((b) => ({
+                                    id: b.id,
+                                    nama: b.nama,
+                                    persen: b.persen,
+                                })),
+                            );
+                            console.log("ID Comparison:");
+                            activeBungaOptions.forEach((b) => {
+                                console.log(
+                                    `  ${b.id} (${typeof b.id}) vs ${loanRequestForm.bunga_option_id} (${typeof loanRequestForm.bunga_option_id}) = ${Number(b.id) === Number(loanRequestForm.bunga_option_id)}`,
+                                );
+                            });
+                        }}
+                        class="px-3 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors text-sm"
+                    >
+                        Debug
+                    </button>
+
                     <button
                         type="button"
                         on:click={closeModals}
