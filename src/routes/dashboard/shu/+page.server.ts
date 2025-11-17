@@ -40,6 +40,20 @@ export const load = async ({ parent }: { parent: any }) => {
 
                 shuRecords = response.data.data || [];
                 console.log("✅ SHU records loaded:", shuRecords.length);
+
+                // Validate that records have IDs for proper deletion
+                if (shuRecords.length > 0) {
+                    const firstRecord = shuRecords[0];
+                    console.log("🔍 First SHU record fields:", Object.keys(firstRecord));
+                    console.log("🔍 First SHU record sample:", firstRecord);
+
+                    const hasId = firstRecord.id || firstRecord.ID;
+                    if (!hasId) {
+                        console.warn("⚠️ SHU records missing ID field (tried both 'id' and 'ID') - delete functionality may not work properly");
+                    } else {
+                        console.log("✅ SHU records have ID field:", hasId);
+                    }
+                }
             } else {
                 console.log("📊 Fetching user SHU history for member ID:", currentUser.id);
 

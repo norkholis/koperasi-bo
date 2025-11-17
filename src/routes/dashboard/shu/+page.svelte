@@ -20,8 +20,26 @@
         showError,
         showWarning,
     } from "$lib/stores/notifications";
+    import { formatCurrency, formatDate } from "$lib/utils";
 
     export let data;
+
+    // Safe date formatting helper
+    function safeDateFormat(shuRecord: any): string {
+        const dateValue =
+            shuRecord.CreatedAt ||
+            shuRecord.created_at ||
+            shuRecord.tanggal_dibuat ||
+            shuRecord.date_created;
+        if (!dateValue) {
+            console.warn(
+                "No date field found in SHU record:",
+                Object.keys(shuRecord),
+            );
+            return "Tanggal tidak tersedia";
+        }
+        return formatDate(dateValue);
+    }
 
     let shuRecords: SHURecord[] = data.shuRecords || [];
     let userShuHistory: any[] = data.userShuHistory || [];
@@ -59,7 +77,18 @@
     if (shuRecords.length > 0) {
         console.log("🔍 Sample SHU record structure:", shuRecords[0]);
         console.log("🔍 SHU record fields:", Object.keys(shuRecords[0]));
-        console.log("🔍 SHU record ID field:", shuRecords[0].id);
+        console.log(
+            "🔍 SHU record ID field:",
+            shuRecords[0].ID || shuRecords[0].id,
+        );
+        console.log(
+            "🔍 SHU record created_at field:",
+            shuRecords[0].CreatedAt || shuRecords[0].created_at,
+        );
+        console.log(
+            "🔍 SHU record created_at type:",
+            typeof (shuRecords[0].CreatedAt || shuRecords[0].created_at),
+        );
     }
 
     // Debug user SHU history structure
@@ -128,22 +157,6 @@
     let savingUserSHU = false;
 
     // Utility functions
-    function formatCurrency(amount: number): string {
-        return new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0,
-        }).format(amount);
-    }
-
-    function formatDate(dateString: string): string {
-        return new Date(dateString).toLocaleDateString("id-ID", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
-    }
-
     function showSuccessNotification(message: string) {
         showSuccess(message);
     }
@@ -575,19 +588,26 @@
     async function deleteSHURecord(id: number) {
         console.log("🔍 Delete function called with ID:", id, typeof id);
 
-        if (!id || id === undefined) {
+        if (!id || id === undefined || id === null) {
             console.error("❌ Invalid ID for deletion:", id);
             showError("Error: ID SHU tidak valid untuk penghapusan");
             return;
         }
 
-        if (!confirm("Apakah Anda yakin ingin menghapus laporan SHU ini?")) {
+        if (
+            !confirm(
+                `Apakah Anda yakin ingin menghapus laporan SHU dengan ID ${id}?`,
+            )
+        ) {
             return;
         }
 
         try {
             console.log("🗑️ Deleting SHU record with ID:", id);
-            await axios.delete(`/shu/${id}`);
+            console.log("🌐 DELETE endpoint:", `/shu/${id}`);
+
+            const response = await axios.delete(`/shu/${id}`);
+            console.log("✅ Delete successful:", response.data);
 
             // Refresh data
             await invalidateAll();
@@ -596,56 +616,21 @@
         } catch (error: any) {
             console.error("❌ Error deleting SHU record:", error);
             console.error("❌ Delete endpoint called:", `/shu/${id}`);
+            console.error("❌ Error response:", error.response?.data);
+
             showError(
                 `Gagal menghapus laporan SHU: ${error.response?.data?.message || error.message}`,
             );
         }
     }
 
-    // Alternative delete function using year when ID is not available
-    async function deleteSHURecordByYear(tahun: number) {
-        try {
-            console.log("🗑️ Attempting to delete SHU record by year:", tahun);
-
-            // Try different possible endpoints
-            const possibleEndpoints = [
-                `/shu/year/${tahun}`,
-                `/shu/tahun/${tahun}`,
-                `/shu?tahun=${tahun}`,
-            ];
-
-            let success = false;
-            for (const endpoint of possibleEndpoints) {
-                try {
-                    console.log("🔄 Trying endpoint:", endpoint);
-                    await axios.delete(endpoint);
-                    success = true;
-                    break;
-                } catch (error: any) {
-                    console.log(
-                        `❌ Endpoint ${endpoint} failed:`,
-                        error.response?.status,
-                    );
-                }
-            }
-
-            if (success) {
-                await invalidateAll();
-                showSuccessNotification("Laporan SHU berhasil dihapus!");
-            } else {
-                throw new Error("Tidak ada endpoint delete yang berhasil");
-            }
-        } catch (error: any) {
-            console.error("❌ Error deleting SHU record by year:", error);
-            showError(
-                `Gagal menghapus laporan SHU: ${error.response?.data?.message || error.message}\n\nMungkin fitur hapus belum tersedia atau perlu ID yang valid.`,
-            );
-        }
-    }
+    // Note: Year-based deletion removed - we should always use the SHU ID
+    // If ID is missing from API response, this indicates a backend issue that should be fixed
 
     async function generatePDF(shu: SHURecord) {
         try {
-            console.log("📄 Generating PDF for SHU:", shu.id);
+            const shuId = shu.ID || shu.id;
+            console.log("📄 Generating PDF for SHU:", shuId);
 
             // Create HTML content for PDF
             const htmlContent = `
@@ -672,7 +657,7 @@
                     <div class="header">
                         <h1>LAPORAN SISA HASIL USAHA (SHU)</h1>
                         <h2>TAHUN ${shu.tahun}</h2>
-                        <p>Tanggal: ${formatDate(shu.created_at)}</p>
+                        <p>Tanggal: ${safeDateFormat(shu)}</p>
                     </div>
                     
                     <div class="info-grid">
@@ -907,7 +892,7 @@
                                     <td
                                         class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                     >
-                                        {formatDate(shu.created_at)}
+                                        {safeDateFormat(shu)}
                                     </td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2"
@@ -933,29 +918,21 @@
                                                 );
                                                 console.log(
                                                     "🔍 SHU ID being passed:",
-                                                    shu.id,
-                                                );
-                                                console.log(
-                                                    "🔍 All SHU fields:",
-                                                    Object.keys(shu),
+                                                    shu.ID || shu.id,
                                                 );
 
-                                                // Try different possible ID field names
-                                                const possibleId = shu.id;
-
-                                                if (possibleId) {
-                                                    deleteSHURecord(possibleId);
+                                                // Always use the SHU ID for deletion (try both field name formats)
+                                                const shuId = shu.ID || shu.id;
+                                                if (shuId) {
+                                                    deleteSHURecord(shuId);
                                                 } else {
-                                                    // If no ID field exists, show user which SHU they're trying to delete
-                                                    const confirmMessage = `Apakah Anda yakin ingin menghapus laporan SHU tahun ${shu.tahun} dengan total ${formatCurrency(shu.total_shu)}?\n\nPeringatan: ID tidak ditemukan, sistem akan mencoba menghapus berdasarkan tahun.`;
-
-                                                    if (
-                                                        confirm(confirmMessage)
-                                                    ) {
-                                                        deleteSHURecordByYear(
-                                                            shu.tahun,
-                                                        );
-                                                    }
+                                                    console.error(
+                                                        "❌ SHU record missing ID field:",
+                                                        shu,
+                                                    );
+                                                    showError(
+                                                        "Error: ID SHU tidak ditemukan. Tidak dapat menghapus record ini.",
+                                                    );
                                                 }
                                             }}
                                             class="text-red-600 hover:text-red-900"
@@ -1949,7 +1926,7 @@
                     <div>
                         <p class="text-sm text-gray-600">Tanggal Dibuat</p>
                         <p class="font-semibold">
-                            {formatDate(selectedSHU.created_at)}
+                            {safeDateFormat(selectedSHU)}
                         </p>
                     </div>
                 </div>

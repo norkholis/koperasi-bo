@@ -40,6 +40,8 @@
     }
 </script>
 
+<svelte:window on:click={handleClickOutside} />
+
 <nav class="bg-indigo-700 text-white">
     <!-- Desktop Navigation -->
     <div class="hidden md:flex p-4 justify-between">
@@ -64,23 +66,67 @@
                     class="hover:bg-indigo-600 px-3 py-1 rounded">Simpanan</a
                 >
 
-                <a
-                    href="/dashboard/pinjaman"
-                    class="hover:bg-indigo-600 px-3 py-1 rounded">Pinjaman</a
-                >
-
-                {#if canManageUsers}
-                    <a
-                        href="/dashboard/pinjaman/bunga"
-                        class="hover:bg-indigo-600 px-3 py-1 rounded"
-                        >Kelola Bunga</a
+                <!-- Pinjaman Dropdown -->
+                <div class="relative">
+                    <button
+                        on:click={togglePinjamanDropdown}
+                        class="hover:bg-indigo-600 px-3 py-1 rounded flex items-center gap-1"
+                        aria-expanded={showPinjamanDropdown}
+                        aria-haspopup="true"
                     >
-                {/if}
+                        Pinjaman
+                        <svg
+                            class="w-4 h-4 transition-transform {showPinjamanDropdown
+                                ? 'rotate-180'
+                                : ''}"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                    </button>
+
+                    {#if showPinjamanDropdown}
+                        <div
+                            class="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200"
+                        >
+                            <div class="py-1">
+                                <a
+                                    href="/dashboard/pinjaman"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    on:click={closePinjamanDropdown}
+                                >
+                                    Kelola Pinjaman
+                                </a>
+                                {#if canManageUsers}
+                                    <a
+                                        href="/dashboard/pinjaman/bunga"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        on:click={closePinjamanDropdown}
+                                    >
+                                        Kelola Bunga
+                                    </a>
+                                {/if}
+                            </div>
+                        </div>
+                    {/if}
+                </div>
 
                 <a
                     href="/dashboard/shu"
                     class="hover:bg-indigo-600 px-3 py-1 rounded">Laporan SHU</a
                 >
+
+                {#if canManageUsers}
+                    <a
+                        href="/dashboard/reporting"
+                        class="hover:bg-indigo-600 px-3 py-1 rounded">Laporan</a
+                    >
+                {/if}
 
                 {#if isSuper}
                     <a
@@ -178,23 +224,25 @@
                         Simpanan
                     </a>
 
-                    <a
-                        href="/dashboard/pinjaman"
-                        class="block px-3 py-2 rounded-md hover:bg-indigo-600 transition-colors"
-                        on:click={closeMobileMenu}
-                    >
-                        Kelola Pinjaman
-                    </a>
-
-                    {#if canManageUsers}
+                    <!-- Pinjaman Menu -->
+                    <div>
                         <a
-                            href="/dashboard/pinjaman/bunga"
-                            class="block px-3 py-2 rounded-md hover:bg-indigo-600 transition-colors ml-4"
+                            href="/dashboard/pinjaman"
+                            class="block px-3 py-2 rounded-md hover:bg-indigo-600 transition-colors"
                             on:click={closeMobileMenu}
                         >
-                            Kelola Bunga
+                            Kelola Pinjaman
                         </a>
-                    {/if}
+                        {#if canManageUsers}
+                            <a
+                                href="/dashboard/pinjaman/bunga"
+                                class="block px-6 py-2 rounded-md hover:bg-indigo-600 transition-colors text-sm text-indigo-200"
+                                on:click={closeMobileMenu}
+                            >
+                                • Kelola Bunga
+                            </a>
+                        {/if}
+                    </div>
 
                     <a
                         href="/dashboard/shu"
@@ -203,6 +251,16 @@
                     >
                         Laporan SHU
                     </a>
+
+                    {#if canManageUsers}
+                        <a
+                            href="/dashboard/reporting"
+                            class="block px-3 py-2 rounded-md hover:bg-indigo-600 transition-colors"
+                            on:click={closeMobileMenu}
+                        >
+                            Laporan Keuangan
+                        </a>
+                    {/if}
 
                     {#if isSuper}
                         <a

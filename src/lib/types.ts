@@ -355,3 +355,97 @@ export interface SHUAnggotaSaveResponse {
 export interface SHUAnggotaHistoryResponse {
     data: SHUAnggotaRecord[];
 }
+
+// Transaction History & Reporting Types
+export interface Transaction {
+    id: number;
+    user_id: number;
+    transaction_type: 'SIMPANAN' | 'PINJAMAN' | 'ANGSURAN' | 'SHU';
+    reference_table: string;
+    reference_id: number;
+    amount: number;
+    balance_before: number;
+    balance_after: number;
+    status: 'PENDING' | 'COMPLETED' | 'CANCELLED' | 'VERIFIED';
+    transaction_date: string;
+    verified_by?: number;
+    verified_at?: string;
+    description: string;
+    metadata?: string;
+    user?: User;
+    verified_by_user?: User;
+}
+
+export interface TransactionFilters {
+    user_id?: number;
+    transaction_type?: 'SIMPANAN' | 'PINJAMAN' | 'ANGSURAN' | 'SHU';
+    status?: 'PENDING' | 'COMPLETED' | 'CANCELLED' | 'VERIFIED';
+    start_date?: string;
+    end_date?: string;
+    min_amount?: number;
+    max_amount?: number;
+    limit?: number;
+    offset?: number;
+}
+
+export interface TransactionHistoryResponse {
+    message: string;
+    data: Transaction[];
+    total: number;
+    limit: number;
+    offset: number;
+}
+
+export interface FinancialSummary {
+    total_simpanan: number;
+    total_pinjaman: number;
+    total_angsuran: number;
+    total_shu: number;
+    total_transactions: number;
+    period_start: string;
+    period_end: string;
+}
+
+export interface FinancialSummaryResponse {
+    message: string;
+    data: FinancialSummary;
+}
+
+export interface FinancialReportRequest {
+    report_type: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY' | 'CUSTOM';
+    start_date: string;
+    end_date: string;
+}
+
+export interface FinancialReport {
+    report_type: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY' | 'CUSTOM';
+    period_start: string;
+    period_end: string;
+    generated_at: string;
+    generated_by: number;
+    summary: {
+        total_simpanan: number;
+        total_pinjaman: number;
+        total_angsuran: number;
+        total_shu: number;
+        total_transactions: number;
+    };
+    transaction_count: number;
+    type_breakdown: {
+        SIMPANAN: number;
+        PINJAMAN: number;
+        ANGSURAN: number;
+        SHU: number;
+    };
+    status_breakdown: {
+        COMPLETED: number;
+        PENDING: number;
+        VERIFIED: number;
+    };
+    monthly_breakdown: { [key: string]: number };
+}
+
+export interface FinancialReportResponse {
+    message: string;
+    data: FinancialReport;
+}
