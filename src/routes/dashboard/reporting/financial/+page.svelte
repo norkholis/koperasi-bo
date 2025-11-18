@@ -10,7 +10,7 @@
     export let data;
 
     const currentUser = data.currentUser;
-    const error = data.error;
+    const error = data?.error || null;
 
     // State
     let generatingReport = false;
@@ -74,17 +74,13 @@
     async function generateReport() {
         generatingReport = true;
         try {
-            console.log("📊 Generating financial report:", reportForm);
-
             const response = await axios.post("/reports/financial", reportForm);
             const result: FinancialReportResponse = response.data;
 
             currentReport = result.data;
             showSuccess("Laporan keuangan berhasil digenerate!");
-
-            console.log("✅ Financial report generated:", currentReport);
         } catch (err: any) {
-            console.error("❌ Error generating report:", err);
+            console.error("Error generating report:", err);
             showError(
                 `Gagal generate laporan: ${err.response?.data?.message || err.message}`,
             );

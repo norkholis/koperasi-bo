@@ -151,7 +151,7 @@ export interface Loan {
     lama_bulan: number;
     jumlah_angsuran: number;
     sisa_angsuran: number;
-    status: 'proses' | 'disetujui' | 'lunas' | 'macet';
+    status: 'proses' | 'disetujui' | 'lunas' | 'macet' | 'ditolak';
     user?: User;
 }
 

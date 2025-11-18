@@ -500,7 +500,7 @@
                         `Comparing: ${bungaId} === ${selectedId} ? ${bungaId === selectedId}`,
                     );
                     return bungaId === selectedId;
-                });
+                }) || null;
                 console.log("Found bunga:", bungaToUse);
             }
 

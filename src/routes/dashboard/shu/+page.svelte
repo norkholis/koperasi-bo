@@ -50,73 +50,13 @@
     $: {
         shuRecords = data.shuRecords || [];
         userShuHistory = data.userShuHistory || [];
-        console.log(
-            "🔄 Reactive update - userShuHistory:",
-            userShuHistory.length,
-        );
-
-        // Debug first user SHU record when available
-        if (userShuHistory.length > 0) {
-            console.log("🔍 First user SHU record:", userShuHistory[0]);
-            console.log("🔍 Available fields:", Object.keys(userShuHistory[0]));
-        }
     }
 
-    // Debug logging
-    console.log("🚀 SHU page loaded");
-    console.log(
-        "👤 Current user:",
-        currentUser?.email,
-        currentUser?.role?.name,
-    );
-    console.log("🔐 Can manage SHU:", canManageSHU);
-    console.log("📊 SHU records count:", shuRecords.length);
-    console.log("📈 User SHU history count:", userShuHistory.length);
-
-    // Debug SHU records structure
-    if (shuRecords.length > 0) {
-        console.log("🔍 Sample SHU record structure:", shuRecords[0]);
-        console.log("🔍 SHU record fields:", Object.keys(shuRecords[0]));
-        console.log(
-            "🔍 SHU record ID field:",
-            shuRecords[0].ID || shuRecords[0].id,
-        );
-        console.log(
-            "🔍 SHU record created_at field:",
-            shuRecords[0].CreatedAt || shuRecords[0].created_at,
-        );
-        console.log(
-            "🔍 SHU record created_at type:",
-            typeof (shuRecords[0].CreatedAt || shuRecords[0].created_at),
-        );
-    }
-
-    // Debug user SHU history structure
-    if (userShuHistory.length > 0) {
-        console.log("🔍 Sample user SHU history:", userShuHistory[0]);
-        console.log(
-            "🔍 User SHU history fields:",
-            Object.keys(userShuHistory[0]),
-        );
-    } else {
-        console.log(
-            "📝 User SHU history is empty, checking if data was fetched",
-        );
-        console.log("📝 Raw userShuHistory value:", data.userShuHistory);
-        console.log("📝 Type of userShuHistory:", typeof data.userShuHistory);
-    }
-
-    // Manual refresh function for debugging
+    // Manual refresh function
     async function refreshUserData() {
-        console.log("🔄 Manual refresh triggered");
         try {
             await invalidateAll();
-            // Update reactive variables
             userShuHistory = data.userShuHistory || [];
-            console.log(
-                "✅ Refresh completed, new userShuHistory:",
-                userShuHistory,
-            );
         } catch (error) {
             console.error("❌ Refresh failed:", error);
         }
@@ -189,6 +129,81 @@
     function openDetailModal(shu: SHURecord) {
         selectedSHU = shu;
         showDetailModal = true;
+
+        // If shu_report is missing, try to fetch detailed data
+        if (!shu.shu_report && canManageSHU) {
+            fetchDetailedSHUData(shu);
+        }
+    }
+
+    async function fetchDetailedSHUData(shu: SHURecord) {
+        try {
+            // Generate the detailed report using the auto-generate endpoint
+            await generateDetailedSHUReport(shu);
+        } catch (error: any) {
+            console.error("Error fetching detailed SHU data:", error);
+        }
+    }
+
+    async function generateDetailedSHUReport(shu: SHURecord) {
+        try {
+            // Use the correct auto-generate endpoint
+            const response = await axios.post("/shu/generate-auto", {
+                tahun: shu.tahun,
+                beban_operasional: shu.beban_operasional || 0,
+                beban_non_operasional: shu.beban_non_operasional || 0,
+                beban_pajak: shu.beban_pajak || 0,
+            });
+
+            if (response.data.data && response.data.data.detail_anggota) {
+                // Update the existing SHU record with detailed data
+                const updateData = {
+                    shu_report: {
+                        persen_jasa_modal:
+                            response.data.data.persen_jasa_modal || 0,
+                        persen_jasa_usaha:
+                            response.data.data.persen_jasa_usaha || 0,
+                        total_simpanan_all:
+                            response.data.data.total_simpanan_all || 0,
+                        total_penjualan_all:
+                            response.data.data.total_penjualan_all || 0,
+                        detail_anggota: response.data.data.detail_anggota || [],
+                    },
+                };
+
+                try {
+                    // Try to update the existing record
+                    const updateResponse = await axios.put(
+                        `/shu/${shu.ID || shu.id}`,
+                        updateData,
+                    );
+
+                    // Update the local selectedSHU with the new detailed data
+                    selectedSHU = {
+                        ...selectedSHU,
+                        shu_report: updateData.shu_report,
+                    };
+
+                    showSuccessNotification(
+                        `Detail SHU berhasil digenerate untuk ${response.data.data.detail_anggota.length} anggota!`,
+                    );
+                } catch (updateError: any) {
+                    // Still update the display even if database update fails
+                    selectedSHU = {
+                        ...selectedSHU,
+                        shu_report: updateData.shu_report,
+                    };
+                    showSuccessNotification(
+                        `Detail SHU berhasil digenerate (tampilan saja): ${response.data.data.detail_anggota.length} anggota`,
+                    );
+                }
+            }
+        } catch (error: any) {
+            console.error("❌ Error generating detailed SHU report:", error);
+            showError(
+                `Gagal generate detail SHU: ${error.response?.data?.message || error.message}`,
+            );
+        }
     }
 
     function closeModals() {
@@ -205,11 +220,9 @@
     // SHU operations
     async function generateSHUReport() {
         try {
-            console.log("📝 Generating SHU report:", generateForm);
             const response = await axios.post("/shu/generate", generateForm);
 
             generatedReport = response.data.data;
-            console.log("✅ SHU report generated:", generatedReport);
 
             showSuccessNotification("Laporan SHU berhasil digenerate!");
         } catch (error: any) {
@@ -223,20 +236,12 @@
 
     async function generateAutoSHUReport() {
         try {
-            console.log(
-                "🤖 Generating automated SHU report:",
-                autoGenerateForm,
-            );
             const response = await axios.post(
                 "/shu/generate-auto",
                 autoGenerateForm,
             );
 
             autoGeneratedReport = response.data.data;
-            console.log(
-                "✅ Automated SHU report generated:",
-                autoGeneratedReport,
-            );
 
             showSuccessNotification(
                 "Laporan SHU otomatis berhasil digenerate!",
@@ -250,21 +255,12 @@
     }
 
     async function saveAutoSHUReport() {
-        console.log("🚀 Starting saveAutoSHUReport function");
-
         if (!autoGeneratedReport) {
-            console.log("❌ No autoGeneratedReport found");
             showWarning("Silakan generate laporan otomatis terlebih dahulu");
             return;
         }
 
         try {
-            // Debug the values first
-            console.log(
-                "🔍 Debug - autoGeneratedReport:",
-                JSON.stringify(autoGeneratedReport, null, 2),
-            );
-
             // Convert values with extra validation
             const totalSHU = Math.round(
                 Number(autoGeneratedReport.total_shu_koperasi) || 0,
@@ -287,22 +283,6 @@
                 Number(autoGeneratedReport.beban_pajak) || 0,
             );
 
-            console.log("🔍 Raw values from autoGeneratedReport:");
-            console.log(
-                "  - total_shu_koperasi:",
-                autoGeneratedReport.total_shu_koperasi,
-                typeof autoGeneratedReport.total_shu_koperasi,
-            );
-            console.log(
-                "  - tahun:",
-                autoGeneratedReport.tahun,
-                typeof autoGeneratedReport.tahun,
-            );
-
-            console.log("🔍 Converted values:");
-            console.log("  - totalSHU:", totalSHU, typeof totalSHU);
-            console.log("  - tahun:", tahun, typeof tahun);
-
             // Check if SHU Total is valid for saving
             if (totalSHU <= 0) {
                 showError(
@@ -321,36 +301,10 @@
                 beban_pajak: bebanPajak,
                 total_shu: totalSHU, // This is the correct field name from API docs
                 status: "draft",
+                shu_report: autoGeneratedReport, // Include the detailed member breakdown
             };
 
-            // Final validation check
-            console.log("🔍 Final payload validation:");
-            console.log(
-                "  - tahun exists:",
-                saveData.tahun !== undefined && saveData.tahun !== null,
-            );
-            console.log(
-                "  - tahun value:",
-                saveData.tahun,
-                typeof saveData.tahun,
-            );
-            console.log(
-                "  - total_shu exists:",
-                saveData.total_shu !== undefined && saveData.total_shu !== null,
-            );
-            console.log(
-                "  - total_shu value:",
-                saveData.total_shu,
-                typeof saveData.total_shu,
-            );
-
-            console.log(
-                "💾 Final payload (matching API docs):",
-                JSON.stringify(saveData, null, 2),
-            );
-
             const response = await axios.post("/shu/save-auto", saveData);
-            console.log("✅ Save successful:", response.data);
 
             // Refresh data
             await invalidateAll();
@@ -359,8 +313,7 @@
                 "Laporan SHU otomatis berhasil disimpan ke daftar!",
             );
         } catch (error: any) {
-            console.error("❌ All save attempts failed:", error);
-            console.error("❌ Final error response:", error.response?.data);
+            console.error("Save failed:", error);
             console.error("❌ Error status:", error.response?.status);
 
             const errorMessage =
@@ -375,8 +328,6 @@
 
     async function generateUserSHU() {
         try {
-            console.log("👤 Generating user SHU for user ID:", currentUser.id);
-
             // User SHU generation now requires year input according to API docs
             const currentYear = new Date().getFullYear();
             const requestData = {
@@ -384,18 +335,10 @@
                 TotalSHUKoperasi: 0, // Try with the fields the error mentioned
             };
 
-            console.log(
-                "� API endpoint:",
-                `/shu/user/${currentUser.id}/generate`,
-            );
-            console.log("📤 Request data:", requestData);
-
             const response = await axios.post(
                 `/shu/user/${currentUser.id}/generate`,
                 requestData,
             );
-
-            console.log("✅ User SHU generated:", response.data);
 
             // Refresh user history
             await invalidateAll();
@@ -424,20 +367,11 @@
             // Try with 'tahun' field if current format fails
             if (error.response?.status === 400) {
                 try {
-                    console.log("🔄 Retrying with alternative format...");
                     const alternativeData = { tahun: new Date().getFullYear() };
-                    console.log(
-                        "📤 Alternative request data:",
-                        alternativeData,
-                    );
 
                     const retryResponse = await axios.post(
                         `/shu/user/${currentUser.id}/generate`,
                         alternativeData,
-                    );
-                    console.log(
-                        "✅ User SHU generated with alternative format:",
-                        retryResponse.data,
                     );
 
                     await invalidateAll();
@@ -481,25 +415,14 @@
                 return;
             }
 
-            console.log(
-                "💾 Saving user SHU for year:",
-                tahun,
-                "user ID:",
-                currentUser.id,
-            );
-
             const saveRequest: SHUAnggotaSaveRequest = {
                 tahun: tahun,
             };
-
-            console.log("📤 Save request data:", saveRequest);
 
             const response = await axios.post<SHUAnggotaSaveResponse>(
                 `/shu-anggota/user/${currentUser.id}/save`,
                 saveRequest,
             );
-
-            console.log("✅ User SHU saved successfully:", response.data);
 
             // Refresh user history to show the newly saved record
             await invalidateAll();
@@ -569,14 +492,28 @@
             saveForm.tahun = generatedReport.tahun;
             saveForm.total_shu = generatedReport.total_shu_koperasi;
 
-            console.log("💾 Saving SHU record:", saveForm);
-            await axios.post("/shu", saveForm);
+            // Include the detailed member breakdown
+            const fullSHUData = {
+                ...saveForm,
+                shu_report: {
+                    persen_jasa_modal: generatedReport.persen_jasa_modal || 0,
+                    persen_jasa_usaha: generatedReport.persen_jasa_usaha || 0,
+                    total_simpanan_all: generatedReport.total_simpanan_all || 0,
+                    total_penjualan_all:
+                        generatedReport.total_penjualan_all || 0,
+                    detail_anggota: generatedReport.detail_anggota || [],
+                },
+            };
+
+            await axios.post("/shu", fullSHUData);
 
             // Refresh data
             await invalidateAll();
 
             closeModals();
-            showSuccessNotification("Laporan SHU berhasil disimpan!");
+            showSuccessNotification(
+                `Laporan SHU berhasil disimpan dengan detail ${generatedReport.detail_anggota?.length || 0} anggota!`,
+            );
         } catch (error: any) {
             console.error("❌ Error saving SHU record:", error);
             showError(
@@ -586,10 +523,8 @@
     }
 
     async function deleteSHURecord(id: number) {
-        console.log("🔍 Delete function called with ID:", id, typeof id);
-
         if (!id || id === undefined || id === null) {
-            console.error("❌ Invalid ID for deletion:", id);
+            console.error("Invalid ID for deletion:", id);
             showError("Error: ID SHU tidak valid untuk penghapusan");
             return;
         }
@@ -603,11 +538,7 @@
         }
 
         try {
-            console.log("🗑️ Deleting SHU record with ID:", id);
-            console.log("🌐 DELETE endpoint:", `/shu/${id}`);
-
             const response = await axios.delete(`/shu/${id}`);
-            console.log("✅ Delete successful:", response.data);
 
             // Refresh data
             await invalidateAll();
@@ -629,8 +560,32 @@
 
     async function generatePDF(shu: SHURecord) {
         try {
-            const shuId = shu.ID || shu.id;
-            console.log("📄 Generating PDF for SHU:", shuId);
+            const shuId = shu.id;
+
+            // Check if detailed data is missing and try to generate it
+            if (
+                !shu.shu_report ||
+                !shu.shu_report.detail_anggota ||
+                shu.shu_report.detail_anggota.length === 0
+            ) {
+                showSuccessNotification(
+                    "Sedang generate detail data untuk PDF...",
+                );
+
+                try {
+                    await generateDetailedSHUReport(shu);
+                    // Wait a moment for the data to be updated
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+                    // Use the updated selectedSHU which should now have shu_report
+                    if (selectedSHU) {
+                        shu = selectedSHU;
+                    }
+                } catch (error) {
+                    console.warn(
+                        "⚠️ Could not generate detailed data, creating PDF without member breakdown",
+                    );
+                }
+            }
 
             // Create HTML content for PDF
             const htmlContent = `
@@ -640,17 +595,127 @@
                     <meta charset="utf-8">
                     <title>Laporan SHU ${shu.tahun}</title>
                     <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; }
-                        .header { text-align: center; margin-bottom: 30px; }
-                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-                        .info-item { margin-bottom: 10px; }
-                        .label { font-weight: bold; color: #666; }
-                        .value { font-size: 18px; font-weight: bold; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-                        th { background-color: #f2f2f2; font-weight: bold; }
-                        .currency { text-align: right; }
-                        .total-row { font-weight: bold; background-color: #f8f9fa; }
+                        body { 
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                            margin: 30px; 
+                            line-height: 1.6;
+                            color: #333;
+                        }
+                        .header { 
+                            text-align: center; 
+                            margin-bottom: 40px; 
+                            border-bottom: 3px solid #007bff;
+                            padding-bottom: 20px;
+                        }
+                        .header h1 {
+                            color: #007bff;
+                            margin-bottom: 10px;
+                            font-size: 24px;
+                        }
+                        .header h2 {
+                            color: #333;
+                            margin-bottom: 5px;
+                        }
+                        .info-grid { 
+                            display: grid; 
+                            grid-template-columns: 1fr 1fr; 
+                            gap: 20px; 
+                            margin-bottom: 30px; 
+                        }
+                        .info-item { 
+                            margin-bottom: 15px;
+                            padding: 10px;
+                            background: #f8f9fa;
+                            border-left: 4px solid #007bff;
+                        }
+                        .label { 
+                            font-weight: bold; 
+                            color: #666;
+                            font-size: 14px;
+                        }
+                        .value { 
+                            font-size: 18px; 
+                            font-weight: bold;
+                            color: #333;
+                        }
+                        .section-title {
+                            color: #007bff;
+                            border-bottom: 2px solid #e9ecef;
+                            padding-bottom: 10px;
+                            margin-top: 30px;
+                            margin-bottom: 20px;
+                        }
+                        .summary-cards {
+                            display: grid;
+                            grid-template-columns: repeat(3, 1fr);
+                            gap: 15px;
+                            margin-bottom: 25px;
+                        }
+                        .summary-card {
+                            padding: 15px;
+                            border-radius: 8px;
+                            text-align: center;
+                            border: 1px solid #dee2e6;
+                        }
+                        .summary-card.blue {
+                            background: #e3f2fd;
+                            border-color: #2196f3;
+                        }
+                        .summary-card.green {
+                            background: #e8f5e8;
+                            border-color: #4caf50;
+                        }
+                        .summary-card.purple {
+                            background: #f3e5f5;
+                            border-color: #9c27b0;
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin-top: 20px;
+                            border: 1px solid #dee2e6;
+                        }
+                        th { 
+                            padding: 12px 8px; 
+                            text-align: left; 
+                            background-color: #007bff;
+                            color: white;
+                            font-weight: bold;
+                            font-size: 13px;
+                        }
+                        td {
+                            padding: 10px 8px;
+                            border-bottom: 1px solid #dee2e6;
+                            font-size: 12px;
+                        }
+                        .currency { 
+                            text-align: right;
+                            font-family: 'Courier New', monospace;
+                        }
+                        .total-row { 
+                            font-weight: bold; 
+                            background-color: #f8f9fa;
+                            border-top: 2px solid #007bff;
+                        }
+                        .member-info {
+                            line-height: 1.4;
+                        }
+                        .member-email {
+                            font-weight: 600;
+                            color: #333;
+                        }
+                        .member-id {
+                            font-size: 11px;
+                            color: #666;
+                        }
+                        .footer {
+                            margin-top: 50px;
+                            text-align: center;
+                            color: #666;
+                            font-size: 12px;
+                            border-top: 1px solid #dee2e6;
+                            padding-top: 20px;
+                        }
                     </style>
                 </head>
                 <body>
@@ -694,17 +759,33 @@
                         </div>
                     </div>
                     
-                    <h3>Detail Pembagian SHU Anggota</h3>
+                    <h3 class="section-title">📊 Pembagian SHU kepada Anggota</h3>
+                    
+                    <div class="summary-cards">
+                        <div class="summary-card blue">
+                            <div class="label">Total Anggota</div>
+                            <div class="value">${shu.shu_report.detail_anggota.length}</div>
+                        </div>
+                        <div class="summary-card green">
+                            <div class="label">Total SHU Dibagikan</div>
+                            <div class="value">${formatCurrency(shu.shu_report.detail_anggota.reduce((sum, member) => sum + member.total_shu_anggota, 0))}</div>
+                        </div>
+                        <div class="summary-card purple">
+                            <div class="label">Rata-rata SHU/Anggota</div>
+                            <div class="value">${formatCurrency(shu.shu_report.detail_anggota.reduce((sum, member) => sum + member.total_shu_anggota, 0) / shu.shu_report.detail_anggota.length)}</div>
+                        </div>
+                    </div>
+                    
                     <table>
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Email Anggota</th>
-                                <th>Total Simpanan</th>
-                                <th>Total Penjualan</th>
-                                <th>Jasa Modal</th>
-                                <th>Jasa Usaha</th>
-                                <th>Total SHU</th>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 25%;">Anggota</th>
+                                <th style="width: 14%;">Total Simpanan</th>
+                                <th style="width: 14%;">Total Penjualan</th>
+                                <th style="width: 14%;">Jasa Modal</th>
+                                <th style="width: 14%;">Jasa Usaha</th>
+                                <th style="width: 14%;">Total SHU</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -712,20 +793,27 @@
                                 .map(
                                     (member, index) => `
                                 <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${member.email}</td>
+                                    <td style="text-align: center;">${index + 1}</td>
+                                    <td class="member-info">
+                                        <div class="member-email">${member.email}</div>
+                                        <div class="member-id">ID: ${member.user_id}</div>
+                                    </td>
                                     <td class="currency">${formatCurrency(member.total_simpanan)}</td>
                                     <td class="currency">${formatCurrency(member.total_penjualan)}</td>
                                     <td class="currency">${formatCurrency(member.jasa_modal)}</td>
                                     <td class="currency">${formatCurrency(member.jasa_usaha)}</td>
-                                    <td class="currency">${formatCurrency(member.total_shu_anggota)}</td>
+                                    <td class="currency" style="font-weight: bold; background-color: #e8f5e8;">${formatCurrency(member.total_shu_anggota)}</td>
                                 </tr>
                             `,
                                 )
                                 .join("")}
                             <tr class="total-row">
-                                <td colspan="6">TOTAL</td>
-                                <td class="currency">${formatCurrency(shu.shu_report.detail_anggota.reduce((sum, member) => sum + member.total_shu_anggota, 0))}</td>
+                                <td colspan="2" style="text-align: center; font-weight: bold;">TOTAL KESELURUHAN</td>
+                                <td class="currency">${formatCurrency(shu.shu_report.detail_anggota.reduce((sum, member) => sum + member.total_simpanan, 0))}</td>
+                                <td class="currency">${formatCurrency(shu.shu_report.detail_anggota.reduce((sum, member) => sum + member.total_penjualan, 0))}</td>
+                                <td class="currency">${formatCurrency(shu.shu_report.detail_anggota.reduce((sum, member) => sum + member.jasa_modal, 0))}</td>
+                                <td class="currency">${formatCurrency(shu.shu_report.detail_anggota.reduce((sum, member) => sum + member.jasa_usaha, 0))}</td>
+                                <td class="currency" style="font-weight: bold; background-color: #d4edda;">${formatCurrency(shu.shu_report.detail_anggota.reduce((sum, member) => sum + member.total_shu_anggota, 0))}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -733,9 +821,11 @@
                             : ""
                     }
                     
-                    <div style="margin-top: 50px; text-align: center; color: #666;">
-                        <p>Laporan ini digenerate secara otomatis oleh sistem Koperasi</p>
+                    <div class="footer">
+                        <p><strong>Laporan Sisa Hasil Usaha (SHU) Koperasi</strong></p>
+                        <p>Laporan ini digenerate secara otomatis oleh sistem</p>
                         <p>Tanggal generate: ${new Date().toLocaleString("id-ID")}</p>
+                        <p style="margin-top: 10px; font-style: italic;">* Semua perhitungan mengacu pada data transaksi yang tercatat dalam sistem</p>
                     </div>
                 </body>
                 </html>
@@ -912,15 +1002,6 @@
                                         </button>
                                         <button
                                             on:click={() => {
-                                                console.log(
-                                                    "🔍 Delete button clicked for SHU:",
-                                                    shu,
-                                                );
-                                                console.log(
-                                                    "🔍 SHU ID being passed:",
-                                                    shu.ID || shu.id,
-                                                );
-
                                                 // Always use the SHU ID for deletion (try both field name formats)
                                                 const shuId = shu.ID || shu.id;
                                                 if (shuId) {
@@ -1980,71 +2061,263 @@
                             </div>
                         </div>
 
-                        <h5 class="font-semibold mb-4">
-                            Detail Anggota ({selectedSHU.shu_report
-                                .detail_anggota.length} orang)
-                        </h5>
-                        <div class="overflow-x-auto">
-                            <table
-                                class="min-w-full text-sm border border-gray-200"
+                        <h5 class="font-semibold mb-4 text-lg">
+                            📊 Pembagian SHU kepada Anggota
+                            <span class="text-sm font-normal text-gray-600"
+                                >({selectedSHU.shu_report.detail_anggota.length}
+                                anggota)</span
                             >
+                        </h5>
+
+                        <!-- Summary Cards -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="text-sm font-medium text-blue-600">
+                                    Total Anggota
+                                </p>
+                                <p class="text-2xl font-bold text-blue-900">
+                                    {selectedSHU.shu_report.detail_anggota
+                                        .length}
+                                </p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <p class="text-sm font-medium text-green-600">
+                                    Total SHU Dibagikan
+                                </p>
+                                <p class="text-lg font-bold text-green-900">
+                                    {formatCurrency(
+                                        selectedSHU.shu_report.detail_anggota.reduce(
+                                            (sum, member) =>
+                                                sum + member.total_shu_anggota,
+                                            0,
+                                        ),
+                                    )}
+                                </p>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <p class="text-sm font-medium text-purple-600">
+                                    Rata-rata SHU/Anggota
+                                </p>
+                                <p class="text-lg font-bold text-purple-900">
+                                    {formatCurrency(
+                                        selectedSHU.shu_report.detail_anggota.reduce(
+                                            (sum, member) =>
+                                                sum + member.total_shu_anggota,
+                                            0,
+                                        ) /
+                                            selectedSHU.shu_report
+                                                .detail_anggota.length,
+                                    )}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto border rounded-lg">
+                            <table class="min-w-full text-sm">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-4 py-2 text-left border-b"
-                                            >Email</th
+                                        <th
+                                            class="px-4 py-3 text-left font-semibold text-gray-900"
+                                            >No</th
                                         >
-                                        <th class="px-4 py-2 text-left border-b"
+                                        <th
+                                            class="px-4 py-3 text-left font-semibold text-gray-900"
+                                            >Anggota</th
+                                        >
+                                        <th
+                                            class="px-4 py-3 text-right font-semibold text-gray-900"
                                             >Simpanan</th
                                         >
-                                        <th class="px-4 py-2 text-left border-b"
+                                        <th
+                                            class="px-4 py-3 text-right font-semibold text-gray-900"
                                             >Penjualan</th
                                         >
-                                        <th class="px-4 py-2 text-left border-b"
+                                        <th
+                                            class="px-4 py-3 text-right font-semibold text-gray-900"
                                             >Jasa Modal</th
                                         >
-                                        <th class="px-4 py-2 text-left border-b"
+                                        <th
+                                            class="px-4 py-3 text-right font-semibold text-gray-900"
                                             >Jasa Usaha</th
                                         >
-                                        <th class="px-4 py-2 text-left border-b"
+                                        <th
+                                            class="px-4 py-3 text-right font-semibold text-gray-900 bg-green-50"
                                             >Total SHU</th
                                         >
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    {#each selectedSHU.shu_report.detail_anggota as member}
-                                        <tr class="border-b">
-                                            <td class="px-4 py-2"
-                                                >{member.email}</td
+                                <tbody class="divide-y divide-gray-200">
+                                    {#each selectedSHU.shu_report.detail_anggota as member, index}
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-4 py-3 text-gray-900"
+                                                >{index + 1}</td
                                             >
-                                            <td class="px-4 py-2"
-                                                >{formatCurrency(
+                                            <td class="px-4 py-3">
+                                                <div>
+                                                    <p
+                                                        class="font-medium text-gray-900"
+                                                    >
+                                                        {member.email}
+                                                    </p>
+                                                    <p
+                                                        class="text-sm text-gray-500"
+                                                    >
+                                                        ID: {member.user_id}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                            <td
+                                                class="px-4 py-3 text-right text-gray-900"
+                                            >
+                                                {formatCurrency(
                                                     member.total_simpanan,
-                                                )}</td
+                                                )}
+                                            </td>
+                                            <td
+                                                class="px-4 py-3 text-right text-gray-900"
                                             >
-                                            <td class="px-4 py-2"
-                                                >{formatCurrency(
+                                                {formatCurrency(
                                                     member.total_penjualan,
-                                                )}</td
+                                                )}
+                                            </td>
+                                            <td
+                                                class="px-4 py-3 text-right text-blue-600"
                                             >
-                                            <td class="px-4 py-2"
-                                                >{formatCurrency(
+                                                {formatCurrency(
                                                     member.jasa_modal,
-                                                )}</td
+                                                )}
+                                            </td>
+                                            <td
+                                                class="px-4 py-3 text-right text-purple-600"
                                             >
-                                            <td class="px-4 py-2"
-                                                >{formatCurrency(
+                                                {formatCurrency(
                                                     member.jasa_usaha,
-                                                )}</td
+                                                )}
+                                            </td>
+                                            <td
+                                                class="px-4 py-3 text-right font-bold text-green-600 bg-green-50"
                                             >
-                                            <td class="px-4 py-2 font-semibold"
-                                                >{formatCurrency(
+                                                {formatCurrency(
                                                     member.total_shu_anggota,
-                                                )}</td
-                                            >
+                                                )}
+                                            </td>
                                         </tr>
                                     {/each}
+                                    <!-- Total Row -->
+                                    <tr class="bg-gray-100 font-semibold">
+                                        <td class="px-4 py-3" colspan="2"
+                                            >TOTAL KESELURUHAN</td
+                                        >
+                                        <td class="px-4 py-3 text-right">
+                                            {formatCurrency(
+                                                selectedSHU.shu_report.detail_anggota.reduce(
+                                                    (sum, member) =>
+                                                        sum +
+                                                        member.total_simpanan,
+                                                    0,
+                                                ),
+                                            )}
+                                        </td>
+                                        <td class="px-4 py-3 text-right">
+                                            {formatCurrency(
+                                                selectedSHU.shu_report.detail_anggota.reduce(
+                                                    (sum, member) =>
+                                                        sum +
+                                                        member.total_penjualan,
+                                                    0,
+                                                ),
+                                            )}
+                                        </td>
+                                        <td
+                                            class="px-4 py-3 text-right text-blue-700"
+                                        >
+                                            {formatCurrency(
+                                                selectedSHU.shu_report.detail_anggota.reduce(
+                                                    (sum, member) =>
+                                                        sum + member.jasa_modal,
+                                                    0,
+                                                ),
+                                            )}
+                                        </td>
+                                        <td
+                                            class="px-4 py-3 text-right text-purple-700"
+                                        >
+                                            {formatCurrency(
+                                                selectedSHU.shu_report.detail_anggota.reduce(
+                                                    (sum, member) =>
+                                                        sum + member.jasa_usaha,
+                                                    0,
+                                                ),
+                                            )}
+                                        </td>
+                                        <td
+                                            class="px-4 py-3 text-right font-bold text-green-700 bg-green-100"
+                                        >
+                                            {formatCurrency(
+                                                selectedSHU.shu_report.detail_anggota.reduce(
+                                                    (sum, member) =>
+                                                        sum +
+                                                        member.total_shu_anggota,
+                                                    0,
+                                                ),
+                                            )}
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                {:else}
+                    <div class="border-t pt-6">
+                        <div
+                            class="bg-yellow-50 border border-yellow-200 rounded-lg p-4"
+                        >
+                            <h4
+                                class="text-lg font-semibold mb-2 text-yellow-800"
+                            >
+                                ⚠️ Data Detail Belum Tersedia
+                            </h4>
+                            <p class="text-yellow-700 mb-3">
+                                Laporan SHU ini belum memiliki detail pembagian
+                                kepada anggota.
+                            </p>
+                            <p class="text-sm text-yellow-600 mb-4">
+                                Klik tombol "Regenerate Detail" untuk
+                                mendapatkan detail lengkap pembagian.
+                            </p>
+
+                            <div class="flex gap-2 mb-3">
+                                <button
+                                    on:click={() =>
+                                        fetchDetailedSHUData(selectedSHU)}
+                                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+                                >
+                                    🔄 Regenerate Detail
+                                </button>
+                                <button
+                                    on:click={() =>
+                                        generateDetailedSHUReport(selectedSHU)}
+                                    class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm"
+                                >
+                                    📊 Generate Report
+                                </button>
+                            </div>
+                            <div
+                                class="mt-3 p-2 bg-yellow-100 rounded text-xs text-yellow-600"
+                            >
+                                <strong>Tersedia:</strong>
+                                {Object.keys(selectedSHU)
+                                    .filter(
+                                        (key) => !["shu_report"].includes(key),
+                                    )
+                                    .join(", ")}
+                                <br />
+                                <strong>Total SHU:</strong>
+                                {formatCurrency(selectedSHU.total_shu || 0)}
+                                <br />
+                                <strong>ID:</strong>
+                                {selectedSHU.ID || selectedSHU.id || "N/A"}
+                            </div>
                         </div>
                     </div>
                 {/if}
