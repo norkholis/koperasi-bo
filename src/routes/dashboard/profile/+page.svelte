@@ -1,11 +1,12 @@
 <script lang="ts">
     import type { User } from "$lib/types";
     import { enhance } from "$app/forms";
+    import { invalidateAll } from "$app/navigation";
 
     export let data;
     export let form;
 
-    const user: User = data.user;
+    $: user = data.user; // Make user reactive to data changes
 
     let profileLoading = false;
     let passwordLoading = false;
@@ -15,7 +16,8 @@
         return async ({ result }: { result: any }) => {
             profileLoading = false;
             if (result.type === "success") {
-                // Profile updated successfully
+                // Profile updated successfully - refresh data
+                await invalidateAll();
             }
         };
     }
@@ -126,9 +128,9 @@
                                 >Terdaftar:</span
                             >
                             <span class="ml-2"
-                                >{new Date(user.created_at || "").toLocaleDateString(
-                                    "id-ID",
-                                )}</span
+                                >{new Date(
+                                    user.created_at || "",
+                                ).toLocaleDateString("id-ID")}</span
                             >
                         </div>
                     </div>
@@ -170,14 +172,14 @@
 
                 <div>
                     <label
-                        for="phone"
+                        for="phone_number"
                         class="block text-sm font-medium text-gray-700 mb-1"
                     >
                         No. Telepon
                     </label>
                     <input
-                        id="phone"
-                        name="phone"
+                        id="phone_number"
+                        name="phone_number"
                         type="tel"
                         value={user.phone_number || ""}
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"

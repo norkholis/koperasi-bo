@@ -8,12 +8,12 @@ export const actions: Actions = {
         const payload: any = {};
 
         const fullName = fd.get('full_name') as string;
-        const phone = fd.get('phone') as string;
+        const phone = fd.get('phone_number') as string;
         const address = fd.get('address') as string;
         const email = fd.get('email') as string;
 
-        if (fullName) payload.full_name = fullName;
-        if (phone) payload.phone = phone;
+        if (fullName) payload.name = fullName;
+        if (phone) payload.phone_number = phone;
         if (address) payload.address = address;
         if (email) payload.email = email;
 
