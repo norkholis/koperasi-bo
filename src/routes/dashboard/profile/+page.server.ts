@@ -43,7 +43,8 @@ export const actions: Actions = {
         try {
             await axios.put('/me/password', {
                 current_password: currentPassword,
-                new_password: newPassword
+                new_password: newPassword,
+                confirm_password: confirmPassword
             });
             return { passwordSuccess: 'Password berhasil diubah' };
         } catch (error: any) {
