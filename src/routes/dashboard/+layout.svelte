@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import DebugPanel from "$lib/components/DebugPanel.svelte";
+    // import DebugPanel from "$lib/components/DebugPanel.svelte";
     export let data;
     $: user = data.user;
 
@@ -63,7 +63,7 @@
 
                 <a
                     href="/dashboard/simpanan"
-                    class="hover:bg-indigo-600 px-3 py-1 rounded">Simpanan</a
+                    class="hover:bg-indigo-600 px-3 py-1 rounded">Wadiah</a
                 >
 
                 <!-- Pinjaman Dropdown -->
@@ -108,7 +108,7 @@
                                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                         on:click={closePinjamanDropdown}
                                     >
-                                        Kelola Bunga
+                                        Kelola Ujrah
                                     </a>
                                 {/if}
                             </div>
@@ -221,7 +221,7 @@
                         class="block px-3 py-2 rounded-md hover:bg-indigo-600 transition-colors"
                         on:click={closeMobileMenu}
                     >
-                        Simpanan
+                        Wadiah
                     </a>
 
                     <!-- Pinjaman Menu -->
@@ -239,7 +239,7 @@
                                 class="block px-6 py-2 rounded-md hover:bg-indigo-600 transition-colors text-sm text-indigo-200"
                                 on:click={closeMobileMenu}
                             >
-                                • Kelola Bunga
+                                • Kelola Ujrah
                             </a>
                         {/if}
                     </div>
@@ -304,4 +304,4 @@
 </main>
 
 <!-- Debug Panel for API Testing -->
-<DebugPanel />
+<!-- <DebugPanel /> -->

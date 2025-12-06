@@ -66,9 +66,9 @@
       />
     </label>
     <button class="w-full bg-blue-600 text-white py-2 rounded">Masuk</button>
-    <p class="text-sm text-center mt-4">
+    <!-- <p class="text-sm text-center mt-4">
       Belum punya akun?
       <a href="/register" class="text-indigo-600">Daftar baru</a>
-    </p>
+    </p> -->
   </form>
 </div>

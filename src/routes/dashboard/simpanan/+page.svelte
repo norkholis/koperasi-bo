@@ -9,7 +9,7 @@
     import { invalidateAll, goto } from "$app/navigation";
     import axios from "$lib/api";
     import { onMount } from "svelte";
-    import WalletDebugger from "$lib/components/WalletDebugger.svelte";
+    // import WalletDebugger from "$lib/components/WalletDebugger.svelte";
     import {
         showSuccess,
         showError,
@@ -403,17 +403,17 @@
 
 <div class="p-6">
     <!-- Debug Panel (temporary) -->
-    <div class="mb-6">
+    <!-- <div class="mb-6">
         <WalletDebugger />
-    </div>
+    </div> -->
 
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-4">
             <h1 class="text-2xl font-bold">
                 {isMember
-                    ? "Wallet Simpanan Saya"
-                    : "Manajemen Wallet Simpanan"}
+                    ? "Wallet Wadiah Saya"
+                    : "Manajemen Wallet Wadiah"}
             </h1>
             {#if selectedUserId && isAdmin}
                 <a
@@ -843,9 +843,9 @@
                         required
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                        <option value="pokok">Simpanan Pokok</option>
-                        <option value="wajib">Simpanan Wajib</option>
-                        <option value="sukarela">Simpanan Sukarela</option>
+                        <option value="pokok">Wadiah Pokok</option>
+                        <option value="wajib">Wadiah Wajib</option>
+                        <option value="sukarela">Wadiah Sukarela</option>
                     </select>
                 </div>
 

@@ -461,7 +461,7 @@
 
 <div class="container mx-auto px-4 py-8">
     <!-- Debug info -->
-    <div class="mb-4 p-4 bg-yellow-100 border border-yellow-300 rounded">
+    <!-- <div class="mb-4 p-4 bg-yellow-100 border border-yellow-300 rounded">
         <h4>Debug Info:</h4>
         <p>showCreateModal: {showCreateModal}</p>
         <p>showEditModal: {showEditModal}</p>
@@ -506,13 +506,13 @@
         >
             Test Edit Modal
         </button>
-    </div>
+    </div> -->
 
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Manajemen Bunga</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Manajemen Ujrah</h1>
             <p class="text-gray-600 mt-2">
-                Kelola opsi bunga untuk pinjaman anggota
+                Kelola opsi ujrah untuk pembiayaan anggota
             </p>
         </div>
 
@@ -521,7 +521,7 @@
                 on:click={openCreateModal}
                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             >
-                + Tambah Bunga
+                + Tambah Ujrah
             </button>
         {/if}
     </div>
@@ -531,23 +531,23 @@
             <div
                 class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
             ></div>
-            <span class="ml-2 text-gray-600">Memuat data bunga...</span>
+            <span class="ml-2 text-gray-600">Memuat data ujrah...</span>
         </div>
     {:else if bungaOptions.length === 0}
         <div class="text-center py-12">
             <div class="text-gray-400 text-6xl mb-4">📊</div>
             <h3 class="text-xl font-medium text-gray-900 mb-2">
-                Belum ada bunga
+                Belum ada ujrah
             </h3>
             <p class="text-gray-600 mb-6">
-                Tambahkan opsi bunga pertama untuk memulai
+                Tambahkan opsi ujrah pertama untuk memulai
             </p>
             {#if canManageBunga}
                 <button
                     on:click={openCreateModal}
                     class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
                 >
-                    Tambah Bunga Pertama
+                    Tambah Ujrah Pertama
                 </button>
             {/if}
         </div>
@@ -747,7 +747,7 @@
         class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
     >
         <div class="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
-            <h2 class="text-xl font-bold mb-4">Tambah Bunga Baru</h2>
+            <h2 class="text-xl font-bold mb-4">Tambah Ujrah Baru</h2>
 
             <form
                 on:submit|preventDefault={createBungaOption}
@@ -755,14 +755,14 @@
             >
                 <div>
                     <label class="block text-sm font-medium mb-1"
-                        >Nama Bunga *</label
+                        >Nama Ujrah *</label
                     >
                     <input
                         type="text"
                         bind:value={createForm.nama}
                         required
                         class="w-full border border-gray-300 rounded px-3 py-2"
-                        placeholder="e.g., Bunga Rendah"
+                        placeholder="e.g., Ujrah Standar"
                     />
                 </div>
 
@@ -822,17 +822,17 @@
     >
         <div class="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
             <h2 class="text-xl font-bold mb-4">
-                Edit Bunga: {selectedBunga?.nama || "Unknown"}
+                Edit Ujrah: {selectedBunga?.nama || "Unknown"}
             </h2>
 
             <!-- Debug info in modal -->
-            <div
+            <!-- <div
                 class="mb-4 p-2 bg-blue-50 border border-blue-200 rounded text-xs"
             >
                 <strong>Debug - Modal Data:</strong>
                 <p>selectedBunga: {JSON.stringify(selectedBunga)}</p>
                 <p>editForm: {JSON.stringify(editForm)}</p>
-            </div>
+            </div> -->
 
             <form
                 on:submit|preventDefault={updateBungaOption}
@@ -840,14 +840,14 @@
             >
                 <div>
                     <label class="block text-sm font-medium mb-1"
-                        >Nama Bunga *</label
+                        >Nama Ujrah *</label
                     >
                     <input
                         type="text"
                         bind:value={editForm.nama}
                         required
                         class="w-full border border-gray-300 rounded px-3 py-2"
-                        placeholder="e.g., Bunga Rendah"
+                        placeholder="e.g., Ujrah Standar"
                     />
                 </div>
 

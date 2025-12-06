@@ -69,7 +69,7 @@
     }
 </script>
 
-<div class="bg-white p-4 rounded-lg shadow border">
+<!-- <div class="bg-white p-4 rounded-lg shadow border">
     <h3 class="text-lg font-bold mb-4">🔧 Wallet API Debugger</h3>
 
     <div class="space-x-2 mb-4">
@@ -101,4 +101,4 @@
             {debugOutput}
         </div>
     {/if}
-</div>
+</div> -->
