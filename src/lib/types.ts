@@ -62,6 +62,11 @@ export interface Wallet {
     description: string;
     created_at: string;
     updated_at: string;
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+    };
 }
 
 export interface WalletTransaction {

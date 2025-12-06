@@ -22,7 +22,16 @@ function transformLoan(pinjaman: any): Loan {
         jumlah_angsuran: pinjaman.JumlahAngsuran || pinjaman.jumlah_angsuran || 0,
         sisa_angsuran: pinjaman.SisaAngsuran || pinjaman.sisa_angsuran || 0,
         status: pinjaman.Status || pinjaman.status || 'proses',
-        user: pinjaman.User || pinjaman.user
+        user: (pinjaman.User || pinjaman.user) ? {
+            id: (pinjaman.User?.ID || pinjaman.user?.ID || pinjaman.User?.id || pinjaman.user?.id),
+            name: (pinjaman.User?.Name || pinjaman.user?.Name || pinjaman.User?.name || pinjaman.user?.name || ''),
+            email: (pinjaman.User?.Email || pinjaman.user?.Email || pinjaman.User?.email || pinjaman.user?.email || ''),
+            address: (pinjaman.User?.Address || pinjaman.user?.Address || pinjaman.User?.address || pinjaman.user?.address || ''),
+            phone_number: (pinjaman.User?.PhoneNumber || pinjaman.user?.PhoneNumber || pinjaman.User?.phone_number || pinjaman.user?.phone_number || ''),
+            nik: (pinjaman.User?.NIK || pinjaman.user?.NIK || pinjaman.User?.nik || pinjaman.user?.nik || ''),
+            role_id: (pinjaman.User?.RoleID || pinjaman.user?.RoleID || pinjaman.User?.role_id || pinjaman.user?.role_id || 0),
+            role: (pinjaman.User?.Role || pinjaman.user?.Role || pinjaman.User?.role || pinjaman.user?.role)
+        } : undefined
     };
 
     console.log("🔄 Transforming loan:", pinjaman);

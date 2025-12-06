@@ -10,7 +10,12 @@ function transformWallet(apiWallet: any): Wallet {
         balance: apiWallet.Balance,
         description: apiWallet.Description,
         created_at: apiWallet.CreatedAt,
-        updated_at: apiWallet.UpdatedAt
+        updated_at: apiWallet.UpdatedAt,
+        user: (apiWallet.user || apiWallet.User) ? {
+            id: (apiWallet.user?.ID || apiWallet.User?.ID || apiWallet.user?.id || apiWallet.User?.id),
+            name: (apiWallet.user?.Name || apiWallet.User?.Name || apiWallet.user?.name || apiWallet.User?.name),
+            email: (apiWallet.user?.Email || apiWallet.User?.Email || apiWallet.user?.email || apiWallet.User?.email)
+        } : undefined
     };
 }
 
