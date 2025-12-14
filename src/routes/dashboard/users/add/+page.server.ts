@@ -38,16 +38,17 @@ export const actions: Actions = {
             }
         }
 
+        // Build payload according to API documentation
         const payload: any = {
             email,
             password,
-            role_id: roleId,
             name,
+            address,
             phone_number: phoneNumber,
-            address
+            role_id: roleId
         };
 
-        // Only include NIK if it's provided
+        // Only include NIK if it's provided and valid
         if (cleanNik) {
             payload.nik = cleanNik;
         }
@@ -57,7 +58,7 @@ export const actions: Actions = {
             const response = await axios.post('/users', payload);
             console.log('✅ API Response Status:', response.status);
             console.log('✅ API Response Data:', response.data);
-            
+
             // Check for successful response (2xx status codes)
             if (response.status >= 200 && response.status < 300) {
                 if (response.data?.data) {
@@ -66,7 +67,7 @@ export const actions: Actions = {
                 } else {
                     console.log('✅ User created successfully (no data field in response)');
                 }
-                
+
                 // Successful creation - redirect with success message
                 throw redirect(303, '/dashboard/users?success=User berhasil ditambahkan');
             } else {
@@ -79,7 +80,7 @@ export const actions: Actions = {
             if (error.status === 303) {
                 throw error; // Re-throw the redirect
             }
-            
+
             console.error('❌ Add user error:', error.response?.data);
             console.error('🔍 Full error object:', error);
             console.log('📊 Error status:', error.response?.status);
@@ -89,13 +90,18 @@ export const actions: Actions = {
 
             // Check for specific status codes
             if (error.response?.status === 409) {
-                // 409 Conflict - typically means duplicate resource
-                errorMessage = 'Email sudah terdaftar dalam sistem. Silakan gunakan email yang berbeda.';
+                const apiError = error.response?.data?.error || '';
+                // Check if it's a NIK or email duplicate
+                if (apiError.includes('nik') || apiError.includes('NIK') || apiError.includes('uni_users_nik')) {
+                    errorMessage = 'NIK sudah terdaftar dalam sistem. Silakan gunakan NIK yang berbeda.';
+                } else {
+                    errorMessage = 'Email sudah terdaftar dalam sistem. Silakan gunakan email yang berbeda.';
+                }
             }
             else if (error.response?.data?.error) {
                 const apiError = error.response.data.error;
                 console.log('🔍 API Error received:', apiError);
-                
+
                 // Handle specific error messages from the new API format
                 if (apiError === 'NIK already exists') {
                     errorMessage = 'NIK sudah terdaftar dalam sistem. Silakan gunakan NIK yang berbeda.';
@@ -128,9 +134,9 @@ export const actions: Actions = {
 
             console.log('💬 About to return error message:', errorMessage);
             console.log('🔍 Error response status:', error.response?.status);
-            
+
             // Return a simple fail response
-            return fail(400, { 
+            return fail(400, {
                 error: errorMessage
             });
         }

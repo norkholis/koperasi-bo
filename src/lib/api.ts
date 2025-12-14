@@ -3,11 +3,16 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { extractErrorMessage, isErrorResponse } from './errorUtils';
 import { showError } from '$lib/stores/notifications';
+import { PUBLIC_API_URL } from '$env/static/public';
+
+console.log('🔧 API Configuration - PUBLIC_API_URL:', PUBLIC_API_URL);
 
 const axios = Axios.create({
-    baseURL: import.meta.env.PUBLIC_API_URL,
+    baseURL: PUBLIC_API_URL,
     headers: { 'Content-Type': 'application/json' }
 });
+
+console.log('🔧 Axios instance created with baseURL:', axios.defaults.baseURL);
 
 // Enhanced request interceptor with comprehensive logging
 axios.interceptors.request.use((config) => {
