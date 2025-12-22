@@ -1,6 +1,6 @@
 export interface Role {
     id: number;
-    name: 'super_admin' | 'admin' | 'member';
+    name: 'super_admin' | 'admin' | 'member' | 'user';
 }
 
 export interface User {
@@ -90,6 +90,23 @@ export interface TopupRequest {
     type: 'pokok' | 'wajib' | 'sukarela';
     amount: number;
     description: string;
+    image_bukti_transfer: string;
+    bank_account_id?: number | string;
+}
+
+export interface BankAccount {
+    id: number;
+    ID?: number; // API might return ID instead of id
+    bank_name: string;
+    account_number: string;
+    account_holder_name: string;
+    account_name?: string; // Alternative field name
+    description?: string;
+    is_active: boolean;
+    created_at?: string;
+    CreatedAt?: string;
+    updated_at?: string;
+    UpdatedAt?: string;
 }
 
 export interface BalanceAdjustment {
@@ -214,8 +231,9 @@ export interface InstallmentRequest {
     bunga: number;
     denda?: number;
     image_bukti_transfer: string; // Required - path/URL to transfer receipt
-    no_rekening: string; // Required - account number used for payment
-    bank_name: string; // Required - bank name used for payment
+    bank_account_id?: number | string; // Optional - bank account selection
+    no_rekening?: string; // Optional - account number (if bank_account_id not provided)
+    bank_name?: string; // Optional - bank name (if bank_account_id not provided)
 }
 
 export interface InstallmentVerification {

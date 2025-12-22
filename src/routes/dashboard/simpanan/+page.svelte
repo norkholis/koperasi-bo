@@ -4,6 +4,7 @@
         WalletTransaction,
         TopupRequest,
         BalanceAdjustment,
+        BankAccount,
     } from "$lib/types";
     import { page } from "$app/stores";
     import { invalidateAll, goto } from "$app/navigation";
@@ -23,6 +24,7 @@
         data.pendingTransactions || [];
     const currentUser = data.currentUser;
     const selectedUserId = data.selectedUserId;
+    let activeBankAccounts: BankAccount[] = [];
 
     // Debug logging (only if needed)
     console.log("🚀 Simpanan page loaded");
@@ -82,6 +84,8 @@
         type: "wajib",
         amount: 0,
         description: "",
+        image_bukti_transfer: "",
+        bank_account_id: "",
     };
 
     let balanceAdjustForm: BalanceAdjustment = {
@@ -89,7 +93,7 @@
         description: "",
     };
 
-    onMount(() => {
+    onMount(async () => {
         // Check for success message in URL params
         const success = $page.url.searchParams.get("success");
         if (success) {
@@ -105,6 +109,14 @@
             setTimeout(() => {
                 showSuccessMessage = false;
             }, 5000);
+        }
+
+        // Fetch active bank accounts for top-up
+        try {
+            const response = await axios.get("/bank-accounts/active");
+            activeBankAccounts = response.data.data || [];
+        } catch (error) {
+            console.error("Failed to fetch active bank accounts:", error);
         }
     });
 
@@ -177,6 +189,8 @@
             type: walletType,
             amount: 0,
             description: "",
+            image_bukti_transfer: "",
+            bank_account_id: "",
         };
         showTopupModal = true;
     }
@@ -886,6 +900,55 @@
                     </p>
                 </div>
 
+                <!-- Bank Account Selection -->
+                {#if activeBankAccounts.length > 0}
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                            Transfer ke Rekening
+                        </label>
+                        <select
+                            bind:value={topupForm.bank_account_id}
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value=""
+                                >Pilih rekening tujuan (opsional)</option
+                            >
+                            {#each activeBankAccounts as bankAccount}
+                                <option
+                                    value={bankAccount.id || bankAccount.ID}
+                                >
+                                    {bankAccount.bank_name} - {bankAccount.account_number}
+                                    ({bankAccount.account_holder_name ||
+                                        bankAccount.account_name ||
+                                        "-"})
+                                </option>
+                            {/each}
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Pilih rekening bank tujuan transfer Anda
+                        </p>
+                    </div>
+                {/if}
+
+                <!-- Image Bukti Transfer -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        URL Bukti Transfer *
+                    </label>
+                    <input
+                        type="url"
+                        bind:value={topupForm.image_bukti_transfer}
+                        required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="https://example.com/bukti-transfer.jpg"
+                    />
+                    <p class="text-xs text-gray-500 mt-1">
+                        Masukkan URL gambar bukti transfer Anda
+                    </p>
+                </div>
+
                 <!-- Description -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -893,10 +956,9 @@
                     </label>
                     <textarea
                         bind:value={topupForm.description}
-                        required
                         rows="3"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Alasan atau keterangan top-up..."
+                        placeholder="Alasan atau keterangan top-up (opsional)..."
                     ></textarea>
                 </div>
 

@@ -61,6 +61,14 @@
                     >
                 {/if}
 
+                {#if canManageUsers}
+                    <a
+                        href="/dashboard/bank-accounts"
+                        class="hover:bg-indigo-600 px-3 py-1 rounded"
+                        >Rekening Bank</a
+                    >
+                {/if}
+
                 <a
                     href="/dashboard/simpanan"
                     class="hover:bg-indigo-600 px-3 py-1 rounded">Wadiah</a
@@ -213,6 +221,16 @@
                             on:click={closeMobileMenu}
                         >
                             Kelola User
+                        </a>
+                    {/if}
+
+                    {#if canManageUsers}
+                        <a
+                            href="/dashboard/bank-accounts"
+                            class="block px-3 py-2 rounded-md hover:bg-indigo-600 transition-colors"
+                            on:click={closeMobileMenu}
+                        >
+                            Rekening Bank
                         </a>
                     {/if}
 
