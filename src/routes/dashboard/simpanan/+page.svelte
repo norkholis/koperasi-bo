@@ -50,7 +50,16 @@
     const isAdmin =
         currentUser?.role?.name === "admin" ||
         currentUser?.role?.name === "super_admin";
-    const isMember = currentUser?.role?.name === "member";
+    const isMember =
+        currentUser?.role?.name === "member" ||
+        currentUser?.role?.name === "user";
+
+    console.log("🔐 Permission checks:", {
+        roleName: currentUser?.role?.name,
+        isAdmin,
+        isMember,
+        selectedUserId,
+    });
 
     // Success message handling
     let successMessage = "";
@@ -411,9 +420,7 @@
     <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-4">
             <h1 class="text-2xl font-bold">
-                {isMember
-                    ? "Wallet Wadiah Saya"
-                    : "Manajemen Wallet Wadiah"}
+                {isMember ? "Wallet Wadiah Saya" : "Manajemen Wallet Wadiah"}
             </h1>
             {#if selectedUserId && isAdmin}
                 <a
@@ -470,6 +477,13 @@
 
     <!-- Wallet Cards (for Members or Specific User View) -->
     {#if isMember || selectedUserId}
+        <!-- Debug: Show wallet cards section -->
+        {console.log(
+            "✅ Showing wallet cards - isMember:",
+            isMember,
+            "selectedUserId:",
+            selectedUserId,
+        )}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {#each ["pokok", "wajib", "sukarela"] as walletType}
                 {@const wallet = getWalletByType(walletType)}
@@ -504,50 +518,54 @@
                         <div class="text-xs text-gray-500 mb-4">
                             Diperbarui: {formatDate(wallet.updated_at)}
                         </div>
-
-                        <div class="flex gap-2 flex-wrap">
-                            {#if isMember}
-                                <button
-                                    on:click={() =>
-                                        openTopupModal(
-                                            walletType as
-                                                | "pokok"
-                                                | "wajib"
-                                                | "sukarela",
-                                        )}
-                                    class="flex-1 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                                >
-                                    Top Up
-                                </button>
-                            {:else if isAdmin}
-                                <button
-                                    on:click={() =>
-                                        openBalanceAdjustModal(wallet)}
-                                    class="flex-1 px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                                >
-                                    Sesuaikan Saldo
-                                </button>
-                            {/if}
-                            {#if wallet}
-                                <button
-                                    on:click={() =>
-                                        openTransactionHistoryModal(wallet)}
-                                    class="flex-1 px-3 py-2 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-                                >
-                                    Riwayat
-                                </button>
-                            {/if}
-                        </div>
                     {:else}
-                        <div class="text-center py-4">
-                            <p class="text-gray-500 text-sm mb-3">
+                        <div class="text-center py-4 mb-4">
+                            <p class="text-gray-500 text-sm mb-1">
                                 Wallet belum tersedia
                             </p>
                             <p class="text-xs text-gray-400">
-                                Wallet akan dibuat otomatis saat registrasi
+                                Wallet akan dibuat saat Top-Up pertama
                             </p>
                         </div>
                     {/if}
+
+                    <div class="flex gap-2 flex-wrap">
+                        {#if isMember}
+                            <!-- Debug: Top-Up button should be visible -->
+                            {console.log(
+                                `🔵 Rendering Top-Up button for ${walletType} - isMember:`,
+                                isMember,
+                            )}
+                            <button
+                                on:click={() =>
+                                    openTopupModal(
+                                        walletType as
+                                            | "pokok"
+                                            | "wajib"
+                                            | "sukarela",
+                                    )}
+                                class="flex-1 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                            >
+                                Top Up
+                            </button>
+                        {:else if isAdmin && wallet}
+                            <button
+                                on:click={() => openBalanceAdjustModal(wallet)}
+                                class="flex-1 px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                            >
+                                Sesuaikan Saldo
+                            </button>
+                        {/if}
+                        {#if wallet}
+                            <button
+                                on:click={() =>
+                                    openTransactionHistoryModal(wallet)}
+                                class="flex-1 px-3 py-2 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                            >
+                                Riwayat
+                            </button>
+                        {/if}
+                    </div>
                 </div>
             {/each}
         </div>
@@ -723,7 +741,7 @@
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                 >
-                                    {wallet.user?.name || '-'}
+                                    {wallet.user?.name || "-"}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span

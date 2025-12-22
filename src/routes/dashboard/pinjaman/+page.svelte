@@ -72,7 +72,9 @@
     const isAdmin =
         currentUser?.role?.name === "admin" ||
         currentUser?.role?.name === "super_admin";
-    const isMember = currentUser?.role?.name === "member";
+    const isMember =
+        currentUser?.role?.name === "member" ||
+        currentUser?.role?.name === "user";
 
     // Success message handling
     let successMessage = "";

@@ -9,7 +9,7 @@
         user?.role?.name === "admin" || user?.role?.name === "super_admin";
     $: isSuper = user?.role?.name === "super_admin";
     $: isAdmin = user?.role?.name === "admin";
-    $: isMember = user?.role?.name === "member";
+    $: isMember = user?.role?.name === "member" || user?.role?.name === "user";
 
     // Mobile menu state
     let showMobileMenu = false;

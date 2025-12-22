@@ -96,7 +96,7 @@ export const load: PageServerLoad = async ({ parent, url, cookies }) => {
         console.log("🎯 Selected User ID:", selectedUserId);
 
         const isAdmin = currentUser.role?.name === "admin" || currentUser.role?.name === "super_admin";
-        const isMember = currentUser.role?.name === "member";
+        const isMember = currentUser.role?.name === "member" || currentUser.role?.name === "user";
 
         console.log("🔐 User permissions:", { isAdmin, isMember });
 
