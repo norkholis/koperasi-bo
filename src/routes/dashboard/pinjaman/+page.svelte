@@ -11,6 +11,7 @@
     import { invalidateAll, goto } from "$app/navigation";
     import axios from "$lib/api";
     import { onMount } from "svelte";
+    import { uploadImageToCloudinary } from "$lib/cloudinary";
     import {
         showSuccess,
         showError,
@@ -27,6 +28,25 @@
     const selectedUserId = data.selectedUserId;
 
     // Debug logging
+    console.log(
+        "🔍 Page loaded with pendingInstallments:",
+        pendingInstallments,
+    );
+    console.log("🔍 First installment:", pendingInstallments[0]);
+    if (pendingInstallments[0]) {
+        console.log(
+            "🔍 First installment image_bukti_transfer:",
+            pendingInstallments[0].image_bukti_transfer,
+        );
+        console.log(
+            "🔍 First installment bank_name:",
+            pendingInstallments[0].bank_name,
+        );
+        console.log(
+            "🔍 First installment no_rekening:",
+            pendingInstallments[0].no_rekening,
+        );
+    }
     console.log("🚀 Pinjaman page loaded");
     console.log(
         "👤 Current user:",
@@ -115,6 +135,11 @@
         no_rekening: "",
         bank_name: "",
     };
+
+    // Image upload state for installment
+    let useFileUploadInstallment = false;
+    let isUploadingInstallment = false;
+    let selectedFileInstallment: File | null = null;
 
     onMount(async () => {
         // Fetch active bank accounts
@@ -418,6 +443,11 @@
                 total_bayar: installment.total_bayar, // snake_case in API response
                 user_id: installment.user_id, // snake_case in API response
                 status: installment.status, // snake_case in API response
+                image_bukti_transfer: installment.image_bukti_transfer, // Payment proof image
+                no_rekening: installment.no_rekening, // Account number
+                bank_name: installment.bank_name, // Bank name
+                pinjaman: installment.pinjaman,
+                user: installment.user,
             }));
 
             console.log("✅ Transformed loan installments:", loanInstallments);
@@ -472,10 +502,55 @@
             no_rekening: "",
             bank_name: "",
         };
+        // Reset upload state
+        useFileUploadInstallment = false;
+        selectedFileInstallment = null;
+        isUploadingInstallment = false;
         showInstallmentModal = true;
     }
 
+    // Handle file selection and upload for installment
+    async function handleFileSelectInstallment(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const file = target.files?.[0];
+
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith("image/")) {
+            showError("File harus berupa gambar");
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showError("Ukuran file maksimal 5MB");
+            return;
+        }
+
+        selectedFileInstallment = file;
+        isUploadingInstallment = true;
+
+        try {
+            const url = await uploadImageToCloudinary(file);
+            installmentForm.image_bukti_transfer = url;
+            showSuccess("Gambar berhasil diupload!");
+        } catch (error) {
+            showError("Gagal mengupload gambar. Silakan coba lagi.");
+            console.error("Upload error:", error);
+        } finally {
+            isUploadingInstallment = false;
+        }
+    }
+
     function openInstallmentDetailModal(installment: Installment) {
+        console.log("📋 Opening installment detail modal:", installment);
+        console.log(
+            "📋 Image bukti transfer:",
+            installment.image_bukti_transfer,
+        );
+        console.log("📋 Bank name:", installment.bank_name);
+        console.log("📋 No rekening:", installment.no_rekening);
         selectedInstallment = installment;
         showInstallmentDetailModal = true;
     }
@@ -1863,19 +1938,122 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         Bukti Transfer *
                     </label>
-                    <input
-                        type="text"
-                        bind:value={installmentForm.image_bukti_transfer}
-                        placeholder="/uploads/angsuran/bukti_transfer_123.jpg"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">
-                        Path atau URL ke file bukti transfer
-                    </p>
+
+                    <!-- Toggle between upload and manual URL -->
+                    <div class="flex items-center gap-4 mb-3">
+                        <button
+                            type="button"
+                            on:click={() => {
+                                useFileUploadInstallment = true;
+                            }}
+                            class="px-3 py-1.5 text-sm rounded-md transition-colors {useFileUploadInstallment
+                                ? 'bg-blue-500 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                        >
+                            📤 Upload File
+                        </button>
+                        <button
+                            type="button"
+                            on:click={() => {
+                                useFileUploadInstallment = false;
+                                selectedFileInstallment = null;
+                            }}
+                            class="px-3 py-1.5 text-sm rounded-md transition-colors {!useFileUploadInstallment
+                                ? 'bg-blue-500 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                        >
+                            🔗 Input URL Manual
+                        </button>
+                    </div>
+
+                    {#if useFileUploadInstallment}
+                        <!-- File Upload Mode -->
+                        <div class="space-y-2">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                on:change={handleFileSelectInstallment}
+                                disabled={isUploadingInstallment}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            {#if isUploadingInstallment}
+                                <div
+                                    class="flex items-center gap-2 text-sm text-blue-600"
+                                >
+                                    <svg
+                                        class="animate-spin h-4 w-4"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4"
+                                        ></circle>
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    <span>Mengupload gambar...</span>
+                                </div>
+                            {/if}
+                            {#if installmentForm.image_bukti_transfer && !isUploadingInstallment}
+                                <div
+                                    class="flex items-center gap-2 text-sm text-green-600"
+                                >
+                                    <svg
+                                        class="h-4 w-4"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                    <span>Gambar berhasil diupload</span>
+                                </div>
+                                <a
+                                    href={installmentForm.image_bukti_transfer}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="text-xs text-blue-600 hover:underline break-all"
+                                >
+                                    {installmentForm.image_bukti_transfer}
+                                </a>
+                            {/if}
+                            <p class="text-xs text-gray-500">
+                                Upload gambar bukti transfer (max 5MB, format:
+                                JPG, PNG, GIF)
+                            </p>
+                        </div>
+                    {:else}
+                        <!-- Manual URL Input Mode -->
+                        <div class="space-y-2">
+                            <input
+                                type="text"
+                                bind:value={
+                                    installmentForm.image_bukti_transfer
+                                }
+                                placeholder="/uploads/angsuran/bukti_transfer_123.jpg"
+                                required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            <p class="text-xs text-gray-500">
+                                Path atau URL ke file bukti transfer
+                            </p>
+                        </div>
+                    {/if}
                 </div>
 
                 <div>
@@ -2182,7 +2360,7 @@
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl"
+            class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
             on:click|stopPropagation
         >
             <h3 class="text-lg font-semibold text-gray-900 mb-4">
@@ -2190,6 +2368,18 @@
             </h3>
 
             <div class="space-y-3">
+                {#if selectedInstallment.user}
+                    <div>
+                        <p class="text-sm text-gray-600">Member</p>
+                        <p class="font-semibold">
+                            {selectedInstallment.user.name}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            {selectedInstallment.user.email}
+                        </p>
+                    </div>
+                {/if}
+
                 <div>
                     <p class="text-sm text-gray-600">Pinjaman</p>
                     <p class="font-semibold">
@@ -2226,6 +2416,20 @@
                     </p>
                 </div>
 
+                {#if selectedInstallment.bank_name || selectedInstallment.no_rekening}
+                    <div>
+                        <p class="text-sm text-gray-600">Bank Pembayaran</p>
+                        <p class="font-semibold">
+                            {selectedInstallment.bank_name || "-"}
+                        </p>
+                        {#if selectedInstallment.no_rekening}
+                            <p class="text-sm text-gray-500">
+                                No. Rek: {selectedInstallment.no_rekening}
+                            </p>
+                        {/if}
+                    </div>
+                {/if}
+
                 <div>
                     <p class="text-sm text-gray-600">Status</p>
                     <span
@@ -2243,6 +2447,41 @@
                         {formatDate(selectedInstallment.tanggal_bayar)}
                     </p>
                 </div>
+
+                {#if selectedInstallment.image_bukti_transfer}
+                    <div>
+                        <p class="text-sm text-gray-600 mb-2">Bukti Transfer</p>
+                        <div class="border rounded-lg overflow-hidden">
+                            <img
+                                src={selectedInstallment.image_bukti_transfer}
+                                alt="Bukti Transfer"
+                                class="w-full h-auto"
+                                on:error={(e) => {
+                                    e.currentTarget.style.display = "none";
+                                    const parent =
+                                        e.currentTarget.parentElement;
+                                    if (parent) {
+                                        const errorDiv =
+                                            document.createElement("div");
+                                        errorDiv.className =
+                                            "p-4 bg-gray-50 text-center text-gray-500 text-sm";
+                                        errorDiv.textContent =
+                                            "Gambar tidak dapat dimuat";
+                                        parent.appendChild(errorDiv);
+                                    }
+                                }}
+                            />
+                        </div>
+                        <a
+                            href={selectedInstallment.image_bukti_transfer}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-xs text-blue-600 hover:underline mt-1 inline-block break-all"
+                        >
+                            Lihat gambar penuh
+                        </a>
+                    </div>
+                {/if}
             </div>
 
             <div class="flex gap-3 pt-6">

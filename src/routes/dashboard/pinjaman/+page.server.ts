@@ -50,9 +50,19 @@ function transformLoan(pinjaman: any): Loan {
 
 // Transform Angsuran from API response to frontend format
 function transformInstallment(angsuran: any): Installment {
-    return {
-        id: angsuran.ID,
-        pinjaman_id: angsuran.pinjaman_id || angsuran.PinjamanID, // Support both formats
+    console.log('🔄 Transforming installment:', {
+        ID: angsuran.ID,
+        image_bukti_transfer: angsuran.image_bukti_transfer,
+        ImageBuktiTransfer: angsuran.ImageBuktiTransfer,
+        NoRekening: angsuran.NoRekening,
+        no_rekening: angsuran.no_rekening,
+        BankName: angsuran.BankName,
+        bank_name: angsuran.bank_name
+    });
+
+    const transformed: Installment = {
+        id: angsuran.ID || angsuran.id,
+        pinjaman_id: angsuran.pinjaman_id || angsuran.PinjamanID,
         angsuran_ke: angsuran.angsuran_ke || angsuran.AngsuranKe,
         tanggal_bayar: angsuran.tanggal_bayar || angsuran.TanggalBayar,
         pokok: angsuran.pokok || angsuran.Pokok,
@@ -65,13 +75,37 @@ function transformInstallment(angsuran: any): Installment {
         ),
         user_id: angsuran.user_id || angsuran.UserID || (angsuran.User && (angsuran.User.ID || angsuran.User.id)) || 0,
         status: angsuran.status || angsuran.Status || 'proses',
-        // New fields from API: ImageBuktiTransfer / image_bukti_transfer, NoRekening / no_rekening, BankName / bank_name
-        image_bukti_transfer: angsuran.image_bukti_transfer || angsuran.ImageBuktiTransfer || angsuran.ImageBukti || undefined,
-        no_rekening: angsuran.no_rekening || angsuran.NoRekening || angsuran.NoRek || undefined,
-        bank_name: angsuran.bank_name || angsuran.BankName || angsuran.Bank || undefined,
-        pinjaman: angsuran.pinjaman ? transformLoan(angsuran.pinjaman) : undefined,
+        pinjaman: angsuran.pinjaman ? transformLoan(angsuran.pinjaman) : (angsuran.Pinjaman ? transformLoan(angsuran.Pinjaman) : undefined),
         user: angsuran.user || angsuran.User
     };
+
+    // Handle image and bank fields - explicitly check both formats
+    if (angsuran.image_bukti_transfer) {
+        transformed.image_bukti_transfer = angsuran.image_bukti_transfer;
+    } else if (angsuran.ImageBuktiTransfer) {
+        transformed.image_bukti_transfer = angsuran.ImageBuktiTransfer;
+    }
+
+    if (angsuran.no_rekening) {
+        transformed.no_rekening = angsuran.no_rekening;
+    } else if (angsuran.NoRekening) {
+        transformed.no_rekening = angsuran.NoRekening;
+    }
+
+    if (angsuran.bank_name) {
+        transformed.bank_name = angsuran.bank_name;
+    } else if (angsuran.BankName) {
+        transformed.bank_name = angsuran.BankName;
+    }
+
+    console.log('✅ Transformed result:', {
+        id: transformed.id,
+        image_bukti_transfer: transformed.image_bukti_transfer,
+        no_rekening: transformed.no_rekening,
+        bank_name: transformed.bank_name
+    });
+
+    return transformed;
 }
 
 export const load: PageServerLoad = async ({ parent, url, cookies }) => {
@@ -216,12 +250,16 @@ export const load: PageServerLoad = async ({ parent, url, cookies }) => {
             try {
                 console.log("📊 Fetching pending installments");
                 const response = await axios.get("/angsuran/pending");
-                console.log("📦 Raw pending installments response:", response.data);
+                console.log("📦 Raw pending installments response:", JSON.stringify(response.data, null, 2));
 
                 const rawInstallments = response.data.data || [];
+                console.log("📦 Raw installments array:", rawInstallments);
+                console.log("📦 First installment raw:", rawInstallments[0]);
+
                 pendingInstallments = rawInstallments.map(transformInstallment);
 
                 console.log("✅ Transformed pending installments:", pendingInstallments.length);
+                console.log("✅ First transformed installment:", JSON.stringify(pendingInstallments[0], null, 2));
             } catch (error) {
                 console.error("❌ Error fetching pending installments:", error);
             }
