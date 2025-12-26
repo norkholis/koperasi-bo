@@ -10,6 +10,7 @@
     import { invalidateAll, goto } from "$app/navigation";
     import axios from "$lib/api";
     import { onMount } from "svelte";
+    import { uploadImageToCloudinary } from "$lib/cloudinary";
     // import WalletDebugger from "$lib/components/WalletDebugger.svelte";
     import {
         showSuccess,
@@ -92,6 +93,11 @@
         amount: 0,
         description: "",
     };
+
+    // Image upload state
+    let useFileUpload = false; // Toggle between file upload and manual URL
+    let isUploading = false;
+    let selectedFile: File | null = null;
 
     onMount(async () => {
         // Check for success message in URL params
@@ -192,6 +198,10 @@
             image_bukti_transfer: "",
             bank_account_id: "",
         };
+        // Reset upload state
+        useFileUpload = false;
+        selectedFile = null;
+        isUploading = false;
         showTopupModal = true;
     }
 
@@ -305,6 +315,40 @@
             console.error("❌ Navigation error:", error);
         } finally {
             isNavigating = false;
+        }
+    }
+
+    // Handle file selection and upload
+    async function handleFileSelect(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const file = target.files?.[0];
+
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith("image/")) {
+            showError("File harus berupa gambar");
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            showError("Ukuran file maksimal 5MB");
+            return;
+        }
+
+        selectedFile = file;
+        isUploading = true;
+
+        try {
+            const url = await uploadImageToCloudinary(file);
+            topupForm.image_bukti_transfer = url;
+            showSuccess("Gambar berhasil diupload!");
+        } catch (error) {
+            showError("Gagal mengupload gambar. Silakan coba lagi.");
+            console.error("Upload error:", error);
+        } finally {
+            isUploading = false;
         }
     }
 
@@ -934,19 +978,120 @@
 
                 <!-- Image Bukti Transfer -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        URL Bukti Transfer *
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Bukti Transfer *
                     </label>
-                    <input
-                        type="url"
-                        bind:value={topupForm.image_bukti_transfer}
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="https://example.com/bukti-transfer.jpg"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">
-                        Masukkan URL gambar bukti transfer Anda
-                    </p>
+
+                    <!-- Toggle between upload and manual URL -->
+                    <div class="flex items-center gap-4 mb-3">
+                        <button
+                            type="button"
+                            on:click={() => {
+                                useFileUpload = true;
+                            }}
+                            class="px-3 py-1.5 text-sm rounded-md transition-colors {useFileUpload
+                                ? 'bg-blue-500 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                        >
+                            📤 Upload File
+                        </button>
+                        <button
+                            type="button"
+                            on:click={() => {
+                                useFileUpload = false;
+                                selectedFile = null;
+                            }}
+                            class="px-3 py-1.5 text-sm rounded-md transition-colors {!useFileUpload
+                                ? 'bg-blue-500 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                        >
+                            🔗 Input URL Manual
+                        </button>
+                    </div>
+
+                    {#if useFileUpload}
+                        <!-- File Upload Mode -->
+                        <div class="space-y-2">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                on:change={handleFileSelect}
+                                disabled={isUploading}
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
+                            {#if isUploading}
+                                <div
+                                    class="flex items-center gap-2 text-sm text-blue-600"
+                                >
+                                    <svg
+                                        class="animate-spin h-4 w-4"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4"
+                                        ></circle>
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    <span>Mengupload gambar...</span>
+                                </div>
+                            {/if}
+                            {#if topupForm.image_bukti_transfer && !isUploading}
+                                <div
+                                    class="flex items-center gap-2 text-sm text-green-600"
+                                >
+                                    <svg
+                                        class="h-4 w-4"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            fill-rule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clip-rule="evenodd"
+                                        />
+                                    </svg>
+                                    <span>Gambar berhasil diupload</span>
+                                </div>
+                                <a
+                                    href={topupForm.image_bukti_transfer}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="text-xs text-blue-600 hover:underline break-all"
+                                >
+                                    {topupForm.image_bukti_transfer}
+                                </a>
+                            {/if}
+                            <p class="text-xs text-gray-500">
+                                Upload gambar bukti transfer (max 5MB, format:
+                                JPG, PNG, GIF)
+                            </p>
+                        </div>
+                    {:else}
+                        <!-- Manual URL Input Mode -->
+                        <div class="space-y-2">
+                            <input
+                                type="url"
+                                bind:value={topupForm.image_bukti_transfer}
+                                required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="https://example.com/bukti-transfer.jpg"
+                            />
+                            <p class="text-xs text-gray-500">
+                                Masukkan URL gambar bukti transfer Anda
+                            </p>
+                        </div>
+                    {/if}
                 </div>
 
                 <!-- Description -->
@@ -1094,14 +1239,14 @@
 <!-- Transaction Detail Modal -->
 {#if showTransactionModal && selectedTransaction}
     <div
-        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50"
+        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
         role="dialog"
         aria-modal="true"
         on:click={closeModals}
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl"
+            class="bg-white rounded-lg p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
             on:click|stopPropagation
         >
             <h3 class="text-lg font-semibold text-gray-900 mb-4">
@@ -1121,6 +1266,18 @@
                         </p>
                     </div>
                 </div>
+
+                {#if selectedTransaction.simpanan?.user}
+                    <div>
+                        <p class="text-sm text-gray-600">Nama Anggota</p>
+                        <p class="font-medium text-gray-900">
+                            {selectedTransaction.simpanan.user.name}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                            {selectedTransaction.simpanan.user.email}
+                        </p>
+                    </div>
+                {/if}
 
                 <div>
                     <p class="text-sm text-gray-600">Jenis Wallet</p>
@@ -1155,6 +1312,60 @@
                         {selectedTransaction.description}
                     </p>
                 </div>
+
+                {#if selectedTransaction.image_bukti_transfer}
+                    <div>
+                        <p class="text-sm text-gray-600 mb-2">Bukti Transfer</p>
+                        <div
+                            class="border border-gray-200 rounded-lg overflow-hidden"
+                        >
+                            <a
+                                href={selectedTransaction.image_bukti_transfer}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="block hover:opacity-90 transition-opacity"
+                            >
+                                <img
+                                    src={selectedTransaction.image_bukti_transfer}
+                                    alt="Bukti Transfer"
+                                    class="w-full h-auto max-h-96 object-contain bg-gray-50"
+                                    on:error={(e) => {
+                                        const target =
+                                            e.currentTarget as HTMLImageElement;
+                                        target.src =
+                                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"%3E%3Crect fill="%23f3f4f6" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="14" fill="%239ca3af" text-anchor="middle" dy=".3em"%3EGambar tidak dapat dimuat%3C/text%3E%3C/svg%3E';
+                                    }}
+                                />
+                            </a>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Klik gambar untuk melihat ukuran penuh
+                        </p>
+                    </div>
+                {/if}
+
+                {#if selectedTransaction.bank_account}
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">
+                            Rekening Tujuan Transfer
+                        </p>
+                        <div
+                            class="bg-blue-50 border border-blue-200 rounded-lg p-3"
+                        >
+                            <p class="text-sm font-medium text-blue-900">
+                                {selectedTransaction.bank_account.bank_name}
+                            </p>
+                            <p class="text-sm text-blue-700">
+                                {selectedTransaction.bank_account
+                                    .account_number}
+                            </p>
+                            <p class="text-xs text-blue-600">
+                                a.n. {selectedTransaction.bank_account
+                                    .account_name}
+                            </p>
+                        </div>
+                    </div>
+                {/if}
 
                 <div>
                     <p class="text-sm text-gray-600">Tanggal Permintaan</p>

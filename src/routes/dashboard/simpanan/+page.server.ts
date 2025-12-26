@@ -5,12 +5,12 @@ import type { Wallet, WalletTransaction } from "$lib/types";
 function transformWallet(apiWallet: any): Wallet {
     return {
         id: apiWallet.ID,
-        user_id: apiWallet.UserID,
-        type: apiWallet.Type,
-        balance: apiWallet.Balance,
-        description: apiWallet.Description,
-        created_at: apiWallet.CreatedAt,
-        updated_at: apiWallet.UpdatedAt,
+        user_id: apiWallet.UserID || apiWallet.user_id,
+        type: apiWallet.Type || apiWallet.type,
+        balance: apiWallet.Balance || apiWallet.balance,
+        description: apiWallet.Description || apiWallet.description,
+        created_at: apiWallet.CreatedAt || apiWallet.created_at,
+        updated_at: apiWallet.UpdatedAt || apiWallet.updated_at,
         user: (apiWallet.user || apiWallet.User) ? {
             id: (apiWallet.user?.ID || apiWallet.User?.ID || apiWallet.user?.id || apiWallet.User?.id),
             name: (apiWallet.user?.Name || apiWallet.User?.Name || apiWallet.user?.name || apiWallet.User?.name),
@@ -27,10 +27,27 @@ function transformTransaction(apiTransaction: any): WalletTransaction {
         type: apiTransaction.Type,
         description: apiTransaction.Description,
         status: apiTransaction.Status,
+        image_bukti_transfer: apiTransaction.image_bukti_transfer,
+        bank_account_id: apiTransaction.bank_account_id,
+        bank_account: apiTransaction.bank_account ? {
+            id: apiTransaction.bank_account.ID,
+            bank_name: apiTransaction.bank_account.bank_name,
+            account_number: apiTransaction.bank_account.account_number,
+            account_name: apiTransaction.bank_account.account_name
+        } : undefined,
         verified_at: apiTransaction.VerifiedAt || apiTransaction.verified_at,
         verified_by_id: apiTransaction.VerifiedByID || apiTransaction.verified_by_id,
         created_at: apiTransaction.CreatedAt,
-        simpanan: apiTransaction.Simpanan ? transformWallet(apiTransaction.Simpanan) : undefined
+        simpanan: apiTransaction.Simpanan ? {
+            id: apiTransaction.Simpanan.ID,
+            user_id: apiTransaction.Simpanan.user_id || apiTransaction.Simpanan.UserID,
+            type: apiTransaction.Simpanan.type || apiTransaction.Simpanan.Type,
+            user: apiTransaction.Simpanan.user ? {
+                id: apiTransaction.Simpanan.user.ID,
+                name: apiTransaction.Simpanan.user.name || apiTransaction.Simpanan.user.Name,
+                email: apiTransaction.Simpanan.user.email || apiTransaction.Simpanan.user.Email
+            } : undefined
+        } : undefined
     };
 }
 

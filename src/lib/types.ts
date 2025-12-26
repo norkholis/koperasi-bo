@@ -76,11 +76,24 @@ export interface WalletTransaction {
         id: number;
         user_id: number;
         type: 'pokok' | 'wajib' | 'sukarela';
+        user?: {
+            id: number;
+            name: string;
+            email: string;
+        };
     };
     type: 'topup' | 'adjustment';
     amount: number;
     description: string;
     status: 'pending' | 'verified' | 'rejected';
+    image_bukti_transfer?: string; // Transfer proof image URL
+    bank_account_id?: number; // Bank account ID for transfer
+    bank_account?: { // Bank account details
+        id: number;
+        bank_name: string;
+        account_number: string;
+        account_name: string;
+    };
     verified_by_id?: number;
     verified_at?: string;
     created_at: string;
