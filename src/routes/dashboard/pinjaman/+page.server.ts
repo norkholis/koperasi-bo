@@ -105,7 +105,7 @@ export const load: PageServerLoad = async ({ parent, url, cookies }) => {
 
         // Load loans based on user role and selected user
         try {
-            if (selectedUserId) {
+            if (selectedUserId && isAdmin) {
                 // Admin viewing specific user's loans
                 console.log("📊 Fetching loans for specific user:", selectedUserId);
                 const response = await axios.get(`/pinjaman?user_id=${selectedUserId}`);
@@ -120,19 +120,32 @@ export const load: PageServerLoad = async ({ parent, url, cookies }) => {
                     return transformed;
                 });
             } else if (isMember) {
-                // Members see only their own loans
+                // Members see only their own loans - use user_id filter and double-check after fetching
                 console.log("📊 Fetching loans for member user:", currentUser.id);
                 const response = await axios.get(`/pinjaman?user_id=${currentUser.id}`);
                 console.log("📦 Raw loans response for member:", response.data);
 
                 const rawLoans = response.data.data || [];
                 console.log("🔍 Raw loans array for member:", rawLoans);
-                loans = rawLoans.map((loan: any) => {
-                    console.log("🔄 Transforming loan:", loan);
-                    const transformed = transformLoan(loan);
-                    console.log("✅ Transformed result:", transformed);
-                    return transformed;
-                });
+
+                // Transform and filter to ensure only user's own loans are returned
+                loans = rawLoans
+                    .map((loan: any) => {
+                        console.log("🔄 Transforming loan:", loan);
+                        const transformed = transformLoan(loan);
+                        console.log("✅ Transformed result:", transformed);
+                        return transformed;
+                    })
+                    .filter((loan: Loan) => {
+                        // Extra safety check: ensure loan belongs to current user
+                        const belongsToUser = loan.user_id === currentUser.id;
+                        if (!belongsToUser) {
+                            console.warn("⚠️ Filtered out loan that doesn't belong to user:", loan.id, "belongs to:", loan.user_id, "current user:", currentUser.id);
+                        }
+                        return belongsToUser;
+                    });
+
+                console.log("✅ Filtered loans for member:", loans.length);
             } else if (isAdmin) {
                 // Admin loads all loans from all users
                 console.log("📊 Fetching ALL loans for admin");
