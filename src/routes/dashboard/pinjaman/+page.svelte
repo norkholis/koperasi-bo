@@ -813,13 +813,31 @@
                 return;
             }
 
-            if (!installmentForm.no_rekening) {
-                showError("Nomor rekening harus diisi");
-                return;
+            // Determine bank details: use manual input if provided, otherwise use dropdown selection
+            let finalNoRekening = installmentForm.no_rekening;
+            let finalBankName = installmentForm.bank_name;
+
+            if (
+                (!finalNoRekening || !finalBankName) &&
+                installmentForm.bank_account_id
+            ) {
+                // Use bank account from dropdown
+                const selectedBankAccount = activeBankAccounts.find(
+                    (acc) =>
+                        (acc.id || acc.ID) == installmentForm.bank_account_id,
+                );
+                if (selectedBankAccount) {
+                    finalNoRekening =
+                        finalNoRekening || selectedBankAccount.account_number;
+                    finalBankName =
+                        finalBankName || selectedBankAccount.bank_name;
+                }
             }
 
-            if (!installmentForm.bank_name) {
-                showError("Nama bank harus diisi");
+            if (!finalNoRekening || !finalBankName) {
+                showError(
+                    "Silakan pilih rekening bank tujuan atau isi nomor rekening dan nama bank secara manual",
+                );
                 return;
             }
 
@@ -830,8 +848,8 @@
                 bunga: Number(installmentForm.bunga),
                 denda: Number(installmentForm.denda || 0),
                 image_bukti_transfer: installmentForm.image_bukti_transfer,
-                no_rekening: installmentForm.no_rekening,
-                bank_name: installmentForm.bank_name,
+                no_rekening: finalNoRekening,
+                bank_name: finalBankName,
             };
 
             console.log("🌐 API Call: POST /angsuran");
@@ -1877,7 +1895,7 @@
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl"
+            class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
             on:click|stopPropagation
         >
             <h3 class="text-lg font-semibold text-gray-900 mb-4">
@@ -2080,7 +2098,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Nomor Rekening
+                        Nomor Rekening (opsional)
                     </label>
                     <input
                         type="text"
@@ -2088,11 +2106,15 @@
                         placeholder="1234567890"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
+                    <p class="text-xs text-gray-500 mt-1">
+                        Kosongkan jika menggunakan rekening dari dropdown di
+                        atas
+                    </p>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Nama Bank
+                        Nama Bank (opsional)
                     </label>
                     <input
                         type="text"
@@ -2100,6 +2122,10 @@
                         placeholder="Bank Mandiri"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
+                    <p class="text-xs text-gray-500 mt-1">
+                        Kosongkan jika menggunakan rekening dari dropdown di
+                        atas
+                    </p>
                 </div>
 
                 <div class="bg-gray-50 p-3 rounded-lg">
