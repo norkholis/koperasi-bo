@@ -431,9 +431,18 @@
     // Transaction verification (Admin only)
     async function verifyTransaction(transactionId: number, approve: boolean) {
         try {
-            await axios.put(`/simpanan/transactions/${transactionId}/verify`, {
-                approve: approve,
-            });
+            const payload = {
+                approve: approve === true,
+            };
+            console.log(
+                "🔍 Verify transaction payload:",
+                JSON.stringify(payload),
+            );
+
+            await axios.put(
+                `/simpanan/transactions/${transactionId}/verify`,
+                payload,
+            );
 
             // Remove from pending list
             pendingTransactions = pendingTransactions.filter(
