@@ -1728,7 +1728,7 @@
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl"
+            class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
             on:click|stopPropagation
         >
             <h3 class="text-lg font-semibold text-gray-900 mb-4">
@@ -1836,36 +1836,6 @@
                 {/if}
 
                 <div class="flex gap-3 pt-4">
-                    <!-- Debug Button -->
-                    <button
-                        type="button"
-                        on:click={() => {
-                            console.log("🐛 DEBUG STATE:");
-                            console.log(
-                                "Form:",
-                                JSON.stringify(loanRequestForm, null, 2),
-                            );
-                            console.log("Selected Bunga:", selectedBungaOption);
-                            console.log(
-                                "Available Bungas:",
-                                activeBungaOptions.map((b) => ({
-                                    id: b.id,
-                                    nama: b.nama,
-                                    persen: b.persen,
-                                })),
-                            );
-                            console.log("ID Comparison:");
-                            activeBungaOptions.forEach((b) => {
-                                console.log(
-                                    `  ${b.id} (${typeof b.id}) vs ${loanRequestForm.bunga_option_id} (${typeof loanRequestForm.bunga_option_id}) = ${Number(b.id) === Number(loanRequestForm.bunga_option_id)}`,
-                                );
-                            });
-                        }}
-                        class="px-3 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors text-sm"
-                    >
-                        Debug
-                    </button>
-
                     <button
                         type="button"
                         on:click={closeModals}

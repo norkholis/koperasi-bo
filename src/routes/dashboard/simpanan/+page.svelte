@@ -693,8 +693,16 @@
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                 >
-                                    #{transaction.simpanan?.user_id ||
-                                        "Unknown"}
+                                    <div>
+                                        <p class="font-medium">
+                                            {transaction.simpanan?.user?.name ||
+                                                "Unknown"}
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            #{transaction.simpanan?.user_id ||
+                                                "-"}
+                                        </p>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span
@@ -910,7 +918,7 @@
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl"
+            class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
             on:click|stopPropagation
         >
             <h3 class="text-lg font-semibold text-gray-900 mb-4">
