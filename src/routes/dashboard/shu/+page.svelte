@@ -595,15 +595,15 @@
                     <meta charset="utf-8">
                     <title>Laporan SHU ${shu.tahun}</title>
                     <style>
-                        body { 
-                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                            margin: 30px; 
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            margin: 30px;
                             line-height: 1.6;
                             color: #333;
                         }
-                        .header { 
-                            text-align: center; 
-                            margin-bottom: 40px; 
+                        .header {
+                            text-align: center;
+                            margin-bottom: 40px;
                             border-bottom: 3px solid #007bff;
                             padding-bottom: 20px;
                         }
@@ -616,25 +616,25 @@
                             color: #333;
                             margin-bottom: 5px;
                         }
-                        .info-grid { 
-                            display: grid; 
-                            grid-template-columns: 1fr 1fr; 
-                            gap: 20px; 
-                            margin-bottom: 30px; 
+                        .info-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 20px;
+                            margin-bottom: 30px;
                         }
-                        .info-item { 
+                        .info-item {
                             margin-bottom: 15px;
                             padding: 10px;
                             background: #f8f9fa;
                             border-left: 4px solid #007bff;
                         }
-                        .label { 
-                            font-weight: bold; 
+                        .label {
+                            font-weight: bold;
                             color: #666;
                             font-size: 14px;
                         }
-                        .value { 
-                            font-size: 18px; 
+                        .value {
+                            font-size: 18px;
                             font-weight: bold;
                             color: #333;
                         }
@@ -669,15 +669,15 @@
                             background: #f3e5f5;
                             border-color: #9c27b0;
                         }
-                        table { 
-                            width: 100%; 
-                            border-collapse: collapse; 
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
                             margin-top: 20px;
                             border: 1px solid #dee2e6;
                         }
-                        th { 
-                            padding: 12px 8px; 
-                            text-align: left; 
+                        th {
+                            padding: 12px 8px;
+                            text-align: left;
                             background-color: #007bff;
                             color: white;
                             font-weight: bold;
@@ -688,12 +688,12 @@
                             border-bottom: 1px solid #dee2e6;
                             font-size: 12px;
                         }
-                        .currency { 
+                        .currency {
                             text-align: right;
                             font-family: 'Courier New', monospace;
                         }
-                        .total-row { 
-                            font-weight: bold; 
+                        .total-row {
+                            font-weight: bold;
                             background-color: #f8f9fa;
                             border-top: 2px solid #007bff;
                         }
@@ -724,7 +724,7 @@
                         <h2>TAHUN ${shu.tahun}</h2>
                         <p>Tanggal: ${safeDateFormat(shu)}</p>
                     </div>
-                    
+
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="label">Total SHU Koperasi:</div>
@@ -735,7 +735,7 @@
                             <div class="value">${shu.status === "final" ? "Final" : "Draft"}</div>
                         </div>
                     </div>
-                    
+
                     ${
                         shu.shu_report
                             ? `
@@ -758,9 +758,9 @@
                             <div class="value">${formatCurrency(shu.shu_report.total_penjualan_all)}</div>
                         </div>
                     </div>
-                    
-                    <h3 class="section-title">📊 Pembagian SHU kepada Anggota</h3>
-                    
+
+                    <h3 class="section-title">Pembagian SHU kepada Anggota</h3>
+
                     <div class="summary-cards">
                         <div class="summary-card blue">
                             <div class="label">Total Anggota</div>
@@ -775,7 +775,7 @@
                             <div class="value">${formatCurrency(shu.shu_report.detail_anggota.reduce((sum, member) => sum + member.total_shu_anggota, 0) / shu.shu_report.detail_anggota.length)}</div>
                         </div>
                     </div>
-                    
+
                     <table>
                         <thead>
                             <tr>
@@ -820,7 +820,7 @@
                     `
                             : ""
                     }
-                    
+
                     <div class="footer">
                         <p><strong>Laporan Sisa Hasil Usaha (SHU) Koperasi</strong></p>
                         <p>Laporan ini digenerate secara otomatis oleh sistem</p>
@@ -856,14 +856,14 @@
     <title>SHU Report - Koperasi Backoffice</title>
 </svelte:head>
 
-<div class="p-6">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+<div class="p-6 animate-fade-in">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">
+            <h1 class="text-2xl font-bold text-slate-900">
                 {canManageSHU ? "Kelola Laporan SHU" : "SHU Saya"}
             </h1>
-            <p class="text-gray-600">
+            <p class="text-slate-500 mt-1">
                 {canManageSHU
                     ? "Kelola laporan Sisa Hasil Usaha koperasi"
                     : "Lihat riwayat dan generate SHU pribadi Anda"}
@@ -871,172 +871,156 @@
         </div>
 
         {#if canManageSHU}
-            <div class="flex space-x-3">
+            <div class="flex gap-2">
                 <button
                     on:click={openGenerateModal}
-                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                    class="btn btn-secondary"
                 >
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                     Generate Manual
                 </button>
                 <button
                     on:click={openAutoGenerateModal}
-                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+                    class="btn btn-primary"
                 >
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     Generate Otomatis
                 </button>
             </div>
         {:else}
             <button
                 on:click={openUserGenerateModal}
-                class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 transition-colors"
+                class="btn btn-primary"
             >
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                 Generate SHU Saya
             </button>
         {/if}
     </div>
 
+    <!-- Summary Stats (teal-tinted) -->
+    {#if canManageSHU && shuRecords.length > 0}
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div class="card stagger-item" style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%); border: 1px solid #99f6e4;">
+                <div class="p-4">
+                    <p class="text-sm font-medium text-teal-600">Total Laporan</p>
+                    <p class="text-2xl font-bold text-teal-900 mt-1 font-tabular">{shuRecords.length}</p>
+                </div>
+            </div>
+            <div class="card stagger-item" style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%); border: 1px solid #99f6e4;">
+                <div class="p-4">
+                    <p class="text-sm font-medium text-teal-600">Total SHU Keseluruhan</p>
+                    <p class="text-xl font-bold text-teal-900 mt-1 font-tabular">{formatCurrency(shuRecords.reduce((sum, r) => sum + (r.total_shu || 0), 0))}</p>
+                </div>
+            </div>
+            <div class="card stagger-item" style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%); border: 1px solid #99f6e4;">
+                <div class="p-4">
+                    <p class="text-sm font-medium text-teal-600">Status Final</p>
+                    <p class="text-2xl font-bold text-teal-900 mt-1 font-tabular">{shuRecords.filter(r => r.status === 'final').length} <span class="text-sm font-normal text-teal-500">/ {shuRecords.length}</span></p>
+                </div>
+            </div>
+        </div>
+    {/if}
+
     <!-- Main Content -->
     {#if canManageSHU}
-        <!-- Admin/Super Admin View: SHU Records Management -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="p-4 sm:p-6 border-b border-gray-200">
-                <h2 class="text-xl font-semibold">Daftar Laporan SHU</h2>
-            </div>
-
-            {#if shuRecords.length === 0}
-                <div class="p-8 text-center text-gray-500">
-                    <p>Belum ada laporan SHU yang tersedia</p>
-                    <div class="mt-4 space-x-2">
+        <!-- Admin/Super Admin View: SHU Records as Cards -->
+        {#if shuRecords.length === 0}
+            <div class="card">
+                <div class="empty-state py-12">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p class="text-slate-500 text-lg mb-1">Belum ada laporan SHU</p>
+                    <p class="text-slate-400 text-sm mb-6">Mulai dengan membuat laporan SHU pertama Anda</p>
+                    <div class="flex gap-2 justify-center">
                         <button
                             on:click={openGenerateModal}
-                            class="text-blue-500 hover:text-blue-600"
+                            class="btn btn-secondary btn-sm"
                         >
-                            Generate manual
+                            Generate Manual
                         </button>
-                        <span class="text-gray-300">atau</span>
                         <button
                             on:click={openAutoGenerateModal}
-                            class="text-green-500 hover:text-green-600"
+                            class="btn btn-primary btn-sm"
                         >
-                            Generate otomatis
+                            Generate Otomatis
                         </button>
                     </div>
                 </div>
-            {:else}
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            </div>
+        {:else}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {#each shuRecords as shu, index}
+                    <div class="card card-interactive animate-slide-up stagger-item">
+                        <div class="p-5">
+                            <!-- Year Header -->
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <div class="text-3xl font-bold text-slate-900 font-tabular">{shu.tahun}</div>
+                                    <p class="text-xs text-slate-400 mt-0.5">{safeDateFormat(shu)}</p>
+                                </div>
+                                <span class="badge {shu.status === 'final' ? 'badge-success' : 'badge-warning'}">
+                                    {shu.status === "final" ? "Final" : "Draft"}
+                                </span>
+                            </div>
+
+                            <!-- Total SHU -->
+                            <div class="mb-4 p-3 rounded-lg" style="background: #f0fdfa;">
+                                <p class="text-xs font-medium text-teal-600 uppercase tracking-wide">Total SHU</p>
+                                <p class="text-xl font-bold text-teal-800 font-tabular mt-0.5">
+                                    {formatCurrency(shu.total_shu)}
+                                </p>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex gap-2 pt-2 border-t border-slate-100">
+                                <button
+                                    on:click={() => openDetailModal(shu)}
+                                    class="btn btn-ghost btn-sm flex-1"
                                 >
-                                    Tahun
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    Detail
+                                </button>
+                                <button
+                                    on:click={() => generatePDF(shu)}
+                                    class="btn btn-ghost btn-sm flex-1"
                                 >
-                                    Total SHU
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    PDF
+                                </button>
+                                <button
+                                    on:click={() => {
+                                        const shuId = shu.ID || shu.id;
+                                        if (shuId) {
+                                            deleteSHURecord(shuId);
+                                        } else {
+                                            console.error(
+                                                "❌ SHU record missing ID field:",
+                                                shu,
+                                            );
+                                            showError(
+                                                "Error: ID SHU tidak ditemukan. Tidak dapat menghapus record ini.",
+                                            );
+                                        }
+                                    }}
+                                    class="btn btn-danger btn-sm"
                                 >
-                                    Status
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Tanggal Dibuat
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Aksi
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {#each shuRecords as shu, index}
-                                <tr class="hover:bg-gray-50">
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                                    >
-                                        {shu.tahun}
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        {formatCurrency(shu.total_shu)}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {shu.status ===
-                                            'final'
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-yellow-100 text-yellow-800'}"
-                                        >
-                                            {shu.status === "final"
-                                                ? "Final"
-                                                : "Draft"}
-                                        </span>
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        {safeDateFormat(shu)}
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 space-x-2"
-                                    >
-                                        <button
-                                            on:click={() =>
-                                                openDetailModal(shu)}
-                                            class="text-blue-600 hover:text-blue-900"
-                                        >
-                                            Detail
-                                        </button>
-                                        <button
-                                            on:click={() => generatePDF(shu)}
-                                            class="text-green-600 hover:text-green-900"
-                                        >
-                                            PDF
-                                        </button>
-                                        <button
-                                            on:click={() => {
-                                                // Always use the SHU ID for deletion (try both field name formats)
-                                                const shuId = shu.ID || shu.id;
-                                                if (shuId) {
-                                                    deleteSHURecord(shuId);
-                                                } else {
-                                                    console.error(
-                                                        "❌ SHU record missing ID field:",
-                                                        shu,
-                                                    );
-                                                    showError(
-                                                        "Error: ID SHU tidak ditemukan. Tidak dapat menghapus record ini.",
-                                                    );
-                                                }
-                                            }}
-                                            class="text-red-600 hover:text-red-900"
-                                        >
-                                            Hapus
-                                        </button>
-                                    </td>
-                                </tr>
-                            {/each}
-                        </tbody>
-                    </table>
-                </div>
-            {/if}
-        </div>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {/each}
+            </div>
+        {/if}
     {:else}
         <!-- Member View: Personal SHU History -->
-        <div class="bg-white rounded-lg shadow">
-            <div
-                class="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center"
-            >
+        <div class="card animate-slide-up">
+            <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h2 class="text-xl font-semibold">Riwayat SHU Saya</h2>
-                    <p class="text-sm text-gray-600 mt-1">
+                    <h2 class="text-lg font-semibold text-slate-900">Riwayat SHU Saya</h2>
+                    <p class="text-sm text-slate-500 mt-0.5">
                         Lihat riwayat SHU yang pernah Anda terima
                     </p>
                 </div>
@@ -1045,119 +1029,83 @@
                         on:click={() => {
                             showUserSaveModal = true;
                         }}
-                        class="px-3 py-2 sm:py-1 text-sm bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-md transition-colors"
+                        class="btn btn-primary btn-sm"
                         disabled={savingUserSHU}
                     >
-                        💾 Simpan SHU
+                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                        Simpan SHU
                     </button>
                     <button
                         on:click={refreshUserData}
-                        class="px-3 py-2 sm:py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                        class="btn btn-ghost btn-sm"
                     >
-                        🔄 Refresh
+                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Refresh
                     </button>
                 </div>
             </div>
 
             {#if userShuHistory.length === 0}
-                <div class="p-8 text-center text-gray-500">
-                    <p>Belum ada riwayat SHU tersimpan untuk akun Anda</p>
-                    <div
-                        class="mt-4 p-4 bg-blue-50 rounded-lg text-sm text-blue-700"
-                    >
-                        <p class="font-medium mb-2">ℹ️ Cara Mendapatkan SHU:</p>
-                        <ul class="text-left space-y-1">
-                            <li>
-                                • Klik tombol "💾 Simpan SHU" untuk menyimpan
-                                SHU tahunan Anda
-                            </li>
-                            <li>
-                                • SHU dihitung berdasarkan kontribusi simpanan
-                                dan transaksi Anda
-                            </li>
-                            <li>
-                                • Hasil tersimpan akan muncul di riwayat dengan
-                                status draft/final
-                            </li>
-                            <li>
-                                • Jika tombol tidak berfungsi, hubungi admin
-                            </li>
+                <div class="empty-state py-12 px-6">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p class="text-slate-500 text-lg mb-1">Belum ada riwayat SHU</p>
+                    <p class="text-slate-400 text-sm mb-6">Belum ada riwayat SHU tersimpan untuk akun Anda</p>
+
+                    <div class="alert alert-info max-w-lg mx-auto text-left mb-6">
+                        <p class="font-semibold mb-2">Cara Mendapatkan SHU:</p>
+                        <ul class="space-y-1 text-sm">
+                            <li>Klik tombol "Simpan SHU" untuk menyimpan SHU tahunan Anda</li>
+                            <li>SHU dihitung berdasarkan kontribusi simpanan dan transaksi Anda</li>
+                            <li>Hasil tersimpan akan muncul di riwayat dengan status draft/final</li>
+                            <li>Jika tombol tidak berfungsi, hubungi admin</li>
                         </ul>
                     </div>
-                    <div class="flex gap-2 justify-center mt-4">
+
+                    <div class="flex gap-2 justify-center">
                         <button
                             on:click={() => {
                                 showUserSaveModal = true;
                             }}
-                            class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+                            class="btn btn-primary"
                         >
-                            💾 Simpan SHU Saya
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            Simpan SHU Saya
                         </button>
                         <button
                             on:click={openUserGenerateModal}
-                            class="px-4 py-2 text-purple-500 border border-purple-500 rounded hover:bg-purple-50 transition-colors"
+                            class="btn btn-secondary"
                         >
-                            🧮 Generate SHU (Legacy)
+                            Generate SHU (Legacy)
                         </button>
                     </div>
                 </div>
             {:else}
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                <div class="table-container">
+                    <table>
+                        <thead>
                             <tr>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Periode
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Jasa Modal
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Jasa Usaha
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Total SHU
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Status
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Tanggal
-                                </th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Aksi
-                                </th>
+                                <th>Periode</th>
+                                <th>Jasa Modal</th>
+                                <th>Jasa Usaha</th>
+                                <th>Total SHU</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody>
                             {#each userShuHistory as userShu, index}
-                                <tr class="hover:bg-gray-50">
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                                    >
+                                <tr>
+                                    <td class="font-semibold text-slate-900 font-tabular">
                                         {userShu.shu?.tahun ||
                                             userShu.periode ||
                                             userShu.tahun ||
                                             userShu.year ||
                                             "N/A"}
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
+                                    <td class="font-tabular">
                                         {formatCurrency(
                                             userShu.jumlah_modal ||
                                                 userShu.jasa_modal ||
@@ -1165,9 +1113,7 @@
                                                 0,
                                         )}
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
+                                    <td class="font-tabular">
                                         {formatCurrency(
                                             userShu.jumlah_usaha ||
                                                 userShu.jasa_usaha ||
@@ -1175,9 +1121,7 @@
                                                 0,
                                         )}
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                                    >
+                                    <td class="font-semibold font-tabular text-teal-700">
                                         {formatCurrency(
                                             userShu.shu_diterima ||
                                                 userShu.total_shu_anggota ||
@@ -1187,23 +1131,14 @@
                                                 0,
                                         )}
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        <span
-                                            class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {userShu
-                                                .shu?.status === 'final'
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-yellow-100 text-yellow-800'}"
-                                        >
+                                    <td>
+                                        <span class="badge {userShu.shu?.status === 'final' ? 'badge-success' : 'badge-warning'}">
                                             {userShu.shu?.status === "final"
                                                 ? "Final"
                                                 : "Draft"}
                                         </span>
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
+                                    <td class="text-slate-500 text-sm">
                                         {formatDate(
                                             userShu.created_at ||
                                                 userShu.CreatedAt ||
@@ -1212,9 +1147,7 @@
                                                 new Date().toISOString(),
                                         )}
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
+                                    <td>
                                         {#if userShu.shu?.tahun}
                                             <button
                                                 on:click={() => {
@@ -1222,10 +1155,11 @@
                                                         userShu.shu.tahun;
                                                     showUserSaveModal = true;
                                                 }}
-                                                class="text-blue-600 hover:text-blue-700 text-sm"
+                                                class="btn btn-ghost btn-sm"
                                                 disabled={savingUserSHU}
                                             >
-                                                💾 Simpan Ulang
+                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                Simpan Ulang
                                             </button>
                                         {/if}
                                     </td>
@@ -1239,646 +1173,394 @@
     {/if}
 </div>
 
-<!-- Generate SHU Modal -->
+<!-- Generate SHU Drawer -->
 {#if showGenerateModal}
-    <div
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-    >
-        <div
-            class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        >
-            <div class="p-4 sm:p-6 border-b border-gray-200">
-                <h3 class="text-lg font-semibold">Generate Laporan SHU</h3>
+    <div class="drawer-overlay" on:click={closeModals} on:keydown={(e) => e.key === 'Escape' && closeModals()}>
+        <div class="drawer-panel animate-slide-in-right" on:click|stopPropagation on:keydown|stopPropagation>
+            <div class="drawer-header">
+                <h3 class="text-lg font-semibold text-slate-900">Generate Laporan SHU</h3>
+                <button on:click={closeModals} class="btn btn-ghost btn-sm" aria-label="Tutup">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
 
-            <form
-                on:submit|preventDefault={generateSHUReport}
-                class="p-4 sm:p-6 space-y-4"
-            >
-                <div>
-                    <label
-                        for="tahun"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                        Tahun
-                    </label>
-                    <input
-                        type="number"
-                        id="tahun"
-                        bind:value={generateForm.tahun}
-                        min="2020"
-                        max="2030"
-                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                    />
-                </div>
-
-                <div>
-                    <label
-                        for="total_shu_koperasi"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                        Total SHU Koperasi
-                    </label>
-                    <input
-                        type="number"
-                        id="total_shu_koperasi"
-                        bind:value={generateForm.total_shu_koperasi}
-                        min="0"
-                        step="1000"
-                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        required
-                    />
-                </div>
-
-                <div
-                    class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4"
-                >
-                    <button
-                        type="button"
-                        on:click={closeModals}
-                        class="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                    >
-                        Batal
-                    </button>
-                    <button
-                        type="submit"
-                        class="w-full sm:w-auto px-4 py-3 sm:py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                    >
-                        Generate
-                    </button>
-                </div>
-            </form>
-
-            <!-- Generated Report Display -->
-            {#if generatedReport}
-                <div class="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
-                    <h4 class="text-lg font-semibold mb-4">
-                        Hasil Generate SHU
-                    </h4>
-
-                    <div
-                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mb-4"
-                    >
-                        <div>
-                            <p class="text-sm text-gray-600">Tahun</p>
-                            <p class="font-semibold">{generatedReport.tahun}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">
-                                Total SHU Koperasi
-                            </p>
-                            <p class="font-semibold">
-                                {formatCurrency(
-                                    generatedReport.total_shu_koperasi,
-                                )}
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">
-                                Persentase Jasa Modal
-                            </p>
-                            <p class="font-semibold">
-                                {generatedReport.persen_jasa_modal}%
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">
-                                Persentase Jasa Usaha
-                            </p>
-                            <p class="font-semibold">
-                                {generatedReport.persen_jasa_usaha}%
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Total Simpanan</p>
-                            <p class="font-semibold">
-                                {formatCurrency(
-                                    generatedReport.total_simpanan_all,
-                                )}
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">Total Penjualan</p>
-                            <p class="font-semibold">
-                                {formatCurrency(
-                                    generatedReport.total_penjualan_all,
-                                )}
-                            </p>
-                        </div>
+            <div class="drawer-body">
+                <form on:submit|preventDefault={generateSHUReport} class="space-y-5">
+                    <div>
+                        <label for="tahun" class="input-label">Tahun</label>
+                        <input
+                            type="number"
+                            id="tahun"
+                            bind:value={generateForm.tahun}
+                            min="2020"
+                            max="2030"
+                            class="input"
+                            required
+                        />
                     </div>
 
-                    <div class="mb-4">
-                        <h5 class="font-semibold mb-2">
-                            Detail Anggota ({generatedReport.detail_anggota
-                                .length} orang)
-                        </h5>
-                        <div class="max-h-40 overflow-y-auto">
-                            <table class="min-w-full text-sm">
-                                <thead class="bg-white">
-                                    <tr>
-                                        <th class="px-2 py-1 text-left"
-                                            >Email</th
-                                        >
-                                        <th class="px-2 py-1 text-left"
-                                            >Simpanan</th
-                                        >
-                                        <th class="px-2 py-1 text-left"
-                                            >Penjualan</th
-                                        >
-                                        <th class="px-2 py-1 text-left"
-                                            >Total SHU</th
-                                        >
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {#each generatedReport.detail_anggota as member}
-                                        <tr class="border-t">
-                                            <td class="px-2 py-1"
-                                                >{member.email}</td
-                                            >
-                                            <td class="px-2 py-1"
-                                                >{formatCurrency(
-                                                    member.total_simpanan,
-                                                )}</td
-                                            >
-                                            <td class="px-2 py-1"
-                                                >{formatCurrency(
-                                                    member.total_penjualan,
-                                                )}</td
-                                            >
-                                            <td class="px-2 py-1 font-semibold"
-                                                >{formatCurrency(
-                                                    member.total_shu_anggota,
-                                                )}</td
-                                            >
+                    <div>
+                        <label for="total_shu_koperasi" class="input-label">Total SHU Koperasi</label>
+                        <input
+                            type="number"
+                            id="total_shu_koperasi"
+                            bind:value={generateForm.total_shu_koperasi}
+                            min="0"
+                            step="1000"
+                            class="input"
+                            required
+                        />
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" on:click={closeModals} class="btn btn-secondary flex-1">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn btn-primary flex-1">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Generate
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Generated Report Display -->
+                {#if generatedReport}
+                    <div class="mt-6 pt-6 border-t border-slate-200">
+                        <h4 class="text-base font-semibold text-slate-900 mb-4">Hasil Generate SHU</h4>
+
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Tahun</p>
+                                <p class="font-semibold text-slate-900 font-tabular">{generatedReport.tahun}</p>
+                            </div>
+                            <div class="p-3 rounded-lg" style="background: #f0fdfa;">
+                                <p class="text-xs text-teal-600">Total SHU Koperasi</p>
+                                <p class="font-semibold text-teal-800 font-tabular">
+                                    {formatCurrency(generatedReport.total_shu_koperasi)}
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Persen Jasa Modal</p>
+                                <p class="font-semibold text-slate-900 font-tabular">{generatedReport.persen_jasa_modal}%</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Persen Jasa Usaha</p>
+                                <p class="font-semibold text-slate-900 font-tabular">{generatedReport.persen_jasa_usaha}%</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Total Simpanan</p>
+                                <p class="font-semibold text-slate-900 font-tabular">
+                                    {formatCurrency(generatedReport.total_simpanan_all)}
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Total Penjualan</p>
+                                <p class="font-semibold text-slate-900 font-tabular">
+                                    {formatCurrency(generatedReport.total_penjualan_all)}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="text-sm font-semibold text-slate-700 mb-2">
+                                Detail Anggota ({generatedReport.detail_anggota.length} orang)
+                            </h5>
+                            <div class="table-container max-h-48 overflow-y-auto">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Email</th>
+                                            <th>Simpanan</th>
+                                            <th>Penjualan</th>
+                                            <th>Total SHU</th>
                                         </tr>
-                                    {/each}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {#each generatedReport.detail_anggota as member}
+                                            <tr>
+                                                <td class="text-sm">{member.email}</td>
+                                                <td class="font-tabular text-sm">{formatCurrency(member.total_simpanan)}</td>
+                                                <td class="font-tabular text-sm">{formatCurrency(member.total_penjualan)}</td>
+                                                <td class="font-semibold font-tabular text-sm">{formatCurrency(member.total_shu_anggota)}</td>
+                                            </tr>
+                                        {/each}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
+
+                        <form on:submit|preventDefault={saveSHUReport} class="space-y-4">
+                            <div>
+                                <label for="status" class="input-label">Status</label>
+                                <select
+                                    id="status"
+                                    bind:value={saveForm.status}
+                                    class="input"
+                                >
+                                    <option value="draft">Draft</option>
+                                    <option value="final">Final</option>
+                                </select>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <button type="button" on:click={closeModals} class="btn btn-secondary flex-1">
+                                    Batal
+                                </button>
+                                <button type="submit" class="btn btn-primary flex-1">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                    Simpan Laporan
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    <form
-                        on:submit|preventDefault={saveSHUReport}
-                        class="space-y-4"
-                    >
-                        <div>
-                            <label
-                                for="status"
-                                class="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                Status
-                            </label>
-                            <select
-                                id="status"
-                                bind:value={saveForm.status}
-                                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                                <option value="draft">Draft</option>
-                                <option value="final">Final</option>
-                            </select>
-                        </div>
-
-                        <div class="flex justify-end space-x-3">
-                            <button
-                                type="button"
-                                on:click={closeModals}
-                                class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                            >
-                                Batal
-                            </button>
-                            <button
-                                type="submit"
-                                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                            >
-                                Simpan Laporan
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            {/if}
+                {/if}
+            </div>
         </div>
     </div>
 {/if}
 
-<!-- Automated Generate SHU Modal -->
+<!-- Automated Generate SHU Drawer -->
 {#if showAutoGenerateModal}
-    <div
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-    >
-        <div
-            class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto"
-        >
-            <div class="p-4 sm:p-6 border-b border-gray-200">
-                <h3 class="text-lg font-semibold">Generate SHU Otomatis</h3>
-                <p class="text-sm text-gray-600 mt-1">
-                    Masukkan data keuangan untuk perhitungan SHU otomatis
-                </p>
+    <div class="drawer-overlay" on:click={closeModals} on:keydown={(e) => e.key === 'Escape' && closeModals()}>
+        <div class="drawer-panel animate-slide-in-right" on:click|stopPropagation on:keydown|stopPropagation>
+            <div class="drawer-header">
+                <h3 class="text-lg font-semibold text-slate-900">Generate SHU Otomatis</h3>
+                <button on:click={closeModals} class="btn btn-ghost btn-sm" aria-label="Tutup">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
 
-            <form
-                on:submit|preventDefault={generateAutoSHUReport}
-                class="p-4 sm:p-6 space-y-4"
-            >
-                <div
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4"
-                >
-                    <div>
-                        <label
-                            for="tahun_auto"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Tahun
-                        </label>
-                        <input
-                            type="number"
-                            id="tahun_auto"
-                            bind:value={autoGenerateForm.tahun}
-                            min="2020"
-                            max="2030"
-                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            required
-                        />
-                    </div>
+            <div class="drawer-body">
+                <p class="text-sm text-slate-500 mb-5">Masukkan data keuangan untuk perhitungan SHU otomatis</p>
 
-                    <div>
-                        <label
-                            for="beban_operasional"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Beban Operasional
-                        </label>
-                        <input
-                            type="number"
-                            id="beban_operasional"
-                            bind:value={autoGenerateForm.beban_operasional}
-                            min="0"
-                            step="1000"
-                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            for="beban_non_operasional"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Beban Non-Operasional
-                        </label>
-                        <input
-                            type="number"
-                            id="beban_non_operasional"
-                            bind:value={autoGenerateForm.beban_non_operasional}
-                            min="0"
-                            step="1000"
-                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            for="beban_pajak"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Beban Pajak
-                        </label>
-                        <input
-                            type="number"
-                            id="beban_pajak"
-                            bind:value={autoGenerateForm.beban_pajak}
-                            min="0"
-                            step="1000"
-                            class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            required
-                        />
-                    </div>
-                </div>
-
-                <!-- Information Note -->
-                <div class="p-4 bg-blue-50 rounded-lg">
-                    <h5 class="font-semibold text-blue-800 mb-2">
-                        ℹ️ Informasi Perhitungan
-                    </h5>
-                    <div class="text-sm text-blue-700 space-y-1">
-                        <p>
-                            • Pendapatan operasional dan non-operasional akan
-                            dihitung otomatis oleh sistem
-                        </p>
-                        <p>
-                            • Formula: SHU Total = (Pendapatan Operasional +
-                            Pendapatan Non-Operasional) - (Beban Operasional +
-                            Beban Non-Operasional + Beban Pajak)
-                        </p>
-                        <p>
-                            • Total beban yang akan dikurangkan: <span
-                                class="font-medium"
-                                >{formatCurrency(
-                                    autoGenerateForm.beban_operasional +
-                                        autoGenerateForm.beban_non_operasional +
-                                        autoGenerateForm.beban_pajak,
-                                )}</span
-                            >
-                        </p>
-                    </div>
-                </div>
-
-                <div
-                    class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-4"
-                >
-                    <button
-                        type="button"
-                        on:click={closeModals}
-                        class="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                    >
-                        Batal
-                    </button>
-                    <button
-                        type="submit"
-                        class="w-full sm:w-auto px-4 py-3 sm:py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                    >
-                        Generate Otomatis
-                    </button>
-                </div>
-            </form>
-
-            <!-- Auto Generated Report Display -->
-            {#if autoGeneratedReport}
-                <div class="p-4 sm:p-6 border-t border-gray-200 bg-green-50">
-                    <h4 class="text-lg font-semibold mb-4">
-                        🎉 Hasil Generate SHU Otomatis
-                    </h4>
-
-                    <div
-                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mb-4"
-                    >
-                        <div>
-                            <p class="text-sm text-gray-600">Tahun</p>
-                            <p class="font-semibold">
-                                {autoGeneratedReport.tahun}
-                            </p>
+                <form on:submit|preventDefault={generateAutoSHUReport} class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="tahun_auto" class="input-label">Tahun</label>
+                            <input
+                                type="number"
+                                id="tahun_auto"
+                                bind:value={autoGenerateForm.tahun}
+                                min="2020"
+                                max="2030"
+                                class="input"
+                                required
+                            />
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-600">
-                                Total SHU Koperasi
-                            </p>
-                            <p class="font-semibold text-green-600">
-                                {formatCurrency(
-                                    autoGeneratedReport.total_shu_koperasi,
-                                )}
-                            </p>
+
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="beban_operasional" class="input-label">Beban Operasional</label>
+                            <input
+                                type="number"
+                                id="beban_operasional"
+                                bind:value={autoGenerateForm.beban_operasional}
+                                min="0"
+                                step="1000"
+                                class="input"
+                                required
+                            />
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-600">
-                                Pendapatan Operasional
-                            </p>
-                            <p class="font-semibold">
-                                {formatCurrency(
-                                    autoGeneratedReport.pendapatan_operasional,
-                                )}
-                            </p>
+
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="beban_non_operasional" class="input-label">Beban Non-Operasional</label>
+                            <input
+                                type="number"
+                                id="beban_non_operasional"
+                                bind:value={autoGenerateForm.beban_non_operasional}
+                                min="0"
+                                step="1000"
+                                class="input"
+                                required
+                            />
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-600">
-                                Pendapatan Non-Operasional
-                            </p>
-                            <p class="font-semibold">
-                                {formatCurrency(
-                                    autoGeneratedReport.pendapatan_non_operasional,
-                                )}
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">
-                                Total Simpanan Semua Anggota
-                            </p>
-                            <p class="font-semibold">
-                                {formatCurrency(
-                                    autoGeneratedReport.total_simpanan_all,
-                                )}
-                            </p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">
-                                Total Penjualan Semua Anggota
-                            </p>
-                            <p class="font-semibold">
-                                {formatCurrency(
-                                    autoGeneratedReport.total_penjualan_all,
-                                )}
-                            </p>
+
+                        <div class="col-span-2 sm:col-span-1">
+                            <label for="beban_pajak" class="input-label">Beban Pajak</label>
+                            <input
+                                type="number"
+                                id="beban_pajak"
+                                bind:value={autoGenerateForm.beban_pajak}
+                                min="0"
+                                step="1000"
+                                class="input"
+                                required
+                            />
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <h5 class="font-semibold mb-2">Detail Keuangan:</h5>
-                        <div
-                            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 text-sm bg-white p-3 rounded"
-                        >
+                    <!-- Information Note -->
+                    <div class="alert alert-info">
+                        <p class="font-semibold text-sm mb-1.5">Informasi Perhitungan</p>
+                        <div class="text-sm space-y-1">
+                            <p>Pendapatan operasional dan non-operasional dihitung otomatis oleh sistem.</p>
+                            <p>Formula: SHU = (Pendapatan Op + Non-Op) - (Beban Op + Non-Op + Pajak)</p>
+                            <p>Total beban: <span class="font-semibold font-tabular">{formatCurrency(autoGenerateForm.beban_operasional + autoGenerateForm.beban_non_operasional + autoGenerateForm.beban_pajak)}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" on:click={closeModals} class="btn btn-secondary flex-1">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn btn-primary flex-1">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Generate Otomatis
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Auto Generated Report Display -->
+                {#if autoGeneratedReport}
+                    <div class="mt-6 pt-6 border-t border-slate-200">
+                        <h4 class="text-base font-semibold text-slate-900 mb-4">Hasil Generate SHU Otomatis</h4>
+
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Tahun</p>
+                                <p class="font-semibold text-slate-900 font-tabular">{autoGeneratedReport.tahun}</p>
+                            </div>
+                            <div class="p-3 rounded-lg" style="background: #f0fdfa;">
+                                <p class="text-xs text-teal-600">Total SHU Koperasi</p>
+                                <p class="font-semibold text-teal-800 font-tabular">
+                                    {formatCurrency(autoGeneratedReport.total_shu_koperasi)}
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Pendapatan Operasional</p>
+                                <p class="font-semibold text-slate-900 font-tabular">
+                                    {formatCurrency(autoGeneratedReport.pendapatan_operasional)}
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Pendapatan Non-Op</p>
+                                <p class="font-semibold text-slate-900 font-tabular">
+                                    {formatCurrency(autoGeneratedReport.pendapatan_non_operasional)}
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Total Simpanan Semua</p>
+                                <p class="font-semibold text-slate-900 font-tabular">
+                                    {formatCurrency(autoGeneratedReport.total_simpanan_all)}
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Total Penjualan Semua</p>
+                                <p class="font-semibold text-slate-900 font-tabular">
+                                    {formatCurrency(autoGeneratedReport.total_penjualan_all)}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Financial Breakdown -->
+                        <div class="mb-4 p-4 rounded-lg bg-slate-50 space-y-2 text-sm">
+                            <p class="font-semibold text-slate-700 mb-2">Detail Keuangan</p>
                             <div class="flex justify-between">
-                                <span class="text-green-700"
-                                    >Pendapatan Operasional:</span
-                                >
-                                <span class="font-medium"
-                                    >{formatCurrency(
-                                        autoGeneratedReport.pendapatan_operasional,
-                                    )}</span
-                                >
+                                <span class="text-teal-700">Pendapatan Operasional</span>
+                                <span class="font-medium font-tabular">{formatCurrency(autoGeneratedReport.pendapatan_operasional)}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-green-700"
-                                    >Pendapatan Non-Operasional:</span
-                                >
-                                <span class="font-medium"
-                                    >{formatCurrency(
-                                        autoGeneratedReport.pendapatan_non_operasional,
-                                    )}</span
-                                >
+                                <span class="text-teal-700">Pendapatan Non-Operasional</span>
+                                <span class="font-medium font-tabular">{formatCurrency(autoGeneratedReport.pendapatan_non_operasional)}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-red-700"
-                                    >Beban Operasional:</span
-                                >
-                                <span class="font-medium"
-                                    >({formatCurrency(
-                                        autoGeneratedReport.beban_operasional,
-                                    )})</span
-                                >
+                                <span class="text-red-600">Beban Operasional</span>
+                                <span class="font-medium font-tabular">({formatCurrency(autoGeneratedReport.beban_operasional)})</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-red-700"
-                                    >Beban Non-Operasional:</span
-                                >
-                                <span class="font-medium"
-                                    >({formatCurrency(
-                                        autoGeneratedReport.beban_non_operasional,
-                                    )})</span
-                                >
+                                <span class="text-red-600">Beban Non-Operasional</span>
+                                <span class="font-medium font-tabular">({formatCurrency(autoGeneratedReport.beban_non_operasional)})</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-red-700">Beban Pajak:</span>
-                                <span class="font-medium"
-                                    >({formatCurrency(
-                                        autoGeneratedReport.beban_pajak,
-                                    )})</span
-                                >
+                                <span class="text-red-600">Beban Pajak</span>
+                                <span class="font-medium font-tabular">({formatCurrency(autoGeneratedReport.beban_pajak)})</span>
                             </div>
-                            <div class="col-span-2 border-t pt-2 mt-2">
-                                <div
-                                    class="flex justify-between font-bold text-lg"
-                                >
-                                    <span>SHU Total:</span>
-                                    <span class="text-green-600"
-                                        >{formatCurrency(
-                                            autoGeneratedReport.total_shu_koperasi,
-                                        )}</span
-                                    >
-                                </div>
+                            <div class="border-t border-slate-200 pt-2 mt-2 flex justify-between text-base font-bold">
+                                <span class="text-slate-900">SHU Total</span>
+                                <span class="text-teal-700 font-tabular">{formatCurrency(autoGeneratedReport.total_shu_koperasi)}</span>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="mb-4">
-                        <h5 class="font-semibold mb-2">
-                            Detail Pembagian SHU ({autoGeneratedReport
-                                .detail_anggota.length} anggota)
-                        </h5>
-                        <div class="max-h-40 overflow-y-auto bg-white rounded">
-                            <table class="min-w-full text-sm">
-                                <thead class="bg-gray-100 sticky top-0">
-                                    <tr>
-                                        <th class="px-2 py-1 text-left"
-                                            >Email</th
-                                        >
-                                        <th class="px-2 py-1 text-left"
-                                            >Simpanan</th
-                                        >
-                                        <th class="px-2 py-1 text-left"
-                                            >Penjualan</th
-                                        >
-                                        <th class="px-2 py-1 text-left"
-                                            >Jasa Modal</th
-                                        >
-                                        <th class="px-2 py-1 text-left"
-                                            >Jasa Usaha</th
-                                        >
-                                        <th class="px-2 py-1 text-left"
-                                            >Total SHU</th
-                                        >
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {#each autoGeneratedReport.detail_anggota as member}
-                                        <tr class="border-t">
-                                            <td class="px-2 py-1"
-                                                >{member.email}</td
-                                            >
-                                            <td class="px-2 py-1"
-                                                >{formatCurrency(
-                                                    member.total_simpanan,
-                                                )}</td
-                                            >
-                                            <td class="px-2 py-1"
-                                                >{formatCurrency(
-                                                    member.total_penjualan,
-                                                )}</td
-                                            >
-                                            <td class="px-2 py-1"
-                                                >{formatCurrency(
-                                                    member.jasa_modal,
-                                                )}</td
-                                            >
-                                            <td class="px-2 py-1"
-                                                >{formatCurrency(
-                                                    member.jasa_usaha,
-                                                )}</td
-                                            >
-                                            <td class="px-2 py-1 font-semibold"
-                                                >{formatCurrency(
-                                                    member.total_shu_anggota,
-                                                )}</td
-                                            >
+                        <!-- Member Detail Table -->
+                        <div class="mb-4">
+                            <h5 class="text-sm font-semibold text-slate-700 mb-2">
+                                Detail Pembagian SHU ({autoGeneratedReport.detail_anggota.length} anggota)
+                            </h5>
+                            <div class="table-container max-h-48 overflow-y-auto">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Email</th>
+                                            <th>Simpanan</th>
+                                            <th>Penjualan</th>
+                                            <th>Jasa Modal</th>
+                                            <th>Jasa Usaha</th>
+                                            <th>Total SHU</th>
                                         </tr>
-                                    {/each}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {#each autoGeneratedReport.detail_anggota as member}
+                                            <tr>
+                                                <td class="text-sm">{member.email}</td>
+                                                <td class="font-tabular text-sm">{formatCurrency(member.total_simpanan)}</td>
+                                                <td class="font-tabular text-sm">{formatCurrency(member.total_penjualan)}</td>
+                                                <td class="font-tabular text-sm">{formatCurrency(member.jasa_modal)}</td>
+                                                <td class="font-tabular text-sm">{formatCurrency(member.jasa_usaha)}</td>
+                                                <td class="font-semibold font-tabular text-sm">{formatCurrency(member.total_shu_anggota)}</td>
+                                            </tr>
+                                        {/each}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button type="button" on:click={closeModals} class="btn btn-secondary flex-1">
+                                Tutup
+                            </button>
+                            <button type="button" on:click={saveAutoSHUReport} class="btn btn-primary flex-1">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                Simpan ke Daftar SHU
+                            </button>
                         </div>
                     </div>
-
-                    <div class="flex justify-end space-x-3">
-                        <button
-                            type="button"
-                            on:click={closeModals}
-                            class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                        >
-                            Tutup
-                        </button>
-                        <button
-                            type="button"
-                            on:click={saveAutoSHUReport}
-                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                        >
-                            💾 Simpan ke Daftar SHU
-                        </button>
-                    </div>
-                </div>
-            {/if}
+                {/if}
+            </div>
         </div>
     </div>
 {/if}
 
 <!-- User Generate SHU Modal -->
 {#if showUserGenerateModal}
-    <div
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-    >
-        <div class="bg-white rounded-lg max-w-md w-full">
-            <div class="p-4 sm:p-6 border-b border-gray-200">
-                <h3 class="text-lg font-semibold">Generate SHU Pribadi</h3>
-                <p class="text-sm text-gray-600 mt-1">
-                    Generate laporan SHU berdasarkan aktivitas simpan-pinjam
-                    Anda
-                </p>
+    <div class="modal-overlay animate-fade-in" on:click={closeModals} on:keydown={(e) => e.key === 'Escape' && closeModals()}>
+        <div class="modal-panel animate-slide-up" on:click|stopPropagation on:keydown|stopPropagation style="max-width: 28rem;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-900">Generate SHU Pribadi</h3>
+                    <p class="text-sm text-slate-500 mt-0.5">
+                        Generate laporan SHU berdasarkan aktivitas simpan-pinjam Anda
+                    </p>
+                </div>
             </div>
 
-            <div class="p-4 sm:p-6">
-                <div class="mb-4 p-4 bg-purple-50 rounded-lg">
-                    <h5 class="font-semibold text-purple-800 mb-2">
-                        Informasi
-                    </h5>
-                    <ul class="text-sm text-purple-700 space-y-1">
-                        <li>
-                            • SHU dihitung berdasarkan simpanan dan transaksi
-                            Anda
-                        </li>
-                        <li>
-                            • Perhitungan menggunakan formula yang telah
-                            ditetapkan koperasi
-                        </li>
-                        <li>• Hasil akan ditampilkan di riwayat SHU Anda</li>
+            <div class="modal-body">
+                <div class="alert alert-info mb-0">
+                    <p class="font-semibold text-sm mb-1.5">Informasi</p>
+                    <ul class="text-sm space-y-1">
+                        <li>SHU dihitung berdasarkan simpanan dan transaksi Anda</li>
+                        <li>Perhitungan menggunakan formula yang telah ditetapkan koperasi</li>
+                        <li>Hasil akan ditampilkan di riwayat SHU Anda</li>
                     </ul>
                 </div>
+            </div>
 
-                <div
-                    class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3"
-                >
-                    <button
-                        type="button"
-                        on:click={closeModals}
-                        class="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                    >
-                        Batal
-                    </button>
-                    <button
-                        type="button"
-                        on:click={generateUserSHU}
-                        class="w-full sm:w-auto px-4 py-3 sm:py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
-                    >
-                        Generate SHU Saya
-                    </button>
-                </div>
+            <div class="modal-footer">
+                <button type="button" on:click={closeModals} class="btn btn-secondary">
+                    Batal
+                </button>
+                <button type="button" on:click={generateUserSHU} class="btn btn-primary">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Generate SHU Saya
+                </button>
             </div>
         </div>
     </div>
@@ -1886,329 +1568,229 @@
 
 <!-- User Save SHU Modal -->
 {#if showUserSaveModal}
-    <div
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-    >
-        <div class="bg-white rounded-lg max-w-md w-full">
-            <div class="p-4 sm:p-6 border-b border-gray-200">
-                <h3 class="text-lg font-semibold">Simpan SHU Pribadi</h3>
-                <p class="text-sm text-gray-600 mt-1">
-                    Simpan laporan SHU Anda ke dalam database
-                </p>
+    <div class="modal-overlay animate-fade-in" on:click={closeModals} on:keydown={(e) => e.key === 'Escape' && closeModals()}>
+        <div class="modal-panel animate-slide-up" on:click|stopPropagation on:keydown|stopPropagation style="max-width: 28rem;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-900">Simpan SHU Pribadi</h3>
+                    <p class="text-sm text-slate-500 mt-0.5">
+                        Simpan laporan SHU Anda ke dalam database
+                    </p>
+                </div>
             </div>
 
-            <div class="p-4 sm:p-6">
-                <div class="mb-4">
-                    <label
-                        for="userSaveTahun"
-                        class="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                        Tahun SHU
-                    </label>
+            <div class="modal-body space-y-4">
+                <div>
+                    <label for="userSaveTahun" class="input-label">Tahun SHU</label>
                     <input
                         id="userSaveTahun"
                         type="number"
                         bind:value={userSaveTahun}
                         min="2020"
                         max="2030"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                        class="input"
                         placeholder="Masukkan tahun (contoh: 2024)"
                     />
                 </div>
 
-                <div class="mb-4 p-4 bg-purple-50 rounded-lg">
-                    <h5 class="font-semibold text-purple-800 mb-2">
-                        Informasi
-                    </h5>
-                    <ul class="text-sm text-purple-700 space-y-1">
-                        <li>
-                            • SHU akan dihitung dan disimpan berdasarkan data
-                            tahun yang dipilih
-                        </li>
-                        <li>
-                            • Pastikan Anda sudah memiliki aktivitas di tahun
-                            tersebut
-                        </li>
-                        <li>
-                            • Data yang disimpan akan muncul di riwayat SHU Anda
-                        </li>
+                <div class="alert alert-info">
+                    <p class="font-semibold text-sm mb-1.5">Informasi</p>
+                    <ul class="text-sm space-y-1">
+                        <li>SHU akan dihitung dan disimpan berdasarkan data tahun yang dipilih</li>
+                        <li>Pastikan Anda sudah memiliki aktivitas di tahun tersebut</li>
+                        <li>Data yang disimpan akan muncul di riwayat SHU Anda</li>
                     </ul>
                 </div>
+            </div>
 
-                <div
-                    class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3"
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    on:click={closeModals}
+                    class="btn btn-secondary"
+                    disabled={savingUserSHU}
                 >
-                    <button
-                        type="button"
-                        on:click={closeModals}
-                        class="w-full sm:w-auto px-4 py-3 sm:py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                        disabled={savingUserSHU}
-                    >
-                        Batal
-                    </button>
-                    <button
-                        type="button"
-                        on:click={async () => {
-                            savingUserSHU = true;
-                            await saveUserSHU(userSaveTahun);
-                            savingUserSHU = false;
-                            closeModals();
-                        }}
-                        class="w-full sm:w-auto px-4 py-3 sm:py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors disabled:opacity-50"
-                        disabled={savingUserSHU || !userSaveTahun}
-                    >
-                        {savingUserSHU ? "Menyimpan..." : "Simpan SHU"}
-                    </button>
-                </div>
+                    Batal
+                </button>
+                <button
+                    type="button"
+                    on:click={async () => {
+                        savingUserSHU = true;
+                        await saveUserSHU(userSaveTahun);
+                        savingUserSHU = false;
+                        closeModals();
+                    }}
+                    class="btn btn-primary"
+                    disabled={savingUserSHU || !userSaveTahun}
+                >
+                    {#if savingUserSHU}
+                        <svg class="w-4 h-4 mr-1.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        Menyimpan...
+                    {:else}
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                        Simpan SHU
+                    {/if}
+                </button>
             </div>
         </div>
     </div>
 {/if}
 
-<!-- Detail SHU Modal -->
+<!-- Detail SHU Drawer -->
 {#if showDetailModal && selectedSHU}
-    <div
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-    >
-        <div
-            class="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-        >
-            <div class="p-4 sm:p-6 border-b border-gray-200">
-                <h3 class="text-lg font-semibold">
-                    Detail Laporan SHU {selectedSHU.tahun}
-                </h3>
+    <div class="drawer-overlay" on:click={closeModals} on:keydown={(e) => e.key === 'Escape' && closeModals()}>
+        <div class="drawer-panel animate-slide-in-right" style="max-width: 56rem;" on:click|stopPropagation on:keydown|stopPropagation>
+            <div class="drawer-header">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-900">Detail Laporan SHU</h3>
+                    <p class="text-sm text-slate-500">Tahun {selectedSHU.tahun}</p>
+                </div>
+                <button on:click={closeModals} class="btn btn-ghost btn-sm" aria-label="Tutup">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
 
-            <div class="p-4 sm:p-6 space-y-6">
-                <div
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4"
-                >
-                    <div>
-                        <p class="text-sm text-gray-600">Tahun</p>
-                        <p class="font-semibold">{selectedSHU.tahun}</p>
+            <div class="drawer-body">
+                <!-- Top info cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    <div class="p-3 rounded-lg bg-slate-50">
+                        <p class="text-xs text-slate-500">Tahun</p>
+                        <p class="text-xl font-bold text-slate-900 font-tabular">{selectedSHU.tahun}</p>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Total SHU</p>
-                        <p class="font-semibold">
+                    <div class="p-3 rounded-lg" style="background: #f0fdfa;">
+                        <p class="text-xs text-teal-600">Total SHU</p>
+                        <p class="text-lg font-bold text-teal-800 font-tabular">
                             {formatCurrency(selectedSHU.total_shu)}
                         </p>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Status</p>
-                        <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {selectedSHU.status ===
-                            'final'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-yellow-100 text-yellow-800'}"
-                        >
+                    <div class="p-3 rounded-lg bg-slate-50">
+                        <p class="text-xs text-slate-500">Status</p>
+                        <span class="badge mt-1 {selectedSHU.status === 'final' ? 'badge-success' : 'badge-warning'}">
                             {selectedSHU.status === "final" ? "Final" : "Draft"}
                         </span>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Tanggal Dibuat</p>
-                        <p class="font-semibold">
+                    <div class="p-3 rounded-lg bg-slate-50">
+                        <p class="text-xs text-slate-500">Tanggal Dibuat</p>
+                        <p class="font-semibold text-slate-900 text-sm mt-0.5">
                             {safeDateFormat(selectedSHU)}
                         </p>
                     </div>
                 </div>
 
                 {#if selectedSHU.shu_report}
-                    <div class="border-t pt-6">
-                        <h4 class="text-lg font-semibold mb-4">
-                            Detail Perhitungan
+                    <!-- Calculation Details -->
+                    <div class="border-t border-slate-200 pt-5 mb-5">
+                        <h4 class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">Detail Perhitungan</h4>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Persen Jasa Modal</p>
+                                <p class="font-semibold text-slate-900 font-tabular">{selectedSHU.shu_report.persen_jasa_modal}%</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Persen Jasa Usaha</p>
+                                <p class="font-semibold text-slate-900 font-tabular">{selectedSHU.shu_report.persen_jasa_usaha}%</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Total Simpanan Semua</p>
+                                <p class="font-semibold text-slate-900 font-tabular text-sm">
+                                    {formatCurrency(selectedSHU.shu_report.total_simpanan_all)}
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-50">
+                                <p class="text-xs text-slate-500">Total Penjualan Semua</p>
+                                <p class="font-semibold text-slate-900 font-tabular text-sm">
+                                    {formatCurrency(selectedSHU.shu_report.total_penjualan_all)}
+                                </p>
+                            </div>
+                        </div>
+
+                        <h4 class="text-sm font-semibold text-slate-700 uppercase tracking-wide mb-3">
+                            Pembagian SHU kepada Anggota
+                            <span class="text-xs font-normal text-slate-400 normal-case ml-1">
+                                ({selectedSHU.shu_report.detail_anggota.length} anggota)
+                            </span>
                         </h4>
 
-                        <div
-                            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mb-6"
-                        >
-                            <div>
-                                <p class="text-sm text-gray-600">
-                                    Persentase Jasa Modal
-                                </p>
-                                <p class="font-semibold">
-                                    {selectedSHU.shu_report.persen_jasa_modal}%
-                                </p>
+                        <!-- Summary Cards (teal-tinted) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                            <div class="card stagger-item" style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%); border: 1px solid #99f6e4;">
+                                <div class="p-3 text-center">
+                                    <p class="text-xs font-medium text-teal-600">Total Anggota</p>
+                                    <p class="text-2xl font-bold text-teal-900 font-tabular">
+                                        {selectedSHU.shu_report.detail_anggota.length}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-600">
-                                    Persentase Jasa Usaha
-                                </p>
-                                <p class="font-semibold">
-                                    {selectedSHU.shu_report.persen_jasa_usaha}%
-                                </p>
+                            <div class="card stagger-item" style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%); border: 1px solid #99f6e4;">
+                                <div class="p-3 text-center">
+                                    <p class="text-xs font-medium text-teal-600">Total SHU Dibagikan</p>
+                                    <p class="text-lg font-bold text-teal-900 font-tabular">
+                                        {formatCurrency(
+                                            selectedSHU.shu_report.detail_anggota.reduce(
+                                                (sum, member) =>
+                                                    sum + member.total_shu_anggota,
+                                                0,
+                                            ),
+                                        )}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-600">
-                                    Total Simpanan Semua Anggota
-                                </p>
-                                <p class="font-semibold">
-                                    {formatCurrency(
-                                        selectedSHU.shu_report
-                                            .total_simpanan_all,
-                                    )}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">
-                                    Total Penjualan Semua Anggota
-                                </p>
-                                <p class="font-semibold">
-                                    {formatCurrency(
-                                        selectedSHU.shu_report
-                                            .total_penjualan_all,
-                                    )}
-                                </p>
-                            </div>
-                        </div>
-
-                        <h5 class="font-semibold mb-4 text-lg">
-                            📊 Pembagian SHU kepada Anggota
-                            <span class="text-sm font-normal text-gray-600"
-                                >({selectedSHU.shu_report.detail_anggota.length}
-                                anggota)</span
-                            >
-                        </h5>
-
-                        <!-- Summary Cards -->
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <p class="text-sm font-medium text-blue-600">
-                                    Total Anggota
-                                </p>
-                                <p class="text-2xl font-bold text-blue-900">
-                                    {selectedSHU.shu_report.detail_anggota
-                                        .length}
-                                </p>
-                            </div>
-                            <div class="bg-green-50 p-4 rounded-lg">
-                                <p class="text-sm font-medium text-green-600">
-                                    Total SHU Dibagikan
-                                </p>
-                                <p class="text-lg font-bold text-green-900">
-                                    {formatCurrency(
-                                        selectedSHU.shu_report.detail_anggota.reduce(
-                                            (sum, member) =>
-                                                sum + member.total_shu_anggota,
-                                            0,
-                                        ),
-                                    )}
-                                </p>
-                            </div>
-                            <div class="bg-purple-50 p-4 rounded-lg">
-                                <p class="text-sm font-medium text-purple-600">
-                                    Rata-rata SHU/Anggota
-                                </p>
-                                <p class="text-lg font-bold text-purple-900">
-                                    {formatCurrency(
-                                        selectedSHU.shu_report.detail_anggota.reduce(
-                                            (sum, member) =>
-                                                sum + member.total_shu_anggota,
-                                            0,
-                                        ) /
-                                            selectedSHU.shu_report
-                                                .detail_anggota.length,
-                                    )}
-                                </p>
+                            <div class="card stagger-item" style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%); border: 1px solid #99f6e4;">
+                                <div class="p-3 text-center">
+                                    <p class="text-xs font-medium text-teal-600">Rata-rata SHU/Anggota</p>
+                                    <p class="text-lg font-bold text-teal-900 font-tabular">
+                                        {formatCurrency(
+                                            selectedSHU.shu_report.detail_anggota.reduce(
+                                                (sum, member) =>
+                                                    sum + member.total_shu_anggota,
+                                                0,
+                                            ) /
+                                                selectedSHU.shu_report
+                                                    .detail_anggota.length,
+                                        )}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto border rounded-lg">
-                            <table class="min-w-full text-sm">
-                                <thead class="bg-gray-50">
+                        <!-- Member Detail Table -->
+                        <div class="table-container">
+                            <table>
+                                <thead>
                                     <tr>
-                                        <th
-                                            class="px-4 py-3 text-left font-semibold text-gray-900"
-                                            >No</th
-                                        >
-                                        <th
-                                            class="px-4 py-3 text-left font-semibold text-gray-900"
-                                            >Anggota</th
-                                        >
-                                        <th
-                                            class="px-4 py-3 text-right font-semibold text-gray-900"
-                                            >Simpanan</th
-                                        >
-                                        <th
-                                            class="px-4 py-3 text-right font-semibold text-gray-900"
-                                            >Penjualan</th
-                                        >
-                                        <th
-                                            class="px-4 py-3 text-right font-semibold text-gray-900"
-                                            >Jasa Modal</th
-                                        >
-                                        <th
-                                            class="px-4 py-3 text-right font-semibold text-gray-900"
-                                            >Jasa Usaha</th
-                                        >
-                                        <th
-                                            class="px-4 py-3 text-right font-semibold text-gray-900 bg-green-50"
-                                            >Total SHU</th
-                                        >
+                                        <th>No</th>
+                                        <th>Anggota</th>
+                                        <th class="text-right">Simpanan</th>
+                                        <th class="text-right">Penjualan</th>
+                                        <th class="text-right">Jasa Modal</th>
+                                        <th class="text-right">Jasa Usaha</th>
+                                        <th class="text-right" style="background: #f0fdfa;">Total SHU</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200">
+                                <tbody>
                                     {#each selectedSHU.shu_report.detail_anggota as member, index}
-                                        <tr class="hover:bg-gray-50">
-                                            <td class="px-4 py-3 text-gray-900"
-                                                >{index + 1}</td
-                                            >
-                                            <td class="px-4 py-3">
+                                        <tr>
+                                            <td class="text-slate-500 font-tabular">{index + 1}</td>
+                                            <td>
                                                 <div>
-                                                    <p
-                                                        class="font-medium text-gray-900"
-                                                    >
-                                                        {member.email}
-                                                    </p>
-                                                    <p
-                                                        class="text-sm text-gray-500"
-                                                    >
-                                                        ID: {member.user_id}
-                                                    </p>
+                                                    <p class="font-medium text-slate-900 text-sm">{member.email}</p>
+                                                    <p class="text-xs text-slate-400">ID: {member.user_id}</p>
                                                 </div>
                                             </td>
-                                            <td
-                                                class="px-4 py-3 text-right text-gray-900"
-                                            >
-                                                {formatCurrency(
-                                                    member.total_simpanan,
-                                                )}
-                                            </td>
-                                            <td
-                                                class="px-4 py-3 text-right text-gray-900"
-                                            >
-                                                {formatCurrency(
-                                                    member.total_penjualan,
-                                                )}
-                                            </td>
-                                            <td
-                                                class="px-4 py-3 text-right text-blue-600"
-                                            >
-                                                {formatCurrency(
-                                                    member.jasa_modal,
-                                                )}
-                                            </td>
-                                            <td
-                                                class="px-4 py-3 text-right text-purple-600"
-                                            >
-                                                {formatCurrency(
-                                                    member.jasa_usaha,
-                                                )}
-                                            </td>
-                                            <td
-                                                class="px-4 py-3 text-right font-bold text-green-600 bg-green-50"
-                                            >
-                                                {formatCurrency(
-                                                    member.total_shu_anggota,
-                                                )}
+                                            <td class="text-right font-tabular text-sm">{formatCurrency(member.total_simpanan)}</td>
+                                            <td class="text-right font-tabular text-sm">{formatCurrency(member.total_penjualan)}</td>
+                                            <td class="text-right font-tabular text-sm text-teal-600">{formatCurrency(member.jasa_modal)}</td>
+                                            <td class="text-right font-tabular text-sm text-teal-600">{formatCurrency(member.jasa_usaha)}</td>
+                                            <td class="text-right font-tabular text-sm font-bold text-teal-700" style="background: #f0fdfa;">
+                                                {formatCurrency(member.total_shu_anggota)}
                                             </td>
                                         </tr>
                                     {/each}
                                     <!-- Total Row -->
-                                    <tr class="bg-gray-100 font-semibold">
-                                        <td class="px-4 py-3" colspan="2"
-                                            >TOTAL KESELURUHAN</td
-                                        >
-                                        <td class="px-4 py-3 text-right">
+                                    <tr style="background: #f0fdfa; font-weight: 600;">
+                                        <td colspan="2" class="font-semibold text-slate-900">TOTAL KESELURUHAN</td>
+                                        <td class="text-right font-tabular text-sm">
                                             {formatCurrency(
                                                 selectedSHU.shu_report.detail_anggota.reduce(
                                                     (sum, member) =>
@@ -2218,7 +1800,7 @@
                                                 ),
                                             )}
                                         </td>
-                                        <td class="px-4 py-3 text-right">
+                                        <td class="text-right font-tabular text-sm">
                                             {formatCurrency(
                                                 selectedSHU.shu_report.detail_anggota.reduce(
                                                     (sum, member) =>
@@ -2228,9 +1810,7 @@
                                                 ),
                                             )}
                                         </td>
-                                        <td
-                                            class="px-4 py-3 text-right text-blue-700"
-                                        >
+                                        <td class="text-right font-tabular text-sm text-teal-700">
                                             {formatCurrency(
                                                 selectedSHU.shu_report.detail_anggota.reduce(
                                                     (sum, member) =>
@@ -2239,9 +1819,7 @@
                                                 ),
                                             )}
                                         </td>
-                                        <td
-                                            class="px-4 py-3 text-right text-purple-700"
-                                        >
+                                        <td class="text-right font-tabular text-sm text-teal-700">
                                             {formatCurrency(
                                                 selectedSHU.shu_report.detail_anggota.reduce(
                                                     (sum, member) =>
@@ -2250,9 +1828,7 @@
                                                 ),
                                             )}
                                         </td>
-                                        <td
-                                            class="px-4 py-3 text-right font-bold text-green-700 bg-green-100"
-                                        >
+                                        <td class="text-right font-tabular text-sm font-bold text-teal-800" style="background: #ccfbf1;">
                                             {formatCurrency(
                                                 selectedSHU.shu_report.detail_anggota.reduce(
                                                     (sum, member) =>
@@ -2268,74 +1844,59 @@
                         </div>
                     </div>
                 {:else}
-                    <div class="border-t pt-6">
-                        <div
-                            class="bg-yellow-50 border border-yellow-200 rounded-lg p-4"
-                        >
-                            <h4
-                                class="text-lg font-semibold mb-2 text-yellow-800"
-                            >
-                                ⚠️ Data Detail Belum Tersedia
-                            </h4>
-                            <p class="text-yellow-700 mb-3">
-                                Laporan SHU ini belum memiliki detail pembagian
-                                kepada anggota.
+                    <div class="border-t border-slate-200 pt-5">
+                        <div class="alert alert-warning">
+                            <h4 class="font-semibold mb-2">Data Detail Belum Tersedia</h4>
+                            <p class="text-sm mb-3">
+                                Laporan SHU ini belum memiliki detail pembagian kepada anggota.
                             </p>
-                            <p class="text-sm text-yellow-600 mb-4">
-                                Klik tombol "Regenerate Detail" untuk
-                                mendapatkan detail lengkap pembagian.
+                            <p class="text-sm mb-4">
+                                Klik tombol "Regenerate Detail" untuk mendapatkan detail lengkap pembagian.
                             </p>
 
                             <div class="flex gap-2 mb-3">
                                 <button
-                                    on:click={() =>
-                                        fetchDetailedSHUData(selectedSHU)}
-                                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+                                    on:click={() => fetchDetailedSHUData(selectedSHU)}
+                                    class="btn btn-primary btn-sm"
                                 >
-                                    🔄 Regenerate Detail
+                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    Regenerate Detail
                                 </button>
                                 <button
-                                    on:click={() =>
-                                        generateDetailedSHUReport(selectedSHU)}
-                                    class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm"
+                                    on:click={() => generateDetailedSHUReport(selectedSHU)}
+                                    class="btn btn-secondary btn-sm"
                                 >
-                                    📊 Generate Report
+                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    Generate Report
                                 </button>
                             </div>
-                            <div
-                                class="mt-3 p-2 bg-yellow-100 rounded text-xs text-yellow-600"
-                            >
-                                <strong>Tersedia:</strong>
+
+                            <div class="text-xs text-slate-500 p-2 bg-slate-50 rounded">
+                                <p><strong>Tersedia:</strong>
                                 {Object.keys(selectedSHU)
                                     .filter(
                                         (key) => !["shu_report"].includes(key),
                                     )
-                                    .join(", ")}
-                                <br />
-                                <strong>Total SHU:</strong>
-                                {formatCurrency(selectedSHU.total_shu || 0)}
-                                <br />
-                                <strong>ID:</strong>
-                                {selectedSHU.ID || selectedSHU.id || "N/A"}
+                                    .join(", ")}</p>
+                                <p><strong>Total SHU:</strong> <span class="font-tabular">{formatCurrency(selectedSHU.total_shu || 0)}</span></p>
+                                <p><strong>ID:</strong> <span class="font-tabular">{selectedSHU.ID || selectedSHU.id || "N/A"}</span></p>
                             </div>
                         </div>
                     </div>
                 {/if}
+            </div>
 
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button
-                        on:click={() => generatePDF(selectedSHU!)}
-                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                    >
-                        Download PDF
-                    </button>
-                    <button
-                        on:click={closeModals}
-                        class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                    >
-                        Tutup
-                    </button>
-                </div>
+            <div class="drawer-footer">
+                <button
+                    on:click={() => generatePDF(selectedSHU)}
+                    class="btn btn-primary"
+                >
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    Download PDF
+                </button>
+                <button on:click={closeModals} class="btn btn-secondary">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>

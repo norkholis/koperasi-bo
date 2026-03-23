@@ -477,68 +477,63 @@
     }
 </script>
 
-<div class="p-6">
-    <!-- Debug Panel (temporary) -->
-    <!-- <div class="mb-6">
-        <WalletDebugger />
-    </div> -->
-
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-4">
-            <h1 class="text-2xl font-bold">
-                {isMember ? "Wallet Wadiah Saya" : "Manajemen Wallet Wadiah"}
-            </h1>
+<div class="p-6 animate-fade-in">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">
+                    {isMember ? "Wallet Wadiah Saya" : "Manajemen Wallet Wadiah"}
+                </h1>
+                <p class="mt-1 text-sm text-slate-500">
+                    {isMember
+                        ? "Kelola simpanan pokok, wajib, dan sukarela Anda"
+                        : "Lihat dan kelola wallet wadiah seluruh anggota"}
+                </p>
+            </div>
             {#if selectedUserId && isAdmin}
-                <a
-                    href="/dashboard/simpanan"
-                    class="text-sm text-blue-600 hover:text-blue-800 underline"
-                >
-                    ← Kembali ke Semua Wallet
-                </a>
+                <div class="flex items-center gap-4">
+                    <span class="badge badge-info font-tabular">
+                        User ID: #{selectedUserId}
+                    </span>
+                    <a
+                        href="/dashboard/simpanan"
+                        class="btn btn-secondary btn-sm"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Kembali ke Semua Wallet
+                    </a>
+                </div>
             {/if}
         </div>
-        {#if selectedUserId && isAdmin}
-            <div class="text-sm text-gray-600">
-                Menampilkan wallet untuk User ID: #{selectedUserId}
-            </div>
-        {/if}
     </div>
 
     <!-- Success Message -->
     {#if showSuccessMessage}
-        <div class="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
-            <div class="flex items-center">
-                <svg
-                    class="h-5 w-5 text-green-400 mr-2"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                >
+        <div class="alert alert-success mb-6 animate-slide-up">
+            <svg class="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clip-rule="evenodd"
+                />
+            </svg>
+            <p class="font-medium flex-1">{successMessage}</p>
+            <button
+                on:click={() => (showSuccessMessage = false)}
+                class="btn btn-ghost btn-icon btn-sm"
+                aria-label="Close success message"
+            >
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                     <path
                         fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                         clip-rule="evenodd"
                     />
                 </svg>
-                <p class="text-green-800 font-medium">{successMessage}</p>
-                <button
-                    on:click={() => (showSuccessMessage = false)}
-                    class="ml-auto text-green-400 hover:text-green-600"
-                    aria-label="Close success message"
-                >
-                    <svg
-                        class="h-4 w-4"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
-                </button>
-            </div>
+            </button>
         </div>
     {/if}
 
@@ -552,29 +547,31 @@
             selectedUserId,
         )}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {#each ["pokok", "wajib", "sukarela"] as walletType}
+            {#each ["pokok", "wajib", "sukarela"] as walletType, i}
                 {@const wallet = getWalletByType(walletType)}
                 <div
-                    class="bg-white rounded-lg shadow-md border-2 {getWalletColor(
-                        walletType,
-                    )} p-6"
+                    class="card card-interactive p-6 stagger-item {walletType === 'pokok'
+                        ? 'border-l-4 border-l-teal-500'
+                        : walletType === 'wajib'
+                          ? 'border-l-4 border-l-amber-500'
+                          : 'border-l-4 border-l-emerald-500'}"
                 >
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold">
+                        <h3 class="text-base font-semibold text-slate-800">
                             {getWalletDisplayName(walletType)}
                         </h3>
-                        <div
-                            class="text-sm px-2 py-1 rounded-full {getWalletColor(
-                                walletType,
-                            )}"
-                        >
+                        <span class="badge {walletType === 'pokok'
+                            ? 'badge-primary'
+                            : walletType === 'wajib'
+                              ? 'badge-warning'
+                              : 'badge-success'}">
                             {walletType.toUpperCase()}
-                        </div>
+                        </span>
                     </div>
 
                     <div class="mb-4">
-                        <p class="text-sm text-gray-600 mb-1">Saldo Saat Ini</p>
-                        <p class="text-2xl font-bold text-gray-900">
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Saldo Saat Ini</p>
+                        <p class="text-2xl font-bold text-slate-900 font-tabular">
                             {wallet
                                 ? formatCurrency(wallet.balance)
                                 : formatCurrency(0)}
@@ -582,21 +579,21 @@
                     </div>
 
                     {#if wallet}
-                        <div class="text-xs text-gray-500 mb-4">
+                        <div class="text-xs text-slate-400 mb-5">
                             Diperbarui: {formatDate(wallet.updated_at)}
                         </div>
                     {:else}
-                        <div class="text-center py-4 mb-4">
-                            <p class="text-gray-500 text-sm mb-1">
+                        <div class="text-center py-3 mb-5 rounded-lg bg-slate-50">
+                            <p class="text-slate-500 text-sm mb-0.5">
                                 Wallet belum tersedia
                             </p>
-                            <p class="text-xs text-gray-400">
+                            <p class="text-xs text-slate-400">
                                 Wallet akan dibuat saat Top-Up pertama
                             </p>
                         </div>
                     {/if}
 
-                    <div class="flex gap-2 flex-wrap">
+                    <div class="flex gap-2">
                         {#if isMember}
                             <!-- Debug: Top-Up button should be visible -->
                             {console.log(
@@ -611,15 +608,21 @@
                                             | "wajib"
                                             | "sukarela",
                                     )}
-                                class="flex-1 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                class="btn btn-primary btn-sm flex-1"
                             >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
                                 Top Up
                             </button>
                         {:else if isAdmin && wallet}
                             <button
                                 on:click={() => openBalanceAdjustModal(wallet)}
-                                class="flex-1 px-3 py-2 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                class="btn btn-success btn-sm flex-1"
                             >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                                </svg>
                                 Sesuaikan Saldo
                             </button>
                         {/if}
@@ -627,8 +630,11 @@
                             <button
                                 on:click={() =>
                                     openTransactionHistoryModal(wallet)}
-                                class="flex-1 px-3 py-2 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                                class="btn btn-ghost btn-sm flex-1"
                             >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                                 Riwayat
                             </button>
                         {/if}
@@ -640,92 +646,66 @@
 
     <!-- Pending Transactions for Admin -->
     {#if isAdmin && pendingTransactions.length > 0}
-        <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900">
-                    Permintaan Top-Up Menunggu Persetujuan
-                    <span
-                        class="ml-2 px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full"
-                    >
+        <div class="card mb-6 animate-slide-up">
+            <div class="px-6 py-4 border-b border-slate-200">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-lg font-semibold text-slate-900">
+                        Permintaan Top-Up Menunggu Persetujuan
+                    </h2>
+                    <span class="badge badge-warning">
                         {pendingTransactions.length}
                     </span>
-                </h2>
+                </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
+            <div class="table-container" style="border: none; box-shadow: none; border-radius: 0;">
+                <table>
+                    <thead>
                         <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Tanggal</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >User</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Wallet</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Jumlah</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Keterangan</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Aksi</th
-                            >
+                            <th>Tanggal</th>
+                            <th>User</th>
+                            <th>Wallet</th>
+                            <th>Jumlah</th>
+                            <th>Keterangan</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody>
                         {#each pendingTransactions as transaction}
-                            <tr class="hover:bg-gray-50">
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                >
+                            <tr>
+                                <td class="whitespace-nowrap">
                                     {formatDate(transaction.created_at)}
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                >
+                                <td class="whitespace-nowrap">
                                     <div>
-                                        <p class="font-medium">
+                                        <p class="font-medium text-slate-900">
                                             {transaction.simpanan?.user?.name ||
                                                 "Unknown"}
                                         </p>
-                                        <p class="text-xs text-gray-500">
+                                        <p class="text-xs text-slate-400 font-tabular">
                                             #{transaction.simpanan?.user_id ||
                                                 "-"}
                                         </p>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 py-1 text-xs rounded-full {getWalletColor(
-                                            transaction.simpanan?.type || '',
-                                        )}"
-                                    >
+                                <td class="whitespace-nowrap">
+                                    <span class="badge {transaction.simpanan?.type === 'pokok'
+                                        ? 'badge-primary'
+                                        : transaction.simpanan?.type === 'wajib'
+                                          ? 'badge-warning'
+                                          : 'badge-success'}">
                                         {getWalletDisplayName(
                                             transaction.simpanan?.type || "",
                                         )}
                                     </span>
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-                                >
+                                <td class="whitespace-nowrap font-tabular font-semibold text-slate-900">
                                     {formatCurrency(transaction.amount)}
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-600">
+                                <td class="text-slate-500">
                                     {transaction.description}
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                >
+                                <td class="whitespace-nowrap">
                                     <div class="flex gap-2">
                                         <button
                                             on:click={() =>
@@ -733,7 +713,7 @@
                                                     transaction.id,
                                                     true,
                                                 )}
-                                            class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                            class="btn btn-success btn-sm"
                                         >
                                             Setujui
                                         </button>
@@ -743,7 +723,7 @@
                                                     transaction.id,
                                                     false,
                                                 )}
-                                            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                            class="btn btn-danger btn-sm"
                                         >
                                             Tolak
                                         </button>
@@ -752,7 +732,7 @@
                                                 openTransactionModal(
                                                     transaction,
                                                 )}
-                                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                            class="btn btn-ghost btn-sm"
                                         >
                                             Detail
                                         </button>
@@ -768,83 +748,55 @@
 
     <!-- All Wallets Table for Admin (when not viewing specific user) -->
     {#if isAdmin && !selectedUserId && wallets.length > 0}
-        <div class="bg-white rounded-lg shadow-md">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900">
+        <div class="card animate-slide-up">
+            <div class="px-6 py-4 border-b border-slate-200">
+                <h2 class="text-lg font-semibold text-slate-900">
                     Semua Wallet Pengguna
                 </h2>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
+            <div class="table-container" style="border: none; box-shadow: none; border-radius: 0;">
+                <table>
+                    <thead>
                         <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >User ID</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Nama User</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Jenis Wallet</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Saldo</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Terakhir Update</th
-                            >
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >Aksi</th
-                            >
+                            <th>User ID</th>
+                            <th>Nama User</th>
+                            <th>Jenis Wallet</th>
+                            <th>Saldo</th>
+                            <th>Terakhir Update</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody>
                         {#each wallets as wallet}
-                            <tr class="hover:bg-gray-50">
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                >
+                            <tr>
+                                <td class="whitespace-nowrap font-tabular text-slate-500">
                                     #{wallet.user_id}
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                >
+                                <td class="whitespace-nowrap font-medium text-slate-900">
                                     {wallet.user?.name || "-"}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="px-2 py-1 text-xs rounded-full {getWalletColor(
-                                            wallet.type,
-                                        )}"
-                                    >
+                                <td class="whitespace-nowrap">
+                                    <span class="badge {wallet.type === 'pokok'
+                                        ? 'badge-primary'
+                                        : wallet.type === 'wajib'
+                                          ? 'badge-warning'
+                                          : 'badge-success'}">
                                         {getWalletDisplayName(wallet.type)}
                                     </span>
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900"
-                                >
+                                <td class="whitespace-nowrap font-tabular font-semibold text-slate-900">
                                     {formatCurrency(wallet.balance)}
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"
-                                >
+                                <td class="whitespace-nowrap text-slate-500">
                                     {formatDate(wallet.updated_at)}
                                 </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                >
+                                <td class="whitespace-nowrap">
                                     <div class="flex gap-2">
                                         <button
                                             on:click={() =>
                                                 openBalanceAdjustModal(wallet)}
-                                            class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                            class="btn btn-primary btn-sm"
                                         >
                                             Sesuaikan
                                         </button>
@@ -853,7 +805,7 @@
                                                 openTransactionHistoryModal(
                                                     wallet,
                                                 )}
-                                            class="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                                            class="btn btn-ghost btn-sm"
                                         >
                                             Riwayat
                                         </button>
@@ -861,10 +813,13 @@
                                             on:click={() =>
                                                 viewUserWallets(wallet)}
                                             disabled={isNavigating}
-                                            class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            class="btn btn-secondary btn-sm"
                                         >
                                             {#if isNavigating}
-                                                Loading...
+                                                <svg class="animate-spin h-4 w-4 text-teal-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
                                             {:else}
                                                 Lihat Detail
                                             {/if}
@@ -881,269 +836,260 @@
 
     <!-- Empty State -->
     {#if wallets.length === 0}
-        <div class="bg-white rounded-lg shadow-md p-8 text-center">
-            <div class="text-gray-400 mb-4">
+        <div class="card animate-slide-up">
+            <div class="empty-state">
                 <svg
-                    class="w-16 h-16 mx-auto"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+                    class="w-16 h-16 mx-auto text-slate-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                 >
-                    <path
-                        fill-rule="evenodd"
-                        d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"
-                        clip-rule="evenodd"
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"
                     />
-                    <path d="M9 8a1 1 0 011-1h2a1 1 0 110 2h-2A1 1 0 019 8z" />
                 </svg>
+                <h3 class="text-lg font-semibold text-slate-700 mb-1">
+                    Belum Ada Wallet
+                </h3>
+                <p class="text-sm text-slate-400 max-w-sm mx-auto">
+                    {isMember
+                        ? "Wallet Anda akan dibuat otomatis. Silahkan hubungi admin jika ada pertanyaan."
+                        : "Belum ada data wallet untuk ditampilkan."}
+                </p>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">
-                Belum Ada Wallet
-            </h3>
-            <p class="text-gray-600">
-                {isMember
-                    ? "Wallet Anda akan dibuat otomatis. Silahkan hubungi admin jika ada pertanyaan."
-                    : "Belum ada data wallet untuk ditampilkan."}
-            </p>
         </div>
     {/if}
 </div>
 
-<!-- Top-up Modal (Members) -->
+<!-- Top-up Drawer (Members) -->
 {#if showTopupModal}
     <div
-        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50"
+        class="drawer-overlay"
         role="dialog"
         aria-modal="true"
         on:click={closeModals}
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
+            class="drawer-panel"
             on:click|stopPropagation
         >
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Top-Up {getWalletDisplayName(topupForm.type)}
-            </h3>
+            <div class="drawer-header">
+                <h3 class="text-lg font-semibold text-slate-900">
+                    Top-Up {getWalletDisplayName(topupForm.type)}
+                </h3>
+                <button on:click={closeModals} class="btn btn-ghost btn-icon btn-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
 
-            <form on:submit|preventDefault={requestTopup} class="space-y-4">
-                <!-- Wallet Type -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Jenis Simpanan
-                    </label>
-                    <select
-                        bind:value={topupForm.type}
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="pokok">Wadiah Pokok</option>
-                        <option value="wajib">Wadiah Wajib</option>
-                        <option value="sukarela">Wadiah Sukarela</option>
-                    </select>
-                </div>
-
-                <!-- Amount -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Jumlah Top-Up (Rp)
-                    </label>
-                    <input
-                        type="number"
-                        bind:value={topupForm.amount}
-                        required
-                        min="1000"
-                        step="1000"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Minimal Rp 1.000"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">
-                        Minimum top-up adalah Rp 1.000
-                    </p>
-                </div>
-
-                <!-- Bank Account Selection -->
-                {#if activeBankAccounts.length > 0}
+            <form on:submit|preventDefault={requestTopup}>
+                <div class="drawer-body space-y-5">
+                    <!-- Wallet Type -->
                     <div>
-                        <label
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Transfer ke Rekening
-                        </label>
+                        <label class="input-label">Jenis Simpanan</label>
                         <select
-                            bind:value={topupForm.bank_account_id}
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            bind:value={topupForm.type}
+                            required
+                            class="input"
                         >
-                            <option value=""
-                                >Pilih rekening tujuan (opsional)</option
-                            >
-                            {#each activeBankAccounts as bankAccount}
-                                <option
-                                    value={bankAccount.id || bankAccount.ID}
-                                >
-                                    {bankAccount.bank_name} - {bankAccount.account_number}
-                                    ({bankAccount.account_holder_name ||
-                                        bankAccount.account_name ||
-                                        "-"})
-                                </option>
-                            {/each}
+                            <option value="pokok">Wadiah Pokok</option>
+                            <option value="wajib">Wadiah Wajib</option>
+                            <option value="sukarela">Wadiah Sukarela</option>
                         </select>
-                        <p class="text-xs text-gray-500 mt-1">
-                            Pilih rekening bank tujuan transfer Anda
+                    </div>
+
+                    <!-- Amount -->
+                    <div>
+                        <label class="input-label">Jumlah Top-Up (Rp)</label>
+                        <input
+                            type="number"
+                            bind:value={topupForm.amount}
+                            required
+                            min="1000"
+                            step="1000"
+                            class="input font-tabular"
+                            placeholder="Minimal Rp 1.000"
+                        />
+                        <p class="text-xs text-slate-400 mt-1.5">
+                            Minimum top-up adalah Rp 1.000
                         </p>
                     </div>
-                {/if}
 
-                <!-- Image Bukti Transfer -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Bukti Transfer *
-                    </label>
-
-                    <!-- Toggle between upload and manual URL -->
-                    <div class="flex items-center gap-4 mb-3">
-                        <button
-                            type="button"
-                            on:click={() => {
-                                useFileUpload = true;
-                            }}
-                            class="px-3 py-1.5 text-sm rounded-md transition-colors {useFileUpload
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                        >
-                            📤 Upload File
-                        </button>
-                        <button
-                            type="button"
-                            on:click={() => {
-                                useFileUpload = false;
-                                selectedFile = null;
-                            }}
-                            class="px-3 py-1.5 text-sm rounded-md transition-colors {!useFileUpload
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                        >
-                            🔗 Input URL Manual
-                        </button>
-                    </div>
-
-                    {#if useFileUpload}
-                        <!-- File Upload Mode -->
-                        <div class="space-y-2">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                on:change={handleFileSelect}
-                                disabled={isUploading}
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                            />
-                            {#if isUploading}
-                                <div
-                                    class="flex items-center gap-2 text-sm text-blue-600"
-                                >
-                                    <svg
-                                        class="animate-spin h-4 w-4"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
+                    <!-- Bank Account Selection -->
+                    {#if activeBankAccounts.length > 0}
+                        <div>
+                            <label class="input-label">Transfer ke Rekening</label>
+                            <select
+                                bind:value={topupForm.bank_account_id}
+                                class="input"
+                            >
+                                <option value="">Pilih rekening tujuan (opsional)</option>
+                                {#each activeBankAccounts as bankAccount}
+                                    <option
+                                        value={bankAccount.id || bankAccount.ID}
                                     >
-                                        <circle
-                                            class="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            stroke-width="4"
-                                        ></circle>
-                                        <path
-                                            class="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        ></path>
-                                    </svg>
-                                    <span>Mengupload gambar...</span>
-                                </div>
-                            {/if}
-                            {#if topupForm.image_bukti_transfer && !isUploading}
-                                <div
-                                    class="flex items-center gap-2 text-sm text-green-600"
-                                >
-                                    <svg
-                                        class="h-4 w-4"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                            clip-rule="evenodd"
-                                        />
-                                    </svg>
-                                    <span>Gambar berhasil diupload</span>
-                                </div>
-                                <a
-                                    href={topupForm.image_bukti_transfer}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="text-xs text-blue-600 hover:underline break-all"
-                                >
-                                    {topupForm.image_bukti_transfer}
-                                </a>
-                            {/if}
-                            <p class="text-xs text-gray-500">
-                                Upload gambar bukti transfer (max 5MB, format:
-                                JPG, PNG, GIF)
-                            </p>
-                        </div>
-                    {:else}
-                        <!-- Manual URL Input Mode -->
-                        <div class="space-y-2">
-                            <input
-                                type="url"
-                                bind:value={topupForm.image_bukti_transfer}
-                                required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="https://example.com/bukti-transfer.jpg"
-                            />
-                            <p class="text-xs text-gray-500">
-                                Masukkan URL gambar bukti transfer Anda
+                                        {bankAccount.bank_name} - {bankAccount.account_number}
+                                        ({bankAccount.account_holder_name ||
+                                            bankAccount.account_name ||
+                                            "-"})
+                                    </option>
+                                {/each}
+                            </select>
+                            <p class="text-xs text-slate-400 mt-1.5">
+                                Pilih rekening bank tujuan transfer Anda
                             </p>
                         </div>
                     {/if}
+
+                    <!-- Image Bukti Transfer -->
+                    <div>
+                        <label class="input-label">Bukti Transfer *</label>
+
+                        <!-- Toggle between upload and manual URL -->
+                        <div class="flex items-center gap-2 mb-3">
+                            <button
+                                type="button"
+                                on:click={() => {
+                                    useFileUpload = true;
+                                }}
+                                class="btn btn-sm {useFileUpload
+                                    ? 'btn-primary'
+                                    : 'btn-ghost'}"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                Upload File
+                            </button>
+                            <button
+                                type="button"
+                                on:click={() => {
+                                    useFileUpload = false;
+                                    selectedFile = null;
+                                }}
+                                class="btn btn-sm {!useFileUpload
+                                    ? 'btn-primary'
+                                    : 'btn-ghost'}"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                </svg>
+                                Input URL Manual
+                            </button>
+                        </div>
+
+                        {#if useFileUpload}
+                            <!-- File Upload Mode -->
+                            <div class="space-y-2">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    on:change={handleFileSelect}
+                                    disabled={isUploading}
+                                    class="input file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer"
+                                />
+                                {#if isUploading}
+                                    <div class="flex items-center gap-2 text-sm text-teal-600">
+                                        <svg
+                                            class="animate-spin h-4 w-4"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <circle
+                                                class="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                stroke-width="4"
+                                            ></circle>
+                                            <path
+                                                class="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                            ></path>
+                                        </svg>
+                                        <span>Mengupload gambar...</span>
+                                    </div>
+                                {/if}
+                                {#if topupForm.image_bukti_transfer && !isUploading}
+                                    <div class="flex items-center gap-2 text-sm text-emerald-600">
+                                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                clip-rule="evenodd"
+                                            />
+                                        </svg>
+                                        <span>Gambar berhasil diupload</span>
+                                    </div>
+                                    <a
+                                        href={topupForm.image_bukti_transfer}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="text-xs text-teal-600 hover:underline break-all"
+                                    >
+                                        {topupForm.image_bukti_transfer}
+                                    </a>
+                                {/if}
+                                <p class="text-xs text-slate-400">
+                                    Upload gambar bukti transfer (max 5MB, format:
+                                    JPG, PNG, GIF)
+                                </p>
+                            </div>
+                        {:else}
+                            <!-- Manual URL Input Mode -->
+                            <div class="space-y-2">
+                                <input
+                                    type="url"
+                                    bind:value={topupForm.image_bukti_transfer}
+                                    required
+                                    class="input"
+                                    placeholder="https://example.com/bukti-transfer.jpg"
+                                />
+                                <p class="text-xs text-slate-400">
+                                    Masukkan URL gambar bukti transfer Anda
+                                </p>
+                            </div>
+                        {/if}
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="input-label">Keterangan</label>
+                        <textarea
+                            bind:value={topupForm.description}
+                            rows="3"
+                            class="input"
+                            placeholder="Alasan atau keterangan top-up (opsional)..."
+                        ></textarea>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                        <p class="text-sm">
+                            Permintaan top-up akan diproses oleh admin. Harap tunggu konfirmasi.
+                        </p>
+                    </div>
                 </div>
 
-                <!-- Description -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Keterangan
-                    </label>
-                    <textarea
-                        bind:value={topupForm.description}
-                        rows="3"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Alasan atau keterangan top-up (opsional)..."
-                    ></textarea>
-                </div>
-
-                <div
-                    class="bg-yellow-50 border border-yellow-200 rounded-md p-3"
-                >
-                    <p class="text-sm text-yellow-800">
-                        ⚠️ Permintaan top-up akan diproses oleh admin. Harap
-                        tunggu konfirmasi.
-                    </p>
-                </div>
-
-                <div class="flex justify-end gap-3 pt-4">
+                <div class="drawer-footer">
                     <button
                         type="button"
                         on:click={closeModals}
-                        class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                        class="btn btn-secondary"
                     >
                         Batal
                     </button>
                     <button
                         type="submit"
-                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        class="btn btn-primary"
                     >
                         Ajukan Top-Up
                     </button>
@@ -1153,97 +1099,108 @@
     </div>
 {/if}
 
-<!-- Balance Adjustment Modal (Admin) -->
+<!-- Balance Adjustment Drawer (Admin) -->
 {#if showBalanceAdjustModal && selectedWallet}
     <div
-        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50"
+        class="drawer-overlay"
         role="dialog"
         aria-modal="true"
         on:click={closeModals}
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl"
+            class="drawer-panel"
             on:click|stopPropagation
         >
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Sesuaikan Saldo {getWalletDisplayName(selectedWallet.type)}
-            </h3>
-
-            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
-                <p class="text-sm text-gray-600">Saldo Saat Ini:</p>
-                <p class="text-xl font-bold text-gray-900">
-                    {formatCurrency(selectedWallet.balance)}
-                </p>
-                <p class="text-xs text-gray-500">
-                    User ID: #{selectedWallet.user_id}
-                </p>
+            <div class="drawer-header">
+                <h3 class="text-lg font-semibold text-slate-900">
+                    Sesuaikan Saldo {getWalletDisplayName(selectedWallet.type)}
+                </h3>
+                <button on:click={closeModals} class="btn btn-ghost btn-icon btn-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
-            <form
-                on:submit|preventDefault={adjustWalletBalance}
-                class="space-y-4"
-            >
-                <!-- Amount (can be positive or negative) -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Jumlah Penyesuaian (Rp)
-                    </label>
-                    <input
-                        type="number"
-                        bind:value={balanceAdjustForm.amount}
-                        required
-                        step="1000"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                        placeholder="Positif untuk menambah, negatif untuk mengurangi"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">
-                        Gunakan angka positif untuk menambah saldo, negatif
-                        untuk mengurangi
-                    </p>
+            <form on:submit|preventDefault={adjustWalletBalance}>
+                <div class="drawer-body space-y-5">
+                    <!-- Current Balance Info -->
+                    <div class="card p-4 bg-slate-50">
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Saldo Saat Ini</p>
+                        <p class="text-2xl font-bold text-slate-900 font-tabular">
+                            {formatCurrency(selectedWallet.balance)}
+                        </p>
+                        <p class="text-xs text-slate-400 font-tabular mt-1">
+                            User ID: #{selectedWallet.user_id}
+                        </p>
+                    </div>
+
+                    <!-- Amount (can be positive or negative) -->
+                    <div>
+                        <label class="input-label">Jumlah Penyesuaian (Rp)</label>
+                        <input
+                            type="number"
+                            bind:value={balanceAdjustForm.amount}
+                            required
+                            step="1000"
+                            class="input font-tabular"
+                            placeholder="Positif untuk menambah, negatif untuk mengurangi"
+                        />
+                        <p class="text-xs text-slate-400 mt-1.5">
+                            Gunakan angka positif untuk menambah saldo, negatif
+                            untuk mengurangi
+                        </p>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="input-label">Keterangan Penyesuaian</label>
+                        <textarea
+                            bind:value={balanceAdjustForm.description}
+                            required
+                            rows="3"
+                            class="input"
+                        ></textarea>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="alert alert-info">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-sm">
+                            <strong>Saldo Baru:</strong>
+                            <span class="font-tabular font-bold">
+                                {formatCurrency(
+                                    selectedWallet.balance + balanceAdjustForm.amount,
+                                )}
+                            </span>
+                        </p>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                        <p class="text-sm">
+                            Penyesuaian saldo akan langsung diterapkan dan
+                            tercatat dalam riwayat transaksi.
+                        </p>
+                    </div>
                 </div>
 
-                <!-- Description -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Keterangan Penyesuaian
-                    </label>
-                    <textarea
-                        bind:value={balanceAdjustForm.description}
-                        required
-                        rows="3"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    ></textarea>
-                </div>
-
-                <!-- Preview -->
-                <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
-                    <p class="text-sm text-blue-800">
-                        <strong>Saldo Baru:</strong>
-                        {formatCurrency(
-                            selectedWallet.balance + balanceAdjustForm.amount,
-                        )}
-                    </p>
-                </div>
-
-                <div class="bg-red-50 border border-red-200 rounded-md p-3">
-                    <p class="text-sm text-red-800">
-                        ⚠️ Penyesuaian saldo akan langsung diterapkan dan
-                        tercatat dalam riwayat transaksi.
-                    </p>
-                </div>
-
-                <div class="flex justify-end gap-3 pt-4">
+                <div class="drawer-footer">
                     <button
                         type="button"
                         on:click={closeModals}
-                        class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                        class="btn btn-secondary"
                     >
                         Batal
                     </button>
                     <button
                         type="submit"
-                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                        class="btn btn-success"
                     >
                         Sesuaikan Saldo
                     </button>
@@ -1256,29 +1213,31 @@
 <!-- Transaction Detail Modal -->
 {#if showTransactionModal && selectedTransaction}
     <div
-        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        class="modal-overlay"
         role="dialog"
         aria-modal="true"
         on:click={closeModals}
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scale-in"
             on:click|stopPropagation
         >
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Detail Transaksi
-            </h3>
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold text-slate-900">
+                    Detail Transaksi
+                </h3>
+            </div>
 
-            <div class="space-y-4">
+            <div class="modal-body space-y-5">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <p class="text-sm text-gray-600">ID Transaksi</p>
-                        <p class="font-medium">#{selectedTransaction.id}</p>
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">ID Transaksi</p>
+                        <p class="font-semibold font-tabular text-slate-900">#{selectedTransaction.id}</p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">User ID</p>
-                        <p class="font-medium">
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">User ID</p>
+                        <p class="font-semibold font-tabular text-slate-900">
                             #{selectedTransaction.simpanan?.user_id}
                         </p>
                     </div>
@@ -1286,23 +1245,23 @@
 
                 {#if selectedTransaction.simpanan?.user}
                     <div>
-                        <p class="text-sm text-gray-600">Nama Anggota</p>
-                        <p class="font-medium text-gray-900">
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Nama Anggota</p>
+                        <p class="font-semibold text-slate-900">
                             {selectedTransaction.simpanan.user.name}
                         </p>
-                        <p class="text-xs text-gray-500">
+                        <p class="text-xs text-slate-400">
                             {selectedTransaction.simpanan.user.email}
                         </p>
                     </div>
                 {/if}
 
                 <div>
-                    <p class="text-sm text-gray-600">Jenis Wallet</p>
-                    <span
-                        class="inline-block px-2 py-1 text-xs rounded-full {getWalletColor(
-                            selectedTransaction.simpanan?.type || '',
-                        )}"
-                    >
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Jenis Wallet</p>
+                    <span class="badge {selectedTransaction.simpanan?.type === 'pokok'
+                        ? 'badge-primary'
+                        : selectedTransaction.simpanan?.type === 'wajib'
+                          ? 'badge-warning'
+                          : 'badge-success'}">
                         {getWalletDisplayName(
                             selectedTransaction.simpanan?.type || "",
                         )}
@@ -1310,32 +1269,30 @@
                 </div>
 
                 <div>
-                    <p class="text-sm text-gray-600">Jenis Transaksi</p>
-                    <p class="text-gray-900 capitalize">
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Jenis Transaksi</p>
+                    <p class="text-slate-900 capitalize font-medium">
                         {selectedTransaction.type}
                     </p>
                 </div>
 
                 <div>
-                    <p class="text-sm text-gray-600">Jumlah</p>
-                    <p class="text-xl font-bold text-gray-900">
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Jumlah</p>
+                    <p class="text-2xl font-bold text-slate-900 font-tabular">
                         {formatCurrency(selectedTransaction.amount)}
                     </p>
                 </div>
 
                 <div>
-                    <p class="text-sm text-gray-600">Keterangan</p>
-                    <p class="text-gray-900">
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Keterangan</p>
+                    <p class="text-slate-700">
                         {selectedTransaction.description}
                     </p>
                 </div>
 
                 {#if selectedTransaction.image_bukti_transfer}
                     <div>
-                        <p class="text-sm text-gray-600 mb-2">Bukti Transfer</p>
-                        <div
-                            class="border border-gray-200 rounded-lg overflow-hidden"
-                        >
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Bukti Transfer</p>
+                        <div class="card overflow-hidden">
                             <a
                                 href={selectedTransaction.image_bukti_transfer}
                                 target="_blank"
@@ -1345,7 +1302,7 @@
                                 <img
                                     src={selectedTransaction.image_bukti_transfer}
                                     alt="Bukti Transfer"
-                                    class="w-full h-auto max-h-96 object-contain bg-gray-50"
+                                    class="w-full h-auto max-h-96 object-contain bg-slate-50"
                                     on:error={(e) => {
                                         const target =
                                             e.currentTarget as HTMLImageElement;
@@ -1355,7 +1312,7 @@
                                 />
                             </a>
                         </div>
-                        <p class="text-xs text-gray-500 mt-1">
+                        <p class="text-xs text-slate-400 mt-1.5">
                             Klik gambar untuk melihat ukuran penuh
                         </p>
                     </div>
@@ -1363,43 +1320,39 @@
 
                 {#if selectedTransaction.bank_account}
                     <div>
-                        <p class="text-sm text-gray-600 mb-1">
+                        <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
                             Rekening Tujuan Transfer
                         </p>
-                        <div
-                            class="bg-blue-50 border border-blue-200 rounded-lg p-3"
-                        >
-                            <p class="text-sm font-medium text-blue-900">
+                        <div class="card p-4 bg-teal-50 border-teal-200">
+                            <p class="text-sm font-semibold text-teal-900">
                                 {selectedTransaction.bank_account.bank_name}
                             </p>
-                            <p class="text-sm text-blue-700">
-                                {selectedTransaction.bank_account
-                                    .account_number}
+                            <p class="text-sm text-teal-700 font-tabular">
+                                {selectedTransaction.bank_account.account_number}
                             </p>
-                            <p class="text-xs text-blue-600">
-                                a.n. {selectedTransaction.bank_account
-                                    .account_name}
+                            <p class="text-xs text-teal-600">
+                                a.n. {selectedTransaction.bank_account.account_name}
                             </p>
                         </div>
                     </div>
                 {/if}
 
                 <div>
-                    <p class="text-sm text-gray-600">Tanggal Permintaan</p>
-                    <p class="text-gray-900">
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Tanggal Permintaan</p>
+                    <p class="text-slate-700">
                         {formatDate(selectedTransaction.created_at)}
                     </p>
                 </div>
 
                 <div>
-                    <p class="text-sm text-gray-600">Status</p>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Status</p>
                     <span
-                        class="inline-block px-2 py-1 text-xs rounded-full
+                        class="badge
                         {selectedTransaction.status === 'pending'
-                            ? 'bg-orange-100 text-orange-800'
+                            ? 'badge-warning'
                             : selectedTransaction.status === 'verified'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'}"
+                              ? 'badge-success'
+                              : 'badge-danger'}"
                     >
                         {selectedTransaction.status === "pending"
                             ? "Menunggu Persetujuan"
@@ -1410,10 +1363,10 @@
                 </div>
             </div>
 
-            <div class="flex justify-between gap-3 pt-6">
+            <div class="modal-footer">
                 <button
                     on:click={closeModals}
-                    class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                    class="btn btn-secondary"
                 >
                     Tutup
                 </button>
@@ -1423,7 +1376,7 @@
                             on:click={() =>
                                 selectedTransaction &&
                                 verifyTransaction(selectedTransaction.id, true)}
-                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                            class="btn btn-success"
                         >
                             Setujui
                         </button>
@@ -1434,7 +1387,7 @@
                                     selectedTransaction.id,
                                     false,
                                 )}
-                            class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                            class="btn btn-danger"
                         >
                             Tolak
                         </button>
@@ -1445,111 +1398,105 @@
     </div>
 {/if}
 
-<!-- Transaction History Modal -->
+<!-- Transaction History Drawer -->
 {#if showTransactionHistoryModal && selectedWallet}
     <div
-        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50"
+        class="drawer-overlay"
         role="dialog"
         aria-modal="true"
         on:click={closeModals}
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
+            class="drawer-panel"
+            style="max-width: 48rem;"
             on:click|stopPropagation
         >
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Riwayat Transaksi - {getWalletDisplayName(selectedWallet.type)}
-            </h3>
+            <div class="drawer-header">
+                <h3 class="text-lg font-semibold text-slate-900">
+                    Riwayat Transaksi - {getWalletDisplayName(selectedWallet.type)}
+                </h3>
+                <button on:click={closeModals} class="btn btn-ghost btn-icon btn-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
 
-            {#if transactionHistory.length > 0}
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                    >Tanggal</th
-                                >
-                                <th
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                    >Jenis</th
-                                >
-                                <th
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                    >Jumlah</th
-                                >
-                                <th
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                    >Status</th
-                                >
-                                <th
-                                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                    >Keterangan</th
-                                >
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {#each transactionHistory as transaction}
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-4 py-2 text-sm text-gray-900">
-                                        {formatDate(transaction.created_at)}
-                                    </td>
-                                    <td
-                                        class="px-4 py-2 text-sm text-gray-900 capitalize"
-                                    >
-                                        {transaction.type}
-                                    </td>
-                                    <td
-                                        class="px-4 py-2 text-sm font-semibold
-                                        {transaction.amount > 0
-                                            ? 'text-green-600'
-                                            : 'text-red-600'}"
-                                    >
-                                        {transaction.amount > 0
-                                            ? "+"
-                                            : ""}{formatCurrency(
-                                            transaction.amount,
-                                        )}
-                                    </td>
-                                    <td class="px-4 py-2">
-                                        <span
-                                            class="px-2 py-1 text-xs rounded-full
-                                            {transaction.status === 'pending'
-                                                ? 'bg-orange-100 text-orange-800'
-                                                : transaction.status ===
-                                                    'verified'
-                                                  ? 'bg-green-100 text-green-800'
-                                                  : 'bg-red-100 text-red-800'}"
-                                        >
-                                            {transaction.status === "pending"
-                                                ? "Pending"
-                                                : transaction.status ===
-                                                    "verified"
-                                                  ? "Verified"
-                                                  : "Rejected"}
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-2 text-sm text-gray-600">
-                                        {transaction.description}
-                                    </td>
+            <div class="drawer-body p-0">
+                {#if transactionHistory.length > 0}
+                    <div class="table-container" style="border: none; box-shadow: none; border-radius: 0;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Jenis</th>
+                                    <th>Jumlah</th>
+                                    <th>Status</th>
+                                    <th>Keterangan</th>
                                 </tr>
-                            {/each}
-                        </tbody>
-                    </table>
-                </div>
-            {:else}
-                <div class="text-center py-8">
-                    <p class="text-gray-500">
-                        Belum ada riwayat transaksi untuk wallet ini.
-                    </p>
-                </div>
-            {/if}
+                            </thead>
+                            <tbody>
+                                {#each transactionHistory as transaction}
+                                    <tr>
+                                        <td class="whitespace-nowrap">
+                                            {formatDate(transaction.created_at)}
+                                        </td>
+                                        <td class="whitespace-nowrap capitalize">
+                                            {transaction.type}
+                                        </td>
+                                        <td class="whitespace-nowrap font-tabular font-semibold
+                                            {transaction.amount > 0
+                                                ? 'text-emerald-600'
+                                                : 'text-rose-600'}">
+                                            {transaction.amount > 0
+                                                ? "+"
+                                                : ""}{formatCurrency(
+                                                transaction.amount,
+                                            )}
+                                        </td>
+                                        <td class="whitespace-nowrap">
+                                            <span
+                                                class="badge
+                                                {transaction.status === 'pending'
+                                                    ? 'badge-warning'
+                                                    : transaction.status ===
+                                                        'verified'
+                                                      ? 'badge-success'
+                                                      : 'badge-danger'}"
+                                            >
+                                                {transaction.status === "pending"
+                                                    ? "Pending"
+                                                    : transaction.status ===
+                                                        "verified"
+                                                      ? "Verified"
+                                                      : "Rejected"}
+                                            </span>
+                                        </td>
+                                        <td class="text-slate-500">
+                                            {transaction.description}
+                                        </td>
+                                    </tr>
+                                {/each}
+                            </tbody>
+                        </table>
+                    </div>
+                {:else}
+                    <div class="empty-state">
+                        <svg class="w-12 h-12 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        <p class="text-slate-500">
+                            Belum ada riwayat transaksi untuk wallet ini.
+                        </p>
+                    </div>
+                {/if}
+            </div>
 
-            <div class="flex justify-end pt-4">
+            <div class="drawer-footer">
                 <button
                     on:click={closeModals}
-                    class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                    class="btn btn-secondary"
                 >
                     Tutup
                 </button>

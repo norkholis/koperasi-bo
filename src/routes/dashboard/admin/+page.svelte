@@ -3,267 +3,140 @@
     const user = data.user;
 </script>
 
-<div class="max-w-6xl mx-auto">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Dashboard Admin</h1>
-        <p class="text-gray-600 mt-2">
-            Selamat datang, {user.full_name || user.email}!
-        </p>
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="animate-fade-in">
+        <div class="flex items-center gap-3 mb-1">
+            <h1 class="text-2xl font-bold text-slate-900">Dashboard Admin</h1>
+            <span class="badge badge-info">Admin</span>
+        </div>
+        <p class="text-slate-500">Selamat datang, {user.full_name || user.email}!</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Quick Access Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <!-- User Management -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div
-                    class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center"
-                >
-                    <svg
-                        class="h-6 w-6 text-blue-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
-                        />
+        <a href="/dashboard/users" class="card card-interactive p-5 stagger-item block group">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-11 h-11 rounded-xl bg-teal-50 flex items-center justify-center group-hover:bg-teal-100 transition-colors">
+                    <svg class="w-5 h-5 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
                     </svg>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        Kelola User
-                    </h3>
-                    <p class="text-gray-600 text-sm">Manajemen pengguna</p>
+                <svg class="w-5 h-5 text-slate-300 group-hover:text-teal-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                </svg>
+            </div>
+            <h3 class="font-semibold text-slate-900 mb-0.5">Kelola User</h3>
+            <p class="text-sm text-slate-500">Manajemen pengguna</p>
+        </a>
+
+        <!-- Profile -->
+        <a href="/dashboard/profile" class="card card-interactive p-5 stagger-item block group">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                </div>
+                <svg class="w-5 h-5 text-slate-300 group-hover:text-emerald-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                </svg>
+            </div>
+            <h3 class="font-semibold text-slate-900 mb-0.5">Profile</h3>
+            <p class="text-sm text-slate-500">Kelola profil Anda</p>
+        </a>
+
+        <!-- Reports -->
+        <div class="card p-5 stagger-item opacity-60">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-11 h-11 rounded-xl bg-amber-50 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                    </svg>
                 </div>
             </div>
-            <div class="mt-4">
-                <a
-                    href="/dashboard/users"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                    Lihat Users
-                </a>
-            </div>
+            <h3 class="font-semibold text-slate-900 mb-0.5">Laporan</h3>
+            <p class="text-sm text-slate-500">Segera hadir</p>
         </div>
 
-        <!-- Profile Management -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div
-                    class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center"
-                >
-                    <svg
-                        class="h-6 w-6 text-green-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
+        <!-- Settings -->
+        <div class="card p-5 stagger-item opacity-60">
+            <div class="flex items-start justify-between mb-4">
+                <div class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Profile</h3>
-                    <p class="text-gray-600 text-sm">Kelola profile Anda</p>
-                </div>
             </div>
-            <div class="mt-4">
-                <a
-                    href="/dashboard/profile"
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                >
-                    Edit Profile
-                </a>
-            </div>
-        </div>
-
-        <!-- Reports Card -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div
-                    class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center"
-                >
-                    <svg
-                        class="h-6 w-6 text-purple-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                        />
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Laporan</h3>
-                    <p class="text-gray-600 text-sm">Statistik & laporan</p>
-                </div>
-            </div>
-            <div class="mt-4">
-                <button
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 cursor-not-allowed opacity-50"
-                    disabled
-                >
-                    Segera Hadir
-                </button>
-            </div>
-        </div>
-
-        <!-- Settings Card -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="flex items-center">
-                <div
-                    class="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center"
-                >
-                    <svg
-                        class="h-6 w-6 text-gray-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                        />
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        Pengaturan
-                    </h3>
-                    <p class="text-gray-600 text-sm">Konfigurasi sistem</p>
-                </div>
-            </div>
-            <div class="mt-4">
-                <button
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 cursor-not-allowed opacity-50"
-                    disabled
-                >
-                    Segera Hadir
-                </button>
-            </div>
+            <h3 class="font-semibold text-slate-900 mb-0.5">Pengaturan</h3>
+            <p class="text-sm text-slate-500">Segera hadir</p>
         </div>
     </div>
 
-    <!-- Admin Information -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Account Information -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">
-                Informasi Akun
-            </h2>
-            <dl class="space-y-3">
-                <div class="flex justify-between">
-                    <dt class="text-gray-600">ID Admin:</dt>
-                    <dd class="font-medium">#{user.id}</dd>
+    <!-- Info Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Account Info -->
+        <div class="card p-6 animate-slide-up">
+            <h2 class="text-lg font-semibold text-slate-900 mb-5">Informasi Akun</h2>
+            <dl class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <dt class="text-sm text-slate-500">ID Admin</dt>
+                    <dd class="font-tabular font-medium text-slate-900">#{user.id}</dd>
                 </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-600">Nama Lengkap:</dt>
-                    <dd class="font-medium">
-                        {user.full_name || "Belum diisi"}
-                    </dd>
+                <div class="flex justify-between items-center">
+                    <dt class="text-sm text-slate-500">Nama Lengkap</dt>
+                    <dd class="text-sm font-medium text-slate-900">{user.full_name || "Belum diisi"}</dd>
                 </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-600">Email:</dt>
-                    <dd class="font-medium">{user.email}</dd>
+                <div class="flex justify-between items-center">
+                    <dt class="text-sm text-slate-500">Email</dt>
+                    <dd class="text-sm font-medium text-slate-900">{user.email}</dd>
                 </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-600">Role:</dt>
-                    <dd class="font-medium">
-                        <span
-                            class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800"
-                        >
-                            Admin
-                        </span>
-                    </dd>
+                <div class="flex justify-between items-center">
+                    <dt class="text-sm text-slate-500">Role</dt>
+                    <dd><span class="badge badge-info">Admin</span></dd>
                 </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-600">No. Telepon:</dt>
-                    <dd class="font-medium">{user.phone || "Belum diisi"}</dd>
+                <div class="flex justify-between items-center">
+                    <dt class="text-sm text-slate-500">No. Telepon</dt>
+                    <dd class="text-sm font-medium text-slate-900">{user.phone || "Belum diisi"}</dd>
                 </div>
-                <div class="flex justify-between">
-                    <dt class="text-gray-600">Terdaftar:</dt>
-                    <dd class="font-medium">
-                        {new Date(user.created_at).toLocaleDateString("id-ID")}
-                    </dd>
+                <div class="flex justify-between items-center">
+                    <dt class="text-sm text-slate-500">Terdaftar</dt>
+                    <dd class="font-tabular text-sm font-medium text-slate-900">{new Date(user.created_at).toLocaleDateString("id-ID")}</dd>
                 </div>
             </dl>
         </div>
 
         <!-- Quick Actions -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Aksi Cepat</h2>
+        <div class="card p-6 animate-slide-up">
+            <h2 class="text-lg font-semibold text-slate-900 mb-5">Aksi Cepat</h2>
             <div class="space-y-3">
-                <a
-                    href="/dashboard/users/add"
-                    class="block w-full text-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                    + Tambah User Baru
+                <a href="/dashboard/users/add" class="btn btn-primary w-full">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Tambah User Baru
                 </a>
-                <a
-                    href="/dashboard/users"
-                    class="block w-full text-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
+                <a href="/dashboard/users" class="btn btn-secondary w-full">
                     Lihat Semua User
                 </a>
-                <a
-                    href="/dashboard/profile"
-                    class="block w-full text-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
+                <a href="/dashboard/profile" class="btn btn-secondary w-full">
                     Edit Profile Saya
                 </a>
             </div>
 
             {#if !user.full_name || !user.phone || !user.address}
-                <div
-                    class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md"
-                >
-                    <div class="flex">
-                        <svg
-                            class="h-5 w-5 text-yellow-400"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                        >
-                            <path
-                                fill-rule="evenodd"
-                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                clip-rule="evenodd"
-                            />
-                        </svg>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-yellow-800">
-                                Profil Belum Lengkap
-                            </h3>
-                            <div class="mt-2 text-sm text-yellow-700">
-                                <p>Mohon lengkapi informasi profil Anda.</p>
-                            </div>
-                            <div class="mt-3">
-                                <a
-                                    href="/dashboard/profile"
-                                    class="text-sm font-medium text-yellow-800 hover:text-yellow-900"
-                                >
-                                    Lengkapi Profil →
-                                </a>
-                            </div>
-                        </div>
+                <div class="alert alert-warning mt-6">
+                    <svg class="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    <div>
+                        <p class="font-medium">Profil Belum Lengkap</p>
+                        <p class="text-sm mt-1 opacity-80">Mohon lengkapi informasi profil Anda.</p>
+                        <a href="/dashboard/profile" class="text-sm font-semibold mt-2 inline-block hover:underline">
+                            Lengkapi Profil &rarr;
+                        </a>
                     </div>
                 </div>
             {/if}

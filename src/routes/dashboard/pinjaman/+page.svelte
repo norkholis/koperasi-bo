@@ -1126,146 +1126,112 @@
     <title>Pinjaman - Koperasi Backoffice</title>
 </svelte:head>
 
-<div class="p-4 sm:p-6">
+<div class="p-4 sm:p-6 animate-fade-in">
     <!-- Header -->
-    <div
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4"
-    >
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-            <h1 class="text-xl sm:text-2xl font-bold">
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-800">
                 {isMember ? "Pinjaman Saya" : "Manajemen Pinjaman"}
             </h1>
             {#if selectedUserId && isAdmin}
                 <a
                     href="/dashboard/pinjaman"
-                    class="text-sm text-blue-600 hover:text-blue-800 underline"
+                    class="text-sm text-teal-600 hover:text-teal-800 underline inline-flex items-center gap-1"
                 >
-                    ← Kembali ke Semua Pinjaman
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    Kembali ke Semua Pinjaman
                 </a>
             {/if}
-            <!-- Debug button for testing API calls -->
-            <!-- {#if isAdmin}
-                <button
-                    on:click={debugApiCalls}
-                    class="px-3 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-                >
-                    🧪 Debug API
-                </button>
-            {/if} -->
         </div>
 
-        {#if selectedUserId && isAdmin}
-            <div class="text-sm text-gray-600">
-                Menampilkan pinjaman untuk User ID: #{selectedUserId}
-            </div>
-        {/if}
+        <div class="flex items-center gap-3">
+            {#if selectedUserId && isAdmin}
+                <span class="badge badge-info">
+                    User ID: #{selectedUserId}
+                </span>
+            {/if}
+            {#if isMember}
+                <button
+                    on:click={openLoanRequestModal}
+                    class="btn btn-primary btn-lg w-full sm:w-auto"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Ajukan Pinjaman
+                </button>
+            {/if}
+        </div>
     </div>
 
     <!-- Success Message -->
     {#if showSuccessMessage}
-        <div
-            class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded"
-        >
+        <div class="alert alert-success mb-4 animate-slide-up">
+            <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
             {successMessage}
         </div>
     {/if}
 
     <!-- Member Dashboard -->
     {#if isMember || selectedUserId}
-        <div class="mb-8">
-            <div
-                class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3"
-            >
-                <h2 class="text-lg sm:text-xl font-semibold">Pinjaman Aktif</h2>
-                {#if isMember}
-                    <button
-                        on:click={openLoanRequestModal}
-                        class="w-full sm:w-auto bg-blue-500 text-white px-4 py-3 sm:py-2 rounded hover:bg-blue-600 transition-colors"
-                    >
-                        Ajukan Pinjaman
-                    </button>
-                {/if}
-            </div>
+        <!-- Active Loans Section -->
+        <div class="mb-8 animate-slide-up">
+            <h2 class="text-lg sm:text-xl font-semibold text-slate-700 mb-4">Pinjaman Aktif</h2>
 
             <div class="grid gap-4">
-                {#each loans.filter((loan) => loan.status === "disetujui") as loan}
-                    <div class="bg-white p-6 rounded-lg shadow border">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <h3 class="text-lg font-semibold">
-                                        Pinjaman #{loan.kode_pinjaman}
-                                    </h3>
-                                    <span
-                                        class="px-2 py-1 text-xs rounded-full border {getStatusColor(
-                                            loan.status,
-                                        )}"
-                                    >
+                {#each loans.filter((loan) => loan.status === "disetujui") as loan, i}
+                    <div class="card card-interactive p-5 sm:p-6 stagger-item">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <span class="font-tabular bg-slate-100 px-2 py-0.5 rounded text-slate-700 text-sm">
+                                        {loan.kode_pinjaman}
+                                    </span>
+                                    <span class="badge {loan.status === 'proses' ? 'badge-warning' : loan.status === 'disetujui' ? 'badge-success' : loan.status === 'macet' ? 'badge-danger' : loan.status === 'lunas' ? 'badge-neutral' : loan.status === 'ditolak' ? 'badge-danger' : 'badge-neutral'}">
                                         {getStatusText(loan.status)}
                                     </span>
                                 </div>
-                                <div
-                                    class="grid grid-cols-2 gap-4 text-sm text-gray-600"
-                                >
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-2 text-sm">
                                     <div>
-                                        <p>
-                                            <span class="font-medium"
-                                                >Jumlah:</span
-                                            >
-                                            {formatCurrency(
-                                                loan.jumlah_pinjaman,
-                                            )}
-                                        </p>
-                                        <p>
-                                            <span class="font-medium"
-                                                >Tenor:</span
-                                            >
-                                            {loan.lama_bulan} bulan
-                                        </p>
-                                        <p>
-                                            <span class="font-medium"
-                                                >Ujrah:</span
-                                            >
-                                            {getEffectiveInterestRate(loan)}%
+                                        <p class="text-slate-500">Jumlah</p>
+                                        <p class="font-semibold font-tabular text-slate-800">
+                                            {formatCurrency(loan.jumlah_pinjaman)}
                                         </p>
                                     </div>
                                     <div>
-                                        <p>
-                                            <span class="font-medium"
-                                                >Angsuran/bulan:</span
-                                            >
-                                            {formatCurrency(
-                                                loan.jumlah_angsuran,
-                                            )}
+                                        <p class="text-slate-500">Tenor</p>
+                                        <p class="font-semibold text-slate-800">{loan.lama_bulan} bulan</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-500">Ujrah</p>
+                                        <p class="font-semibold font-tabular text-slate-800">{getEffectiveInterestRate(loan)}%</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-500">Angsuran/bulan</p>
+                                        <p class="font-semibold font-tabular text-slate-800">
+                                            {formatCurrency(loan.jumlah_angsuran)}
                                         </p>
-                                        <p>
-                                            <span class="font-medium"
-                                                >Sisa angsuran:</span
-                                            >
-                                            {loan.sisa_angsuran} kali
-                                        </p>
-                                        <p>
-                                            <span class="font-medium"
-                                                >Diajukan:</span
-                                            >
-                                            {formatDate(loan.created_at)}
-                                        </p>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-500">Sisa angsuran</p>
+                                        <p class="font-semibold font-tabular text-slate-800">{loan.sisa_angsuran} kali</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-slate-500">Diajukan</p>
+                                        <p class="font-semibold text-slate-800 text-xs">{formatDate(loan.created_at)}</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex gap-2 ml-4">
+                            <div class="flex gap-2 sm:flex-col sm:items-end">
                                 {#if loan.status === "disetujui" && isMember}
                                     <button
-                                        on:click={() =>
-                                            openInstallmentModal(loan)}
-                                        class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                                        on:click={() => openInstallmentModal(loan)}
+                                        class="btn btn-success btn-sm"
                                     >
                                         Bayar Angsuran
                                     </button>
                                 {/if}
                                 <button
                                     on:click={() => openLoanDetailModal(loan)}
-                                    class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                    class="btn btn-secondary btn-sm"
                                 >
                                     Detail
                                 </button>
@@ -1275,347 +1241,138 @@
                 {/each}
 
                 {#if loans.filter((loan) => loan.status === "disetujui" && loan.sisa_angsuran > 0).length === 0}
-                    <div class="text-center py-8 text-gray-500">
-                        {#if isMember}
-                            Belum ada pinjaman aktif. <button
-                                on:click={openLoanRequestModal}
-                                class="text-blue-600 hover:text-blue-800 underline"
-                                >Ajukan pinjaman pertama</button
-                            >
-                        {:else}
-                            Tidak ada pinjaman aktif untuk user ini.
-                        {/if}
+                    <div class="card p-8">
+                        <div class="empty-state">
+                            <svg class="w-12 h-12 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            {#if isMember}
+                                <p class="text-slate-500">Belum ada pinjaman aktif.</p>
+                                <button
+                                    on:click={openLoanRequestModal}
+                                    class="text-teal-600 hover:text-teal-800 font-medium mt-1 underline"
+                                >Ajukan pinjaman pertama</button>
+                            {:else}
+                                <p class="text-slate-500">Tidak ada pinjaman aktif untuk user ini.</p>
+                            {/if}
+                        </div>
                     </div>
                 {/if}
             </div>
         </div>
 
         <!-- All Loans History -->
-        <div class="mb-8">
-            <h2 class="text-lg sm:text-xl font-semibold mb-4">
+        <div class="mb-8 animate-slide-up">
+            <h2 class="text-lg sm:text-xl font-semibold text-slate-700 mb-4">
                 Riwayat Pinjaman
             </h2>
 
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-50">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th>Jumlah</th>
+                            <th>Tenor</th>
+                            <th>Status</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each loans as loan}
                             <tr>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Kode</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Jumlah</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Tenor</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Status</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Tanggal</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Aksi</th
-                                >
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {#each loans as loan}
-                                <tr class="hover:bg-gray-50">
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                                    >
+                                <td>
+                                    <span class="font-tabular bg-slate-100 px-2 py-0.5 rounded text-slate-700">
                                         {loan.kode_pinjaman}
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="font-tabular">{formatCurrency(loan.jumlah_pinjaman)}</span>
+                                </td>
+                                <td>{loan.lama_bulan} bulan</td>
+                                <td>
+                                    <span class="badge {loan.status === 'proses' ? 'badge-warning' : loan.status === 'disetujui' ? 'badge-success' : loan.status === 'macet' ? 'badge-danger' : loan.status === 'lunas' ? 'badge-neutral' : loan.status === 'ditolak' ? 'badge-danger' : 'badge-neutral'}">
+                                        {getStatusText(loan.status)}
+                                    </span>
+                                </td>
+                                <td class="text-sm">{formatDate(loan.created_at)}</td>
+                                <td>
+                                    <button
+                                        on:click={() => openLoanDetailModal(loan)}
+                                        class="btn btn-ghost btn-sm text-teal-600"
                                     >
-                                        {formatCurrency(loan.jumlah_pinjaman)}
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        {loan.lama_bulan} bulan
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 py-1 text-xs rounded-full border {getStatusColor(
-                                                loan.status,
-                                            )}"
-                                        >
-                                            {getStatusText(loan.status)}
-                                        </span>
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        {formatDate(loan.created_at)}
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                    >
-                                        <button
-                                            on:click={() =>
-                                                openLoanDetailModal(loan)}
-                                            class="text-blue-600 hover:text-blue-900 mr-2"
-                                        >
-                                            Detail
-                                        </button>
-                                    </td>
-                                </tr>
-                            {/each}
-                        </tbody>
-                    </table>
-                </div>
+                                        Detail
+                                    </button>
+                                </td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
             </div>
         </div>
     {/if}
 
     <!-- Admin Dashboard -->
     {#if isAdmin && !selectedUserId}
-        <!-- Pending Approvals -->
+        <!-- Pending Installment Approvals -->
         {#if pendingInstallments.length > 0}
-            <div class="mb-8">
-                <h2 class="text-lg sm:text-xl font-semibold mb-4">
+            <div class="mb-8 animate-slide-up">
+                <h2 class="text-lg sm:text-xl font-semibold text-slate-700 mb-4">
                     Angsuran Menunggu Verifikasi
                 </h2>
 
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >User</th
-                                    >
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >Pinjaman</th
-                                    >
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >Angsuran Ke</th
-                                    >
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >Total</th
-                                    >
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >Tanggal</th
-                                    >
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >Aksi</th
-                                    >
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                {#each pendingInstallments as installment}
-                                    <tr class="hover:bg-gray-50">
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                        >
-                                            {installment.user?.name ||
-                                                installment.user?.email ||
-                                                `User #${installment.user_id}`}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                        >
-                                            {installment.pinjaman
-                                                ?.kode_pinjaman ||
-                                                `#${installment.pinjaman_id}`}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                        >
-                                            {installment.angsuran_ke}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                        >
-                                            {formatCurrency(
-                                                installment.total_bayar,
-                                            )}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                        >
-                                            {formatDate(
-                                                installment.tanggal_bayar,
-                                            )}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                        >
-                                            <div class="flex gap-2">
-                                                <button
-                                                    on:click={() =>
-                                                        openInstallmentDetailModal(
-                                                            installment,
-                                                        )}
-                                                    class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                                                >
-                                                    Detail
-                                                </button>
-                                                <button
-                                                    on:click={() =>
-                                                        verifyInstallment(
-                                                            installment.id,
-                                                            "verified",
-                                                        )}
-                                                    class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                                                >
-                                                    Verifikasi
-                                                </button>
-                                                <button
-                                                    on:click={() =>
-                                                        verifyInstallment(
-                                                            installment.id,
-                                                            "kurang",
-                                                        )}
-                                                    class="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
-                                                >
-                                                    Kurang
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {/each}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        {/if}
-
-        <!-- All Loans Management -->
-        <div class="mb-8">
-            <h2 class="text-xl font-semibold mb-4">Semua Pinjaman</h2>
-
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <!-- Desktop Table -->
-                <div class="hidden md:block overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-50">
+                <div class="table-container">
+                    <table>
+                        <thead>
                             <tr>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Kode</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >User</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Jumlah</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Status</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Sisa</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Tanggal</th
-                                >
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >Aksi</th
-                                >
+                                <th>User</th>
+                                <th>Pinjaman</th>
+                                <th>Angsuran Ke</th>
+                                <th>Total</th>
+                                <th>Tanggal</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            {#each loans as loan}
-                                <tr class="hover:bg-gray-50">
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                                    >
-                                        {loan.kode_pinjaman}
+                        <tbody>
+                            {#each pendingInstallments as installment}
+                                <tr>
+                                    <td>
+                                        {installment.user?.name ||
+                                            installment.user?.email ||
+                                            `User #${installment.user_id}`}
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        {loan.user?.name ||
-                                            loan.user?.email ||
-                                            `User #${loan.user_id}`}
-                                    </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        {formatCurrency(loan.jumlah_pinjaman)}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            class="px-2 py-1 text-xs rounded-full border {getStatusColor(
-                                                loan.status,
-                                            )}"
-                                        >
-                                            {getStatusText(loan.status)}
+                                    <td>
+                                        <span class="font-tabular bg-slate-100 px-2 py-0.5 rounded text-slate-700">
+                                            {installment.pinjaman?.kode_pinjaman || `#${installment.pinjaman_id}`}
                                         </span>
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        {loan.sisa_angsuran}
+                                    <td>
+                                        <span class="font-tabular">{installment.angsuran_ke}</span>
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                                    >
-                                        {formatDate(loan.created_at)}
+                                    <td>
+                                        <span class="font-tabular">{formatCurrency(installment.total_bayar)}</span>
                                     </td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                    >
+                                    <td class="text-sm">
+                                        {formatDate(installment.tanggal_bayar)}
+                                    </td>
+                                    <td>
                                         <div class="flex gap-2">
-                                            {#if loan.status === "proses"}
-                                                <button
-                                                    on:click={() =>
-                                                        approveLoan(loan.id)}
-                                                    class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                                                >
-                                                    Setujui
-                                                </button>
-                                                <button
-                                                    on:click={() =>
-                                                        rejectLoan(loan.id)}
-                                                    class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                                                >
-                                                    Tolak
-                                                </button>
-                                            {/if}
                                             <button
-                                                on:click={() =>
-                                                    openLoanDetailModal(loan)}
-                                                class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                                                on:click={() => openInstallmentDetailModal(installment)}
+                                                class="btn btn-secondary btn-sm"
                                             >
                                                 Detail
                                             </button>
                                             <button
-                                                on:click={() =>
-                                                    viewUserLoans(loan)}
-                                                disabled={isNavigating}
-                                                class="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                on:click={() => verifyInstallment(installment.id, "verified")}
+                                                class="btn btn-success btn-sm"
                                             >
-                                                {#if isNavigating}
-                                                    Loading...
-                                                {:else}
-                                                    Lihat Detail
-                                                {/if}
+                                                Verifikasi
+                                            </button>
+                                            <button
+                                                on:click={() => verifyInstallment(installment.id, "kurang")}
+                                                class="btn btn-warning btn-sm"
+                                            >
+                                                Kurang
                                             </button>
                                         </div>
                                     </td>
@@ -1624,230 +1381,294 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        {/if}
 
-                <!-- Mobile Card View -->
-                <div class="md:hidden divide-y divide-gray-200">
-                    {#each loans as loan}
-                        <div class="p-4 bg-white hover:bg-gray-50">
-                            <div class="flex items-start justify-between mb-3">
-                                <div>
-                                    <h3
-                                        class="text-sm font-medium text-gray-900"
-                                    >
+        <!-- All Loans Management -->
+        <div class="mb-8 animate-slide-up">
+            <h2 class="text-xl font-semibold text-slate-700 mb-4">Semua Pinjaman</h2>
+
+            <!-- Desktop Table -->
+            <div class="hidden md:block table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th>User</th>
+                            <th>Jumlah</th>
+                            <th>Status</th>
+                            <th>Sisa</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each loans as loan}
+                            <tr>
+                                <td>
+                                    <span class="font-tabular bg-slate-100 px-2 py-0.5 rounded text-slate-700">
                                         {loan.kode_pinjaman}
-                                    </h3>
-                                    <p class="text-xs text-gray-500 mt-1">
-                                        {loan.user?.name ||
-                                            loan.user?.email ||
-                                            `User #${loan.user_id}`}
-                                    </p>
-                                    <p
-                                        class="text-lg font-semibold text-blue-600 mt-1"
-                                    >
-                                        {formatCurrency(loan.jumlah_pinjaman)}
-                                    </p>
-                                </div>
-                                <span
-                                    class="px-2 py-1 text-xs rounded-full border {getStatusColor(
-                                        loan.status,
-                                    )}"
-                                >
-                                    {getStatusText(loan.status)}
-                                </span>
-                            </div>
-
-                            <div
-                                class="grid grid-cols-2 gap-3 text-sm text-gray-600 mb-4"
-                            >
-                                <div>
-                                    <span class="font-medium"
-                                        >Sisa angsuran:</span
-                                    >
-                                    {loan.sisa_angsuran} kali
-                                </div>
-                                <div>
-                                    <span class="font-medium">Tanggal:</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    {loan.user?.name || loan.user?.email || `User #${loan.user_id}`}
+                                </td>
+                                <td>
+                                    <span class="font-tabular">{formatCurrency(loan.jumlah_pinjaman)}</span>
+                                </td>
+                                <td>
+                                    <span class="badge {loan.status === 'proses' ? 'badge-warning' : loan.status === 'disetujui' ? 'badge-success' : loan.status === 'macet' ? 'badge-danger' : loan.status === 'lunas' ? 'badge-neutral' : loan.status === 'ditolak' ? 'badge-danger' : 'badge-neutral'}">
+                                        {getStatusText(loan.status)}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="font-tabular">{loan.sisa_angsuran}</span>
+                                </td>
+                                <td class="text-sm">
                                     {formatDate(loan.created_at)}
-                                </div>
-                            </div>
-
-                            <div class="flex flex-col gap-2">
-                                {#if loan.status === "proses"}
+                                </td>
+                                <td>
                                     <div class="flex gap-2">
+                                        {#if loan.status === "proses"}
+                                            <button
+                                                on:click={() => approveLoan(loan.id)}
+                                                class="btn btn-success btn-sm"
+                                            >
+                                                Setujui
+                                            </button>
+                                            <button
+                                                on:click={() => rejectLoan(loan.id)}
+                                                class="btn btn-danger btn-sm"
+                                            >
+                                                Tolak
+                                            </button>
+                                        {/if}
                                         <button
-                                            on:click={() =>
-                                                approveLoan(loan.id)}
-                                            class="flex-1 px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-sm"
+                                            on:click={() => openLoanDetailModal(loan)}
+                                            class="btn btn-secondary btn-sm"
                                         >
-                                            ✓ Setujui
+                                            Detail
                                         </button>
                                         <button
-                                            on:click={() => rejectLoan(loan.id)}
-                                            class="flex-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
+                                            on:click={() => viewUserLoans(loan)}
+                                            disabled={isNavigating}
+                                            class="btn btn-ghost btn-sm text-teal-600"
                                         >
-                                            ✗ Tolak
+                                            {#if isNavigating}
+                                                Loading...
+                                            {:else}
+                                                Lihat Detail
+                                            {/if}
                                         </button>
                                     </div>
-                                {/if}
-                                <div class="flex gap-2">
-                                    <button
-                                        on:click={() =>
-                                            openLoanDetailModal(loan)}
-                                        class="flex-1 px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
-                                    >
-                                        Detail
-                                    </button>
-                                    <button
-                                        on:click={() => viewUserLoans(loan)}
-                                        disabled={isNavigating}
-                                        class="flex-1 px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                                    >
-                                        {#if isNavigating}
-                                            Loading...
-                                        {:else}
-                                            Lihat Detail
-                                        {/if}
-                                    </button>
-                                </div>
+                                </td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="md:hidden space-y-3">
+                {#each loans as loan, i}
+                    <div class="card p-4 stagger-item">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <span class="font-tabular bg-slate-100 px-2 py-0.5 rounded text-slate-700 text-sm">
+                                    {loan.kode_pinjaman}
+                                </span>
+                                <p class="text-xs text-slate-500 mt-1.5">
+                                    {loan.user?.name || loan.user?.email || `User #${loan.user_id}`}
+                                </p>
+                                <p class="text-lg font-semibold font-tabular text-teal-700 mt-1">
+                                    {formatCurrency(loan.jumlah_pinjaman)}
+                                </p>
+                            </div>
+                            <span class="badge {loan.status === 'proses' ? 'badge-warning' : loan.status === 'disetujui' ? 'badge-success' : loan.status === 'macet' ? 'badge-danger' : loan.status === 'lunas' ? 'badge-neutral' : loan.status === 'ditolak' ? 'badge-danger' : 'badge-neutral'}">
+                                {getStatusText(loan.status)}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 text-sm text-slate-600 mb-4">
+                            <div>
+                                <span class="text-slate-500 text-xs">Sisa angsuran</span>
+                                <p class="font-tabular font-semibold">{loan.sisa_angsuran} kali</p>
+                            </div>
+                            <div>
+                                <span class="text-slate-500 text-xs">Tanggal</span>
+                                <p class="text-xs">{formatDate(loan.created_at)}</p>
                             </div>
                         </div>
-                    {/each}
-                </div>
+
+                        <div class="flex flex-col gap-2">
+                            {#if loan.status === "proses"}
+                                <div class="flex gap-2">
+                                    <button
+                                        on:click={() => approveLoan(loan.id)}
+                                        class="btn btn-success btn-sm flex-1"
+                                    >
+                                        Setujui
+                                    </button>
+                                    <button
+                                        on:click={() => rejectLoan(loan.id)}
+                                        class="btn btn-danger btn-sm flex-1"
+                                    >
+                                        Tolak
+                                    </button>
+                                </div>
+                            {/if}
+                            <div class="flex gap-2">
+                                <button
+                                    on:click={() => openLoanDetailModal(loan)}
+                                    class="btn btn-secondary btn-sm flex-1"
+                                >
+                                    Detail
+                                </button>
+                                <button
+                                    on:click={() => viewUserLoans(loan)}
+                                    disabled={isNavigating}
+                                    class="btn btn-ghost btn-sm flex-1 text-teal-600"
+                                >
+                                    {#if isNavigating}
+                                        Loading...
+                                    {:else}
+                                        Lihat Detail
+                                    {/if}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {/each}
             </div>
         </div>
     {/if}
 </div>
 
-<!-- Loan Request Modal -->
+<!-- Loan Request Drawer -->
 {#if showLoanRequestModal}
     <div
-        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50"
+        class="drawer-overlay"
         role="dialog"
         aria-modal="true"
         on:click={closeModals}
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
+            class="drawer-panel"
             on:click|stopPropagation
         >
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Ajukan Pinjaman
-            </h3>
+            <div class="drawer-header">
+                <h3 class="text-lg font-semibold text-slate-800">
+                    Ajukan Pinjaman
+                </h3>
+                <button on:click={closeModals} class="btn btn-ghost btn-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
 
-            <form on:submit|preventDefault={requestLoan} class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Jumlah Pinjaman
-                    </label>
-                    <input
-                        type="number"
-                        bind:value={loanRequestForm.jumlah_pinjaman}
-                        min="1"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Masukkan jumlah pinjaman"
-                    />
-                </div>
+            <form on:submit|preventDefault={requestLoan}>
+                <div class="drawer-body space-y-5">
+                    <div>
+                        <label class="input-label">Jumlah Pinjaman</label>
+                        <input
+                            type="number"
+                            bind:value={loanRequestForm.jumlah_pinjaman}
+                            min="1"
+                            required
+                            class="input font-tabular"
+                            placeholder="Masukkan jumlah pinjaman"
+                        />
+                    </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Tenor (bulan)
-                    </label>
-                    <select
-                        bind:value={loanRequestForm.lama_bulan}
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        <option value={6}>6 bulan</option>
-                        <option value={12}>12 bulan</option>
-                        <option value={18}>18 bulan</option>
-                        <option value={24}>24 bulan</option>
-                        <option value={36}>36 bulan</option>
-                    </select>
-                </div>
+                    <div>
+                        <label class="input-label">Tenor (bulan)</label>
+                        <select
+                            bind:value={loanRequestForm.lama_bulan}
+                            required
+                            class="input"
+                        >
+                            <option value={6}>6 bulan</option>
+                            <option value={12}>12 bulan</option>
+                            <option value={18}>18 bulan</option>
+                            <option value={24}>24 bulan</option>
+                            <option value={36}>36 bulan</option>
+                        </select>
+                    </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Pilih Bunga
-                    </label>
-                    <select
-                        bind:value={loanRequestForm.bunga_option_id}
-                        on:change={onBungaOptionChange}
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        <option value={0}>Pilih opsi bunga...</option>
-                        {#each activeBungaOptions as bunga (bunga.id)}
-                            <option value={bunga.id}>
-                                {bunga.nama} - {bunga.persen}%
-                                {#if bunga.deskripsi}
-                                    ({bunga.deskripsi})
-                                {/if}
-                            </option>
-                        {/each}
-                    </select>
-                    {#if selectedBungaOption}
-                        <p class="text-xs text-gray-500 mt-1">
-                            {selectedBungaOption.deskripsi || ""}
-                        </p>
+                    <div>
+                        <label class="input-label">Pilih Ujrah</label>
+                        <select
+                            bind:value={loanRequestForm.bunga_option_id}
+                            on:change={onBungaOptionChange}
+                            required
+                            class="input"
+                        >
+                            <option value={0}>Pilih opsi ujrah...</option>
+                            {#each activeBungaOptions as bunga (bunga.id)}
+                                <option value={bunga.id}>
+                                    {bunga.nama} - {bunga.persen}%
+                                    {#if bunga.deskripsi}
+                                        ({bunga.deskripsi})
+                                    {/if}
+                                </option>
+                            {/each}
+                        </select>
+                        {#if selectedBungaOption}
+                            <p class="text-xs text-slate-500 mt-1">
+                                {selectedBungaOption.deskripsi || ""}
+                            </p>
+                        {/if}
+                    </div>
+
+                    <div>
+                        <label class="input-label">No. Rekening Pencairan</label>
+                        <input
+                            type="text"
+                            bind:value={loanRequestForm.no_rekening_pencairan}
+                            required
+                            class="input font-tabular"
+                            placeholder="Nomor rekening untuk pencairan dana"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="input-label">Nama Bank</label>
+                        <input
+                            type="text"
+                            bind:value={loanRequestForm.bank_name}
+                            required
+                            class="input"
+                            placeholder="Nama bank (contoh: Bank BCA)"
+                        />
+                    </div>
+
+                    {#if loanRequestForm.jumlah_pinjaman > 0 && loanRequestForm.lama_bulan > 0 && selectedBungaOption}
+                        <div class="card p-4 bg-teal-50 border-teal-200">
+                            <p class="text-sm text-teal-800 mb-1">
+                                <span class="font-medium">Ujrah yang dipilih:</span>
+                                {selectedBungaOption.nama} (<span class="font-tabular">{selectedBungaOption.persen}%</span>)
+                            </p>
+                            <p class="text-sm text-teal-800">
+                                <span class="font-medium">Estimasi angsuran per bulan:</span>
+                                <span class="font-tabular font-bold text-base">{formatCurrency(loanRequestForm.jumlah_angsuran)}</span>
+                            </p>
+                        </div>
                     {/if}
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        No. Rekening Pencairan
-                    </label>
-                    <input
-                        type="text"
-                        bind:value={loanRequestForm.no_rekening_pencairan}
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Nomor rekening untuk pencairan dana"
-                    />
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Nama Bank
-                    </label>
-                    <input
-                        type="text"
-                        bind:value={loanRequestForm.bank_name}
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Nama bank (contoh: Bank BCA)"
-                    />
-                </div>
-
-                {#if loanRequestForm.jumlah_pinjaman > 0 && loanRequestForm.lama_bulan > 0 && selectedBungaOption}
-                    <div class="bg-gray-50 p-3 rounded-lg">
-                        <p class="text-sm text-gray-600 mb-2">
-                            <span class="font-medium">Ujrah yang dipilih:</span>
-                            {selectedBungaOption.nama} ({selectedBungaOption.persen}%)
-                        </p>
-                        <p class="text-sm text-gray-600">
-                            <span class="font-medium"
-                                >Estimasi angsuran per bulan:</span
-                            >
-                            {formatCurrency(loanRequestForm.jumlah_angsuran)}
-                        </p>
-                    </div>
-                {/if}
-
-                <div class="flex gap-3 pt-4">
+                <div class="drawer-footer">
                     <button
                         type="button"
                         on:click={closeModals}
-                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                        class="btn btn-secondary"
                     >
                         Batal
                     </button>
                     <button
                         type="submit"
-                        class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                        class="btn btn-primary"
                     >
-                        Ajukan
+                        Ajukan Pinjaman
                     </button>
                 </div>
             </form>
@@ -1855,271 +1676,234 @@
     </div>
 {/if}
 
-<!-- Installment Modal -->
+<!-- Pay Installment Drawer -->
 {#if showInstallmentModal && selectedLoan}
     <div
-        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50"
+        class="drawer-overlay"
         role="dialog"
         aria-modal="true"
         on:click={closeModals}
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
+            class="drawer-panel"
             on:click|stopPropagation
         >
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Bayar Angsuran - {selectedLoan.kode_pinjaman}
-            </h3>
-
-            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
-                <p class="text-sm text-gray-600">
-                    <span class="font-medium">Angsuran ke:</span>
-                    {installmentForm.angsuran_ke}
-                </p>
-                <p class="text-sm text-gray-600">
-                    <span class="font-medium">Sisa angsuran:</span>
-                    {selectedLoan.sisa_angsuran} kali
-                </p>
+            <div class="drawer-header">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">
+                        Bayar Angsuran
+                    </h3>
+                    <p class="text-sm text-slate-500 font-tabular">{selectedLoan.kode_pinjaman}</p>
+                </div>
+                <button on:click={closeModals} class="btn btn-ghost btn-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
 
-            <form
-                on:submit|preventDefault={submitInstallment}
-                class="space-y-4"
-            >
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Pokok
-                    </label>
-                    <input
-                        type="number"
-                        bind:value={installmentForm.pokok}
-                        min="1"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Bunga
-                    </label>
-                    <input
-                        type="number"
-                        bind:value={installmentForm.bunga}
-                        min="0"
-                        required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Denda (opsional)
-                    </label>
-                    <input
-                        type="number"
-                        bind:value={installmentForm.denda}
-                        min="0"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Bukti Transfer *
-                    </label>
-
-                    <!-- Toggle between upload and manual URL -->
-                    <div class="flex items-center gap-4 mb-3">
-                        <button
-                            type="button"
-                            on:click={() => {
-                                useFileUploadInstallment = true;
-                            }}
-                            class="px-3 py-1.5 text-sm rounded-md transition-colors {useFileUploadInstallment
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                        >
-                            📤 Upload File
-                        </button>
-                        <button
-                            type="button"
-                            on:click={() => {
-                                useFileUploadInstallment = false;
-                                selectedFileInstallment = null;
-                            }}
-                            class="px-3 py-1.5 text-sm rounded-md transition-colors {!useFileUploadInstallment
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                        >
-                            🔗 Input URL Manual
-                        </button>
+            <form on:submit|preventDefault={submitInstallment}>
+                <div class="drawer-body space-y-5">
+                    <!-- Loan summary info -->
+                    <div class="card p-4 bg-slate-50">
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <p class="text-slate-500">Angsuran ke</p>
+                                <p class="font-semibold font-tabular text-slate-800">{installmentForm.angsuran_ke}</p>
+                            </div>
+                            <div>
+                                <p class="text-slate-500">Sisa angsuran</p>
+                                <p class="font-semibold font-tabular text-slate-800">{selectedLoan.sisa_angsuran} kali</p>
+                            </div>
+                        </div>
                     </div>
 
-                    {#if useFileUploadInstallment}
-                        <!-- File Upload Mode -->
-                        <div class="space-y-2">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                on:change={handleFileSelectInstallment}
-                                disabled={isUploadingInstallment}
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                            />
-                            {#if isUploadingInstallment}
-                                <div
-                                    class="flex items-center gap-2 text-sm text-blue-600"
-                                >
-                                    <svg
-                                        class="animate-spin h-4 w-4"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <circle
-                                            class="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            stroke-width="4"
-                                        ></circle>
-                                        <path
-                                            class="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        ></path>
-                                    </svg>
-                                    <span>Mengupload gambar...</span>
-                                </div>
-                            {/if}
-                            {#if installmentForm.image_bukti_transfer && !isUploadingInstallment}
-                                <div
-                                    class="flex items-center gap-2 text-sm text-green-600"
-                                >
-                                    <svg
-                                        class="h-4 w-4"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                            clip-rule="evenodd"
-                                        />
-                                    </svg>
-                                    <span>Gambar berhasil diupload</span>
-                                </div>
-                                <a
-                                    href={installmentForm.image_bukti_transfer}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="text-xs text-blue-600 hover:underline break-all"
-                                >
-                                    {installmentForm.image_bukti_transfer}
-                                </a>
-                            {/if}
-                            <p class="text-xs text-gray-500">
-                                Upload gambar bukti transfer (max 5MB, format:
-                                JPG, PNG, GIF)
-                            </p>
+                    <div>
+                        <label class="input-label">Pokok</label>
+                        <input
+                            type="number"
+                            bind:value={installmentForm.pokok}
+                            min="1"
+                            required
+                            class="input font-tabular"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="input-label">Ujrah</label>
+                        <input
+                            type="number"
+                            bind:value={installmentForm.bunga}
+                            min="0"
+                            required
+                            class="input font-tabular"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="input-label">Denda (opsional)</label>
+                        <input
+                            type="number"
+                            bind:value={installmentForm.denda}
+                            min="0"
+                            class="input font-tabular"
+                        />
+                    </div>
+
+                    <!-- Bukti Transfer -->
+                    <div>
+                        <label class="input-label">Bukti Transfer *</label>
+
+                        <!-- Toggle buttons -->
+                        <div class="flex items-center gap-2 mb-3">
+                            <button
+                                type="button"
+                                on:click={() => { useFileUploadInstallment = true; }}
+                                class="btn btn-sm {useFileUploadInstallment ? 'btn-primary' : 'btn-secondary'}"
+                            >
+                                Upload File
+                            </button>
+                            <button
+                                type="button"
+                                on:click={() => { useFileUploadInstallment = false; selectedFileInstallment = null; }}
+                                class="btn btn-sm {!useFileUploadInstallment ? 'btn-primary' : 'btn-secondary'}"
+                            >
+                                Input URL Manual
+                            </button>
                         </div>
-                    {:else}
-                        <!-- Manual URL Input Mode -->
-                        <div class="space-y-2">
-                            <input
-                                type="text"
-                                bind:value={
-                                    installmentForm.image_bukti_transfer
-                                }
-                                placeholder="/uploads/angsuran/bukti_transfer_123.jpg"
-                                required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            <p class="text-xs text-gray-500">
-                                Path atau URL ke file bukti transfer
-                            </p>
-                        </div>
-                    {/if}
+
+                        {#if useFileUploadInstallment}
+                            <!-- File Upload Mode -->
+                            <div class="space-y-2">
+                                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-teal-300 rounded-lg cursor-pointer bg-teal-50/50 hover:bg-teal-50 transition-colors">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg class="w-8 h-8 mb-2 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                        <p class="text-sm text-teal-600 font-medium">Klik untuk upload gambar</p>
+                                        <p class="text-xs text-slate-500">Max 5MB (JPG, PNG, GIF)</p>
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        on:change={handleFileSelectInstallment}
+                                        disabled={isUploadingInstallment}
+                                        class="hidden"
+                                    />
+                                </label>
+
+                                {#if isUploadingInstallment}
+                                    <div class="flex items-center gap-2 text-sm text-teal-600">
+                                        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>Mengupload gambar...</span>
+                                    </div>
+                                {/if}
+                                {#if installmentForm.image_bukti_transfer && !isUploadingInstallment}
+                                    <div class="alert alert-success">
+                                        <svg class="h-4 w-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span>Gambar berhasil diupload</span>
+                                    </div>
+                                    <a
+                                        href={installmentForm.image_bukti_transfer}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="text-xs text-teal-600 hover:underline break-all"
+                                    >
+                                        {installmentForm.image_bukti_transfer}
+                                    </a>
+                                {/if}
+                            </div>
+                        {:else}
+                            <!-- Manual URL Input Mode -->
+                            <div class="space-y-2">
+                                <input
+                                    type="text"
+                                    bind:value={installmentForm.image_bukti_transfer}
+                                    placeholder="/uploads/angsuran/bukti_transfer_123.jpg"
+                                    required
+                                    class="input"
+                                />
+                                <p class="text-xs text-slate-500">
+                                    Path atau URL ke file bukti transfer
+                                </p>
+                            </div>
+                        {/if}
+                    </div>
+
+                    <!-- Bank Account Selection -->
+                    <div>
+                        <label class="input-label">Rekening Bank Tujuan (opsional)</label>
+                        <select
+                            bind:value={installmentForm.bank_account_id}
+                            class="input"
+                        >
+                            <option value="">Pilih rekening bank</option>
+                            {#each activeBankAccounts as bankAccount}
+                                <option value={bankAccount.id || bankAccount.ID}>
+                                    {bankAccount.bank_name} - {bankAccount.account_number}
+                                    ({bankAccount.account_holder_name || bankAccount.account_name})
+                                </option>
+                            {/each}
+                        </select>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Atau isi rekening bank manual di bawah ini
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="input-label">Nomor Rekening (opsional)</label>
+                        <input
+                            type="text"
+                            bind:value={installmentForm.no_rekening}
+                            placeholder="1234567890"
+                            class="input font-tabular"
+                        />
+                        <p class="text-xs text-slate-500 mt-1">
+                            Kosongkan jika menggunakan rekening dari dropdown di atas
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="input-label">Nama Bank (opsional)</label>
+                        <input
+                            type="text"
+                            bind:value={installmentForm.bank_name}
+                            placeholder="Bank Mandiri"
+                            class="input"
+                        />
+                        <p class="text-xs text-slate-500 mt-1">
+                            Kosongkan jika menggunakan rekening dari dropdown di atas
+                        </p>
+                    </div>
+
+                    <!-- Total Summary -->
+                    <div class="card p-4 bg-teal-50 border-teal-200">
+                        <p class="text-sm text-teal-700">
+                            <span class="font-medium">Total pembayaran:</span>
+                        </p>
+                        <p class="font-tabular font-bold text-xl text-teal-800">
+                            {formatCurrency(
+                                installmentForm.pokok +
+                                    installmentForm.bunga +
+                                    (installmentForm.denda || 0),
+                            )}
+                        </p>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Rekening Bank Tujuan (opsional)
-                    </label>
-                    <select
-                        bind:value={installmentForm.bank_account_id}
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        <option value="">Pilih rekening bank</option>
-                        {#each activeBankAccounts as bankAccount}
-                            <option value={bankAccount.id || bankAccount.ID}>
-                                {bankAccount.bank_name} - {bankAccount.account_number}
-                                ({bankAccount.account_holder_name ||
-                                    bankAccount.account_name})
-                            </option>
-                        {/each}
-                    </select>
-                    <p class="text-xs text-gray-500 mt-1">
-                        Atau isi rekening bank manual di bawah ini
-                    </p>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Nomor Rekening (opsional)
-                    </label>
-                    <input
-                        type="text"
-                        bind:value={installmentForm.no_rekening}
-                        placeholder="1234567890"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">
-                        Kosongkan jika menggunakan rekening dari dropdown di
-                        atas
-                    </p>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Nama Bank (opsional)
-                    </label>
-                    <input
-                        type="text"
-                        bind:value={installmentForm.bank_name}
-                        placeholder="Bank Mandiri"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <p class="text-xs text-gray-500 mt-1">
-                        Kosongkan jika menggunakan rekening dari dropdown di
-                        atas
-                    </p>
-                </div>
-
-                <div class="bg-gray-50 p-3 rounded-lg">
-                    <p class="text-sm text-gray-600">
-                        <span class="font-medium">Total pembayaran:</span>
-                        {formatCurrency(
-                            installmentForm.pokok +
-                                installmentForm.bunga +
-                                (installmentForm.denda || 0),
-                        )}
-                    </p>
-                </div>
-
-                <div class="flex gap-3 pt-4">
+                <div class="drawer-footer">
                     <button
                         type="button"
                         on:click={closeModals}
-                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                        class="btn btn-secondary"
                     >
                         Batal
                     </button>
                     <button
                         type="submit"
-                        class="flex-1 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                        class="btn btn-success"
                     >
                         Bayar Angsuran
                     </button>
@@ -2132,212 +1916,156 @@
 <!-- Loan Detail Modal -->
 {#if showLoanDetailModal && selectedLoan}
     <div
-        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50"
+        class="modal-overlay"
         role="dialog"
         aria-modal="true"
         on:click={closeModals}
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
+            class="modal-panel !max-w-3xl max-h-[90vh] overflow-y-auto"
             on:click|stopPropagation
         >
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Detail Pinjaman {selectedLoan.kode_pinjaman}
-            </h3>
-
-            <!-- Loan Information -->
-            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                <div class="grid grid-cols-2 gap-4">
+            <div class="modal-header">
+                <div class="flex items-center justify-between w-full">
                     <div>
-                        <p class="text-sm text-gray-600">Jumlah Pinjaman</p>
-                        <p class="font-semibold text-lg">
-                            {formatCurrency(selectedLoan.jumlah_pinjaman)}
-                        </p>
+                        <h3 class="text-lg font-semibold text-slate-800">
+                            Detail Pinjaman
+                        </h3>
+                        <span class="font-tabular bg-slate-100 px-2 py-0.5 rounded text-slate-600 text-sm">{selectedLoan.kode_pinjaman}</span>
                     </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Status</p>
-                        <span
-                            class="px-2 py-1 text-xs rounded-full border {getStatusColor(
-                                selectedLoan.status,
-                            )}"
-                        >
-                            {getStatusText(selectedLoan.status)}
-                        </span>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Tenor</p>
-                        <p class="font-semibold">
-                            {selectedLoan.lama_bulan} bulan
-                        </p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Angsuran per bulan</p>
-                        <p class="font-semibold">
-                            {formatCurrency(selectedLoan.jumlah_angsuran)}
-                        </p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Ujrah</p>
-                        <p class="font-semibold">
-                            {getEffectiveInterestRate(selectedLoan)}%
-                        </p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">Sisa Angsuran</p>
-                        <p class="font-semibold">
-                            {selectedLoan.sisa_angsuran} kali
-                        </p>
-                    </div>
+                    <button on:click={closeModals} class="btn btn-ghost btn-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
             </div>
 
-            <!-- Installment History -->
-            <div>
-                <h4 class="font-semibold text-gray-900 mb-3">
-                    Riwayat Angsuran
-                </h4>
-
-                {#if loanInstallments.length > 0}
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >Ke-</th
-                                    >
-                                    <th
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >Tanggal</th
-                                    >
-                                    <th
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >Pokok</th
-                                    >
-                                    <th
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >Ujrah</th
-                                    >
-                                    <th
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >Denda</th
-                                    >
-                                    <th
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >Total</th
-                                    >
-                                    <th
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >Status</th
-                                    >
-                                    <th
-                                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"
-                                        >Aksi</th
-                                    >
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                {#each loanInstallments as installment}
-                                    <tr class="hover:bg-gray-50">
-                                        <td
-                                            class="px-4 py-2 text-sm text-gray-900"
-                                        >
-                                            {installment.angsuran_ke}
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 text-sm text-gray-900"
-                                        >
-                                            {formatDate(
-                                                installment.tanggal_bayar,
-                                            )}
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 text-sm text-gray-900"
-                                        >
-                                            {formatCurrency(installment.pokok)}
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 text-sm text-gray-900"
-                                        >
-                                            {formatCurrency(installment.bunga)}
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 text-sm text-gray-900"
-                                        >
-                                            {formatCurrency(installment.denda)}
-                                        </td>
-                                        <td
-                                            class="px-4 py-2 text-sm text-gray-900"
-                                        >
-                                            {formatCurrency(
-                                                installment.total_bayar,
-                                            )}
-                                        </td>
-                                        <td class="px-4 py-2">
-                                            <span
-                                                class="px-2 py-1 text-xs rounded-full border {getStatusColor(
-                                                    installment.status,
-                                                )}"
-                                            >
-                                                {getStatusText(
-                                                    installment.status,
-                                                )}
-                                            </span>
-                                        </td>
-                                        <td class="px-4 py-2 text-sm">
-                                            <div class="flex gap-2">
-                                                <button
-                                                    on:click={() =>
-                                                        openInstallmentDetailModal(
-                                                            installment,
-                                                        )}
-                                                    class="text-blue-600 hover:text-blue-900"
-                                                >
-                                                    Detail
-                                                </button>
-                                                {#if installment.status === "proses" && isAdmin}
-                                                    <button
-                                                        on:click={() =>
-                                                            verifyInstallment(
-                                                                installment.id,
-                                                                "verified",
-                                                            )}
-                                                        class="text-green-600 hover:text-green-900"
-                                                    >
-                                                        Verifikasi
-                                                    </button>
-                                                    <button
-                                                        on:click={() =>
-                                                            verifyInstallment(
-                                                                installment.id,
-                                                                "kurang",
-                                                            )}
-                                                        class="text-orange-600 hover:text-orange-900"
-                                                    >
-                                                        Kurang
-                                                    </button>
-                                                {/if}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {/each}
-                            </tbody>
-                        </table>
-                    </div>
-                {:else}
-                    <div class="text-center py-8">
-                        <p class="text-gray-500">
-                            Belum ada angsuran untuk pinjaman ini.
+            <div class="modal-body">
+                <!-- Loan Information Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="card p-3 bg-slate-50">
+                        <p class="text-xs text-slate-500 mb-1">Jumlah Pinjaman</p>
+                        <p class="font-semibold font-tabular text-lg text-slate-800">
+                            {formatCurrency(selectedLoan.jumlah_pinjaman)}
                         </p>
                     </div>
-                {/if}
+                    <div class="card p-3 bg-slate-50">
+                        <p class="text-xs text-slate-500 mb-1">Status</p>
+                        <span class="badge {selectedLoan.status === 'proses' ? 'badge-warning' : selectedLoan.status === 'disetujui' ? 'badge-success' : selectedLoan.status === 'macet' ? 'badge-danger' : selectedLoan.status === 'lunas' ? 'badge-neutral' : selectedLoan.status === 'ditolak' ? 'badge-danger' : 'badge-neutral'}">
+                            {getStatusText(selectedLoan.status)}
+                        </span>
+                    </div>
+                    <div class="card p-3 bg-slate-50">
+                        <p class="text-xs text-slate-500 mb-1">Tenor</p>
+                        <p class="font-semibold text-slate-800">{selectedLoan.lama_bulan} bulan</p>
+                    </div>
+                    <div class="card p-3 bg-slate-50">
+                        <p class="text-xs text-slate-500 mb-1">Angsuran per bulan</p>
+                        <p class="font-semibold font-tabular text-slate-800">
+                            {formatCurrency(selectedLoan.jumlah_angsuran)}
+                        </p>
+                    </div>
+                    <div class="card p-3 bg-slate-50">
+                        <p class="text-xs text-slate-500 mb-1">Ujrah</p>
+                        <p class="font-semibold font-tabular text-slate-800">{getEffectiveInterestRate(selectedLoan)}%</p>
+                    </div>
+                    <div class="card p-3 bg-slate-50">
+                        <p class="text-xs text-slate-500 mb-1">Sisa Angsuran</p>
+                        <p class="font-semibold font-tabular text-slate-800">{selectedLoan.sisa_angsuran} kali</p>
+                    </div>
+                </div>
+
+                <!-- Installment History -->
+                <div>
+                    <h4 class="font-semibold text-slate-800 mb-3">
+                        Riwayat Angsuran
+                    </h4>
+
+                    {#if loanInstallments.length > 0}
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Ke-</th>
+                                        <th>Tanggal</th>
+                                        <th>Pokok</th>
+                                        <th>Ujrah</th>
+                                        <th>Denda</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {#each loanInstallments as installment}
+                                        <tr>
+                                            <td>
+                                                <span class="font-tabular">{installment.angsuran_ke}</span>
+                                            </td>
+                                            <td class="text-xs">
+                                                {formatDate(installment.tanggal_bayar)}
+                                            </td>
+                                            <td>
+                                                <span class="font-tabular">{formatCurrency(installment.pokok)}</span>
+                                            </td>
+                                            <td>
+                                                <span class="font-tabular">{formatCurrency(installment.bunga)}</span>
+                                            </td>
+                                            <td>
+                                                <span class="font-tabular">{formatCurrency(installment.denda)}</span>
+                                            </td>
+                                            <td>
+                                                <span class="font-tabular font-semibold">{formatCurrency(installment.total_bayar)}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge {installment.status === 'proses' ? 'badge-warning' : installment.status === 'verified' ? 'badge-success' : installment.status === 'kurang' ? 'badge-warning' : installment.status === 'lebih' ? 'badge-info' : 'badge-neutral'}">
+                                                    {getStatusText(installment.status)}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="flex gap-1">
+                                                    <button
+                                                        on:click={() => openInstallmentDetailModal(installment)}
+                                                        class="btn btn-ghost btn-sm text-teal-600"
+                                                    >
+                                                        Detail
+                                                    </button>
+                                                    {#if installment.status === "proses" && isAdmin}
+                                                        <button
+                                                            on:click={() => verifyInstallment(installment.id, "verified")}
+                                                            class="btn btn-ghost btn-sm text-green-600"
+                                                        >
+                                                            Verifikasi
+                                                        </button>
+                                                        <button
+                                                            on:click={() => verifyInstallment(installment.id, "kurang")}
+                                                            class="btn btn-ghost btn-sm text-amber-600"
+                                                        >
+                                                            Kurang
+                                                        </button>
+                                                    {/if}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {/each}
+                                </tbody>
+                            </table>
+                        </div>
+                    {:else}
+                        <div class="card p-8">
+                            <div class="empty-state">
+                                <svg class="w-10 h-10 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <p class="text-slate-500">Belum ada angsuran untuk pinjaman ini.</p>
+                            </div>
+                        </div>
+                    {/if}
+                </div>
             </div>
 
-            <div class="flex justify-end pt-4">
+            <div class="modal-footer">
                 <button
                     on:click={closeModals}
-                    class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                    class="btn btn-secondary"
                 >
                     Tutup
                 </button>
@@ -2349,77 +2077,76 @@
 <!-- Installment Detail Modal -->
 {#if showInstallmentDetailModal && selectedInstallment}
     <div
-        class="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50"
+        class="modal-overlay"
         role="dialog"
         aria-modal="true"
         on:click={closeModals}
         on:keydown={(e) => e.key === "Escape" && closeModals()}
     >
         <div
-            class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] overflow-y-auto"
+            class="modal-panel !max-w-2xl max-h-[90vh] overflow-y-auto"
             on:click|stopPropagation
         >
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                Detail Angsuran #{selectedInstallment.angsuran_ke}
-            </h3>
+            <div class="modal-header">
+                <div class="flex items-center justify-between w-full">
+                    <h3 class="text-lg font-semibold text-slate-800">
+                        Detail Angsuran <span class="font-tabular">#{selectedInstallment.angsuran_ke}</span>
+                    </h3>
+                    <button on:click={closeModals} class="btn btn-ghost btn-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
 
-            <div class="space-y-3">
+            <div class="modal-body space-y-4">
                 {#if selectedInstallment.user}
-                    <div>
-                        <p class="text-sm text-gray-600">Member</p>
-                        <p class="font-semibold">
-                            {selectedInstallment.user.name}
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            {selectedInstallment.user.email}
-                        </p>
+                    <div class="card p-3 bg-slate-50">
+                        <p class="text-xs text-slate-500 mb-0.5">Member</p>
+                        <p class="font-semibold text-slate-800">{selectedInstallment.user.name}</p>
+                        <p class="text-sm text-slate-500">{selectedInstallment.user.email}</p>
                     </div>
                 {/if}
 
-                <div>
-                    <p class="text-sm text-gray-600">Pinjaman</p>
-                    <p class="font-semibold">
-                        {selectedInstallment.pinjaman?.kode_pinjaman ||
-                            `#${selectedInstallment.pinjaman_id}`}
-                    </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-slate-500 mb-0.5">Pinjaman</p>
+                        <span class="font-tabular bg-slate-100 px-2 py-0.5 rounded text-slate-700 text-sm">
+                            {selectedInstallment.pinjaman?.kode_pinjaman || `#${selectedInstallment.pinjaman_id}`}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 mb-0.5">Status</p>
+                        <span class="badge {selectedInstallment.status === 'proses' ? 'badge-warning' : selectedInstallment.status === 'verified' ? 'badge-success' : selectedInstallment.status === 'kurang' ? 'badge-warning' : selectedInstallment.status === 'lebih' ? 'badge-info' : 'badge-neutral'}">
+                            {getStatusText(selectedInstallment.status)}
+                        </span>
+                    </div>
                 </div>
 
-                <div>
-                    <p class="text-sm text-gray-600">Pokok</p>
-                    <p class="font-semibold">
-                        {formatCurrency(selectedInstallment.pokok)}
-                    </p>
-                </div>
-
-                <div>
-                    <p class="text-sm text-gray-600">Ujrah</p>
-                    <p class="font-semibold">
-                        {formatCurrency(selectedInstallment.bunga)}
-                    </p>
-                </div>
-
-                <div>
-                    <p class="text-sm text-gray-600">Denda</p>
-                    <p class="font-semibold">
-                        {formatCurrency(selectedInstallment.denda)}
-                    </p>
-                </div>
-
-                <div>
-                    <p class="text-sm text-gray-600">Total Pembayaran</p>
-                    <p class="font-semibold text-xl">
-                        {formatCurrency(selectedInstallment.total_bayar)}
-                    </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-slate-500 mb-0.5">Pokok</p>
+                        <p class="font-semibold font-tabular text-slate-800">{formatCurrency(selectedInstallment.pokok)}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 mb-0.5">Ujrah</p>
+                        <p class="font-semibold font-tabular text-slate-800">{formatCurrency(selectedInstallment.bunga)}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 mb-0.5">Denda</p>
+                        <p class="font-semibold font-tabular text-slate-800">{formatCurrency(selectedInstallment.denda)}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 mb-0.5">Total Pembayaran</p>
+                        <p class="font-semibold font-tabular text-xl text-teal-700">{formatCurrency(selectedInstallment.total_bayar)}</p>
+                    </div>
                 </div>
 
                 {#if selectedInstallment.bank_name || selectedInstallment.no_rekening}
-                    <div>
-                        <p class="text-sm text-gray-600">Bank Pembayaran</p>
-                        <p class="font-semibold">
-                            {selectedInstallment.bank_name || "-"}
-                        </p>
+                    <div class="card p-3 bg-slate-50">
+                        <p class="text-xs text-slate-500 mb-0.5">Bank Pembayaran</p>
+                        <p class="font-semibold text-slate-800">{selectedInstallment.bank_name || "-"}</p>
                         {#if selectedInstallment.no_rekening}
-                            <p class="text-sm text-gray-500">
+                            <p class="text-sm font-tabular text-slate-500">
                                 No. Rek: {selectedInstallment.no_rekening}
                             </p>
                         {/if}
@@ -2427,42 +2154,25 @@
                 {/if}
 
                 <div>
-                    <p class="text-sm text-gray-600">Status</p>
-                    <span
-                        class="px-2 py-1 text-xs rounded-full border {getStatusColor(
-                            selectedInstallment.status,
-                        )}"
-                    >
-                        {getStatusText(selectedInstallment.status)}
-                    </span>
-                </div>
-
-                <div>
-                    <p class="text-sm text-gray-600">Tanggal Bayar</p>
-                    <p class="text-gray-900">
-                        {formatDate(selectedInstallment.tanggal_bayar)}
-                    </p>
+                    <p class="text-xs text-slate-500 mb-0.5">Tanggal Bayar</p>
+                    <p class="text-slate-800">{formatDate(selectedInstallment.tanggal_bayar)}</p>
                 </div>
 
                 {#if selectedInstallment.image_bukti_transfer}
                     <div>
-                        <p class="text-sm text-gray-600 mb-2">Bukti Transfer</p>
-                        <div class="border rounded-lg overflow-hidden">
+                        <p class="text-xs text-slate-500 mb-2">Bukti Transfer</p>
+                        <div class="border border-slate-200 rounded-lg overflow-hidden">
                             <img
                                 src={selectedInstallment.image_bukti_transfer}
                                 alt="Bukti Transfer"
                                 class="w-full h-auto"
                                 on:error={(e) => {
                                     e.currentTarget.style.display = "none";
-                                    const parent =
-                                        e.currentTarget.parentElement;
+                                    const parent = e.currentTarget.parentElement;
                                     if (parent) {
-                                        const errorDiv =
-                                            document.createElement("div");
-                                        errorDiv.className =
-                                            "p-4 bg-gray-50 text-center text-gray-500 text-sm";
-                                        errorDiv.textContent =
-                                            "Gambar tidak dapat dimuat";
+                                        const errorDiv = document.createElement("div");
+                                        errorDiv.className = "p-4 bg-slate-50 text-center text-slate-500 text-sm";
+                                        errorDiv.textContent = "Gambar tidak dapat dimuat";
                                         parent.appendChild(errorDiv);
                                     }
                                 }}
@@ -2472,7 +2182,7 @@
                             href={selectedInstallment.image_bukti_transfer}
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="text-xs text-blue-600 hover:underline mt-1 inline-block break-all"
+                            class="text-xs text-teal-600 hover:underline mt-1.5 inline-block break-all"
                         >
                             Lihat gambar penuh
                         </a>
@@ -2480,32 +2190,24 @@
                 {/if}
             </div>
 
-            <div class="flex gap-3 pt-6">
+            <div class="modal-footer">
                 {#if selectedInstallment.status === "proses" && isAdmin}
                     <button
-                        on:click={() =>
-                            verifyInstallment(
-                                selectedInstallment?.id || 0,
-                                "verified",
-                            )}
-                        class="flex-1 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+                        on:click={() => verifyInstallment(selectedInstallment?.id || 0, "verified")}
+                        class="btn btn-success"
                     >
                         Verifikasi
                     </button>
                     <button
-                        on:click={() =>
-                            verifyInstallment(
-                                selectedInstallment?.id || 0,
-                                "kurang",
-                            )}
-                        class="flex-1 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
+                        on:click={() => verifyInstallment(selectedInstallment?.id || 0, "kurang")}
+                        class="btn btn-warning"
                     >
                         Kurang
                     </button>
                 {:else}
                     <button
                         on:click={closeModals}
-                        class="w-full px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                        class="btn btn-secondary"
                     >
                         Tutup
                     </button>

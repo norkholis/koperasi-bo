@@ -135,31 +135,25 @@
     <title>Laporan Keuangan - Koperasi Backoffice</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50 p-4 sm:p-6">
+<div class="animate-fade-in space-y-6">
     <!-- Header -->
-    <div
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8"
-    >
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
-                Generate Laporan Keuangan
-            </h1>
-            <p class="text-gray-600 mt-2">
-                Buat laporan keuangan berdasarkan periode dan jenis yang dipilih
-            </p>
+            <h1 class="text-2xl font-bold text-slate-900">Generate Laporan Keuangan</h1>
+            <p class="text-slate-500 mt-1">Buat laporan keuangan berdasarkan periode dan jenis yang dipilih</p>
         </div>
         {#if currentReport}
             <div class="mt-4 sm:mt-0 flex gap-2">
-                <button
-                    on:click={exportReport}
-                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                    Export JSON
+                <button on:click={exportReport} class="btn btn-success btn-sm">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    Export
                 </button>
-                <button
-                    on:click={printReport}
-                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
+                <button on:click={printReport} class="btn btn-secondary btn-sm">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
+                    </svg>
                     Print
                 </button>
             </div>
@@ -167,45 +161,23 @@
     </div>
 
     {#if error}
-        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg
-                        class="h-5 w-5 text-red-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800">Error</h3>
-                    <p class="text-sm text-red-700 mt-1">{error}</p>
-                </div>
+        <div class="alert alert-danger animate-slide-up">
+            <svg class="w-5 h-5 flex-shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+                <p class="font-semibold">Error</p>
+                <p class="text-sm mt-0.5">{error}</p>
             </div>
         </div>
     {:else}
-        <!-- Report Generation Form -->
-        <div
-            class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8"
-        >
-            <h3 class="text-lg font-medium text-gray-900 mb-4">
-                Parameter Laporan
-            </h3>
+        <!-- Report Form -->
+        <div class="card p-6 animate-slide-up">
+            <h3 class="text-base font-semibold text-slate-900 mb-4">Parameter Laporan</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Jenis Laporan
-                    </label>
-                    <select
-                        bind:value={reportForm.report_type}
-                        on:change={updateDateRange}
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    >
+                    <label class="input-label">Jenis Laporan</label>
+                    <select bind:value={reportForm.report_type} on:change={updateDateRange} class="input">
                         <option value="DAILY">Harian</option>
                         <option value="WEEKLY">Mingguan</option>
                         <option value="MONTHLY">Bulanan</option>
@@ -213,43 +185,23 @@
                         <option value="CUSTOM">Custom Range</option>
                     </select>
                 </div>
-
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Tanggal Mulai
-                    </label>
-                    <input
-                        type="date"
-                        bind:value={reportForm.start_date}
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
+                    <label class="input-label">Tanggal Mulai</label>
+                    <input type="date" bind:value={reportForm.start_date} class="input font-tabular" />
                 </div>
-
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                        Tanggal Akhir
-                    </label>
-                    <input
-                        type="date"
-                        bind:value={reportForm.end_date}
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
+                    <label class="input-label">Tanggal Akhir</label>
+                    <input type="date" bind:value={reportForm.end_date} class="input font-tabular" />
                 </div>
             </div>
-
-            <div class="mt-6">
-                <button
-                    on:click={generateReport}
-                    disabled={generatingReport}
-                    class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+            <div class="mt-5">
+                <button on:click={generateReport} disabled={generatingReport} class="btn btn-primary">
                     {#if generatingReport}
-                        <div class="flex items-center">
-                            <div
-                                class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
-                            ></div>
-                            Generating...
-                        </div>
+                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Generating...
                     {:else}
                         Generate Laporan
                     {/if}
@@ -259,266 +211,91 @@
 
         <!-- Report Display -->
         {#if currentReport}
-            <div
-                class="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-                id="report-content"
-            >
+            <div class="card p-6 animate-slide-up" id="report-content">
                 <!-- Report Header -->
-                <div class="border-b border-gray-200 pb-6 mb-6">
-                    <h2 class="text-xl font-semibold text-gray-900">
+                <div class="border-b border-slate-200 pb-5 mb-6">
+                    <h2 class="text-xl font-semibold text-slate-900">
                         Laporan Keuangan {currentReport.report_type}
                     </h2>
-                    <p class="text-gray-600 mt-1">
-                        Periode: {formatDate(currentReport.period_start)} - {formatDate(
-                            currentReport.period_end,
-                        )}
+                    <p class="text-slate-500 mt-1 font-tabular">
+                        Periode: {formatDate(currentReport.period_start)} - {formatDate(currentReport.period_end)}
                     </p>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Generated pada {formatDate(currentReport.generated_at)} oleh
-                        User ID: {currentReport.generated_by}
+                    <p class="text-sm text-slate-400 mt-0.5 font-tabular">
+                        Generated pada {formatDate(currentReport.generated_at)} oleh User ID: {currentReport.generated_by}
                     </p>
                 </div>
 
                 <!-- Summary Cards -->
-                <div
-                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-                >
-                    <div class="bg-green-50 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg
-                                    class="h-8 w-8 text-green-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                                    />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-green-600">
-                                    Total Simpanan
-                                </p>
-                                <p class="text-lg font-semibold text-green-900">
-                                    {formatCurrency(
-                                        currentReport.summary.total_simpanan,
-                                    )}
-                                </p>
-                            </div>
-                        </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+                    <div class="card p-4 border-t-2 border-emerald-500 stagger-item">
+                        <p class="text-sm font-medium text-slate-500 mb-1">Total Simpanan</p>
+                        <p class="text-lg font-bold text-slate-900 font-tabular">{formatCurrency(currentReport.summary.total_simpanan)}</p>
                     </div>
-
-                    <div class="bg-blue-50 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg
-                                    class="h-8 w-8 text-blue-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                                    />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-blue-600">
-                                    Total Pinjaman
-                                </p>
-                                <p class="text-lg font-semibold text-blue-900">
-                                    {formatCurrency(
-                                        currentReport.summary.total_pinjaman,
-                                    )}
-                                </p>
-                            </div>
-                        </div>
+                    <div class="card p-4 border-t-2 border-teal-500 stagger-item">
+                        <p class="text-sm font-medium text-slate-500 mb-1">Total Pinjaman</p>
+                        <p class="text-lg font-bold text-slate-900 font-tabular">{formatCurrency(currentReport.summary.total_pinjaman)}</p>
                     </div>
-
-                    <div class="bg-purple-50 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg
-                                    class="h-8 w-8 text-purple-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                                    />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-purple-600">
-                                    Total Angsuran
-                                </p>
-                                <p
-                                    class="text-lg font-semibold text-purple-900"
-                                >
-                                    {formatCurrency(
-                                        currentReport.summary.total_angsuran,
-                                    )}
-                                </p>
-                            </div>
-                        </div>
+                    <div class="card p-4 border-t-2 border-amber-500 stagger-item">
+                        <p class="text-sm font-medium text-slate-500 mb-1">Total Angsuran</p>
+                        <p class="text-lg font-bold text-slate-900 font-tabular">{formatCurrency(currentReport.summary.total_angsuran)}</p>
                     </div>
-
-                    <div class="bg-yellow-50 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg
-                                    class="h-8 w-8 text-yellow-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                                    />
-                                </svg>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-yellow-600">
-                                    Total SHU
-                                </p>
-                                <p
-                                    class="text-lg font-semibold text-yellow-900"
-                                >
-                                    {formatCurrency(
-                                        currentReport.summary.total_shu,
-                                    )}
-                                </p>
-                            </div>
-                        </div>
+                    <div class="card p-4 border-t-2 border-sky-500 stagger-item">
+                        <p class="text-sm font-medium text-slate-500 mb-1">Total SHU</p>
+                        <p class="text-lg font-bold text-slate-900 font-tabular">{formatCurrency(currentReport.summary.total_shu)}</p>
                     </div>
                 </div>
 
                 <!-- Transaction Count -->
-                <div class="bg-gray-50 rounded-lg p-4 mb-8">
+                <div class="card p-4 bg-slate-50 border-slate-200 mb-8">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600">
-                                Total Transaksi
-                            </p>
-                            <p class="text-2xl font-bold text-gray-900">
-                                {currentReport.transaction_count.toLocaleString(
-                                    "id-ID",
-                                )}
-                            </p>
+                            <p class="text-sm font-medium text-slate-500">Total Transaksi</p>
+                            <p class="text-2xl font-bold text-slate-900 font-tabular">{currentReport.transaction_count.toLocaleString("id-ID")}</p>
                         </div>
-                        <div class="text-gray-400">
-                            <svg
-                                class="h-12 w-12"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 00-2 2h-2a2 2 0 00-2-2z"
-                                />
-                            </svg>
-                        </div>
+                        <svg class="h-10 w-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                        </svg>
                     </div>
                 </div>
 
-                <!-- Breakdown Tables -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Type Breakdown -->
-                    <div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-4">
-                            Breakdown per Jenis
-                        </h4>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="space-y-3">
-                                {#each Object.entries(currentReport.type_breakdown) as [type, amount]}
-                                    <div
-                                        class="flex justify-between items-center"
-                                    >
-                                        <span
-                                            class="text-sm font-medium text-gray-700"
-                                            >{type}</span
-                                        >
-                                        <span
-                                            class="text-sm font-semibold text-gray-900"
-                                            >{formatCurrency(amount)}</span
-                                        >
-                                    </div>
-                                {/each}
-                            </div>
+                <!-- Breakdown -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card p-5">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Breakdown per Jenis</h4>
+                        <div class="space-y-3">
+                            {#each Object.entries(currentReport.type_breakdown) as [type, amount]}
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-slate-700">{type}</span>
+                                    <span class="text-sm font-semibold text-slate-900 font-tabular">{formatCurrency(amount)}</span>
+                                </div>
+                            {/each}
                         </div>
                     </div>
 
-                    <!-- Status Breakdown -->
-                    <div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-4">
-                            Breakdown per Status
-                        </h4>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="space-y-3">
-                                {#each Object.entries(currentReport.status_breakdown) as [status, count]}
-                                    <div
-                                        class="flex justify-between items-center"
-                                    >
-                                        <span
-                                            class="text-sm font-medium text-gray-700"
-                                            >{status}</span
-                                        >
-                                        <span
-                                            class="text-sm font-semibold text-gray-900"
-                                            >{count.toLocaleString(
-                                                "id-ID",
-                                            )}</span
-                                        >
-                                    </div>
-                                {/each}
-                            </div>
+                    <div class="card p-5">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Breakdown per Status</h4>
+                        <div class="space-y-3">
+                            {#each Object.entries(currentReport.status_breakdown) as [status, count]}
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-slate-700">{status}</span>
+                                    <span class="text-sm font-semibold text-slate-900 font-tabular">{count.toLocaleString("id-ID")}</span>
+                                </div>
+                            {/each}
                         </div>
                     </div>
                 </div>
 
                 <!-- Monthly Breakdown -->
                 {#if Object.keys(currentReport.monthly_breakdown).length > 0}
-                    <div class="mt-8">
-                        <h4 class="text-lg font-medium text-gray-900 mb-4">
-                            Breakdown Bulanan
-                        </h4>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div
-                                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-                            >
-                                {#each Object.entries(currentReport.monthly_breakdown) as [month, amount]}
-                                    <div class="bg-white rounded-lg p-3">
-                                        <p
-                                            class="text-sm font-medium text-gray-600"
-                                        >
-                                            {month}
-                                        </p>
-                                        <p
-                                            class="text-lg font-semibold text-gray-900"
-                                        >
-                                            {formatCurrency(amount)}
-                                        </p>
-                                    </div>
-                                {/each}
-                            </div>
+                    <div class="mt-6">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Breakdown Bulanan</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {#each Object.entries(currentReport.monthly_breakdown) as [month, amount]}
+                                <div class="card p-3.5 stagger-item">
+                                    <p class="text-xs font-medium text-slate-500 mb-0.5">{month}</p>
+                                    <p class="text-base font-semibold text-slate-900 font-tabular">{formatCurrency(amount)}</p>
+                                </div>
+                            {/each}
                         </div>
                     </div>
                 {/if}
@@ -529,17 +306,8 @@
 
 <style>
     @media print {
-        .no-print {
-            display: none;
-        }
-
-        body {
-            background: white !important;
-        }
-
-        #report-content {
-            box-shadow: none !important;
-            border: none !important;
-        }
+        .no-print { display: none; }
+        body { background: white !important; }
+        #report-content { box-shadow: none !important; border: none !important; }
     }
 </style>

@@ -37,189 +37,103 @@
     }
 </script>
 
-<div class="p-6 max-w-2xl mx-auto">
+<div class="max-w-2xl mx-auto animate-fade-in">
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold">Edit User</h1>
-        <button
-            on:click={goBack}
-            class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-        >
-            Back to Users
-        </button>
+        <div>
+            <button
+                on:click={goBack}
+                class="mb-3 text-teal-600 hover:text-teal-800 flex items-center gap-1 text-sm font-medium transition-colors"
+            >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Kembali ke Daftar User
+            </button>
+            <h1 class="text-2xl font-bold text-slate-900">Edit User</h1>
+        </div>
     </div>
 
     {#if !canManageUsers}
-        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-            <p class="text-red-800">You don't have permission to edit users.</p>
+        <div class="alert alert-danger">
+            <svg class="w-5 h-5 flex-shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+            </svg>
+            <p>You don't have permission to edit users.</p>
         </div>
     {:else}
-        <div class="bg-white shadow rounded-lg p-6">
-            <form method="POST" action="?/update" use:enhance={handleSubmit}>
-                <div class="space-y-4">
-                    <!-- Email -->
-                    <div>
-                        <label
-                            for="email"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Email
-                        </label>
+        <div class="card">
+            <form method="POST" action="?/update" use:enhance={handleSubmit} class="p-6 space-y-5">
+                <div>
+                    <label for="email" class="input-label">Email</label>
+                    <input type="email" id="email" name="email" value={user.email} required class="input" />
+                </div>
+
+                <div>
+                    <label for="name" class="input-label">Nama</label>
+                    <input type="text" id="name" name="name" value={user.name || ""} class="input" />
+                </div>
+
+                <div>
+                    <label for="phone_number" class="input-label">No. Telepon</label>
+                    <input type="text" id="phone_number" name="phone_number" value={user.phone_number || ""} class="input" />
+                </div>
+
+                <div>
+                    <label for="nik" class="input-label">NIK</label>
+                    <input type="text" id="nik" name="nik" value={user.nik || ""} class="input font-tabular" />
+                </div>
+
+                <div>
+                    <label for="role_id" class="input-label">Role</label>
+                    <select id="role_id" name="role_id" required class="input">
+                        {#each roles as role}
+                            <option value={role.id} selected={role.id === user.role_id}>
+                                {role.name}
+                            </option>
+                        {/each}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="password" class="input-label">Password Baru (kosongkan untuk tetap)</label>
+                    <div class="relative">
                         <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={user.email}
-                            required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            type={showPassword ? "text" : "password"}
+                            id="password"
+                            name="password"
+                            class="input pr-11"
                         />
-                    </div>
-
-                    <!-- Name -->
-                    <div>
-                        <label
-                            for="name"
-                            class="block text-sm font-medium text-gray-700 mb-1"
+                        <button
+                            type="button"
+                            on:click={() => (showPassword = !showPassword)}
+                            class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
                         >
-                            Name
-                        </label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={user.name || ""}
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <!-- Phone Number -->
-                    <div>
-                        <label
-                            for="phone_number"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Phone Number
-                        </label>
-                        <input
-                            type="text"
-                            id="phone_number"
-                            name="phone_number"
-                            value={user.phone_number || ""}
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <!-- NIK -->
-                    <div>
-                        <label
-                            for="nik"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            NIK
-                        </label>
-                        <input
-                            type="text"
-                            id="nik"
-                            name="nik"
-                            value={user.nik || ""}
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <!-- Role -->
-                    <div>
-                        <label
-                            for="role_id"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            Role
-                        </label>
-                        <select
-                            id="role_id"
-                            name="role_id"
-                            required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            {#each roles as role}
-                                <option
-                                    value={role.id}
-                                    selected={role.id === user.role_id}
-                                >
-                                    {role.name}
-                                </option>
-                            {/each}
-                        </select>
-                    </div>
-
-                    <!-- Password (optional) -->
-                    <div>
-                        <label
-                            for="password"
-                            class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                            New Password (leave empty to keep current)
-                        </label>
-                        <div class="relative">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                id="password"
-                                name="password"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <button
-                                type="button"
-                                on:click={() => (showPassword = !showPassword)}
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
-                            >
-                                {#if showPassword}
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z"
-                                            clip-rule="evenodd"
-                                        />
-                                        <path
-                                            d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z"
-                                        />
-                                    </svg>
-                                {:else}
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                    >
-                                        <path
-                                            d="M10 12a2 2 0 100-4 2 2 0 000 4z"
-                                        />
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                            clip-rule="evenodd"
-                                        />
-                                    </svg>
-                                {/if}
-                            </button>
-                        </div>
+                            {#if showPassword}
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                </svg>
+                            {:else}
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            {/if}
+                        </button>
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3 mt-6">
+                <div class="flex justify-end gap-3 pt-5 border-t border-slate-200">
                     <button
                         type="button"
                         on:click={goBack}
-                        class="px-4 py-2 text-gray-600 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                        class="btn btn-secondary"
                         disabled={isSubmitting}
                     >
-                        Cancel
+                        Batal
                     </button>
                     <button
                         type="submit"
-                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors disabled:opacity-50"
+                        class="btn btn-primary"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? "Updating..." : "Update User"}

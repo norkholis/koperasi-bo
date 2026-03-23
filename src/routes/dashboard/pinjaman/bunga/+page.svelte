@@ -459,59 +459,12 @@
     <title>Manajemen Bunga - Koperasi Backoffice</title>
 </svelte:head>
 
-<div class="container mx-auto px-4 py-8">
-    <!-- Debug info -->
-    <!-- <div class="mb-4 p-4 bg-yellow-100 border border-yellow-300 rounded">
-        <h4>Debug Info:</h4>
-        <p>showCreateModal: {showCreateModal}</p>
-        <p>showEditModal: {showEditModal}</p>
-        <p>selectedBunga: {selectedBunga ? selectedBunga.nama : "null"}</p>
-        <p>canManageBunga: {canManageBunga}</p>
-        <p>currentUser: {JSON.stringify(currentUser?.role)}</p>
-        <p>bungaOptionsCount: {bungaOptions.length}</p>
-
-        <button
-            on:click={() => testAuth()}
-            class="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-sm"
-        >
-            Test Auth
-        </button>
-
-        <button
-            on:click={() => {
-                console.log("🍪 Current cookies:", document.cookie);
-                console.log("💾 Current localStorage:", {
-                    token: localStorage.getItem("token"),
-                    auth_token: localStorage.getItem("auth_token"),
-                    user_info: localStorage.getItem("user_info"),
-                });
-            }}
-            class="mt-2 ml-2 px-3 py-1 bg-green-500 text-white rounded text-sm"
-        >
-            Check Storage
-        </button>
-
-        <button
-            on:click={() => {
-                console.log("🧪 Testing edit modal with first bunga...");
-                if (bungaOptions.length > 0) {
-                    const firstBunga = bungaOptions[0];
-                    console.log("📊 First bunga data:", firstBunga);
-                    openEditModal(firstBunga);
-                } else {
-                    console.log("❌ No bunga options available");
-                }
-            }}
-            class="mt-2 ml-2 px-3 py-1 bg-orange-500 text-white rounded text-sm"
-        >
-            Test Edit Modal
-        </button>
-    </div> -->
-
-    <div class="flex justify-between items-center mb-6">
+<div class="animate-fade-in">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Manajemen Ujrah</h1>
-            <p class="text-gray-600 mt-2">
+            <h1 class="text-2xl font-bold text-slate-900">Manajemen Ujrah</h1>
+            <p class="text-slate-500 mt-1 text-sm">
                 Kelola opsi ujrah untuk pembiayaan anggota
             </p>
         </div>
@@ -519,383 +472,311 @@
         {#if canManageBunga}
             <button
                 on:click={openCreateModal}
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                class="btn btn-primary"
             >
-                + Tambah Ujrah
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Tambah Ujrah
             </button>
         {/if}
     </div>
 
     {#if isLoading}
-        <div class="flex justify-center items-center py-12">
-            <div
-                class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
-            ></div>
-            <span class="ml-2 text-gray-600">Memuat data ujrah...</span>
+        <!-- Loading State -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {#each [1, 2, 3] as _}
+                <div class="card p-6">
+                    <div class="skeleton h-4 w-24 mb-4"></div>
+                    <div class="skeleton h-8 w-16 mb-3"></div>
+                    <div class="skeleton h-3 w-full mb-2"></div>
+                    <div class="skeleton h-3 w-2/3"></div>
+                </div>
+            {/each}
         </div>
     {:else if bungaOptions.length === 0}
-        <div class="text-center py-12">
-            <div class="text-gray-400 text-6xl mb-4">📊</div>
-            <h3 class="text-xl font-medium text-gray-900 mb-2">
+        <!-- Empty State -->
+        <div class="card p-12 text-center">
+            <div class="mx-auto w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mb-4">
+                <svg class="w-8 h-8 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 mb-1">
                 Belum ada ujrah
             </h3>
-            <p class="text-gray-600 mb-6">
+            <p class="text-slate-500 text-sm mb-6">
                 Tambahkan opsi ujrah pertama untuk memulai
             </p>
             {#if canManageBunga}
                 <button
                     on:click={openCreateModal}
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    class="btn btn-primary"
                 >
                     Tambah Ujrah Pertama
                 </button>
             {/if}
         </div>
     {:else}
-        <div
-            class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
-        >
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Nama Bunga
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Persentase
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Deskripsi
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Status
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Dibuat Oleh
-                            </th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Tanggal
-                            </th>
+        <!-- Interest Rate Card Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {#each bungaOptions as bunga (bunga.id)}
+                <div class="card card-interactive stagger-item p-6 flex flex-col">
+                    <!-- Card Top: Name + Badge -->
+                    <div class="flex items-start justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-slate-900 leading-tight">
+                            {bunga.nama}
+                        </h3>
+                        <span class="badge {bunga.is_active ? 'badge-success' : 'badge-danger'}">
+                            {bunga.is_active ? "Aktif" : "Nonaktif"}
+                        </span>
+                    </div>
+
+                    <!-- Percentage Display -->
+                    <div class="mb-4">
+                        <span class="font-tabular text-3xl font-bold text-teal-700">
+                            {formatPercentage(bunga.persen)}
+                        </span>
+                        <span class="text-slate-400 text-xs ml-1">per bulan</span>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-sm text-slate-500 mb-5 line-clamp-2 flex-1">
+                        {bunga.deskripsi || "Tidak ada deskripsi"}
+                    </p>
+
+                    <!-- Card Footer: Meta + Actions -->
+                    <div class="pt-4 border-t border-slate-100">
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs text-slate-400">
+                                <span>{bunga.created_by_user?.name || `ID: ${bunga.created_by}`}</span>
+                                <span class="mx-1">&middot;</span>
+                                <span>{new Date(bunga.created_at).toLocaleDateString("id-ID")}</span>
+                            </div>
+
                             {#if canManageBunga}
-                                <th
-                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Aksi
-                                </th>
+                                <div class="flex items-center gap-1">
+                                    <button
+                                        on:click={() => openEditModal(bunga)}
+                                        class="btn btn-ghost btn-sm"
+                                        title="Edit"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </button>
+                                    <button
+                                        on:click={() => toggleBungaStatus(bunga)}
+                                        class="btn btn-sm {bunga.is_active ? 'btn-ghost text-amber-600 hover:bg-amber-50' : 'btn-ghost text-teal-600 hover:bg-teal-50'}"
+                                        title={bunga.is_active ? "Nonaktifkan" : "Aktifkan"}
+                                    >
+                                        {#if bunga.is_active}
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636" />
+                                            </svg>
+                                        {:else}
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        {/if}
+                                    </button>
+                                    <button
+                                        on:click={() => deleteBungaOption(bunga)}
+                                        class="btn btn-ghost btn-sm text-rose-500 hover:bg-rose-50"
+                                        title="Hapus"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
                             {/if}
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        {#each bungaOptions as bunga (bunga.id)}
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div
-                                        class="text-sm font-medium text-gray-900"
-                                    >
-                                        {bunga.nama}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div
-                                        class="text-sm text-gray-900 font-semibold"
-                                    >
-                                        {formatPercentage(bunga.persen)}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div
-                                        class="text-sm text-gray-600 max-w-xs truncate"
-                                    >
-                                        {bunga.deskripsi || "-"}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {bunga.is_active
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-red-100 text-red-800'}"
-                                    >
-                                        {bunga.is_active ? "Aktif" : "Nonaktif"}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-600">
-                                        {bunga.created_by_user?.name ||
-                                            `ID: ${bunga.created_by}`}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-600">
-                                        {new Date(
-                                            bunga.created_at,
-                                        ).toLocaleDateString("id-ID")}
-                                    </div>
-                                </td>
-                                {#if canManageBunga}
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
-                                    >
-                                        <div class="flex justify-end space-x-2">
-                                            <button
-                                                on:click={() =>
-                                                    openEditModal(bunga)}
-                                                class="text-blue-600 hover:text-blue-900 transition-colors"
-                                                title="Edit"
-                                            >
-                                                <svg
-                                                    class="w-4 h-4"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                                    />
-                                                </svg>
-                                            </button>
-                                            <button
-                                                on:click={() =>
-                                                    toggleBungaStatus(bunga)}
-                                                class="{bunga.is_active
-                                                    ? 'text-red-600 hover:text-red-900'
-                                                    : 'text-green-600 hover:text-green-900'} transition-colors"
-                                                title={bunga.is_active
-                                                    ? "Nonaktifkan"
-                                                    : "Aktifkan"}
-                                            >
-                                                {#if bunga.is_active}
-                                                    <svg
-                                                        class="w-4 h-4"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"
-                                                        />
-                                                    </svg>
-                                                {:else}
-                                                    <svg
-                                                        class="w-4 h-4"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <path
-                                                            stroke-linecap="round"
-                                                            stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M5 13l4 4L19 7"
-                                                        />
-                                                    </svg>
-                                                {/if}
-                                            </button>
-                                            <button
-                                                on:click={() =>
-                                                    deleteBungaOption(bunga)}
-                                                class="text-red-600 hover:text-red-900 transition-colors"
-                                                title="Hapus"
-                                            >
-                                                <svg
-                                                    class="w-4 h-4"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        stroke-linecap="round"
-                                                        stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                    </td>
-                                {/if}
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            </div>
+                        </div>
+                    </div>
+                </div>
+            {/each}
         </div>
     {/if}
 </div>
 
-<!-- Create Bunga Modal -->
+<!-- Create Bunga Drawer -->
 {#if showCreateModal}
     <div
-        class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
+        class="drawer-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-drawer-title"
+        on:click|self={closeModals}
+        on:keydown={(e) => e.key === 'Escape' && closeModals()}
     >
-        <div class="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
-            <h2 class="text-xl font-bold mb-4">Tambah Ujrah Baru</h2>
+    </div>
+    <div class="drawer-panel">
+        <div class="drawer-header">
+            <h2 id="create-drawer-title" class="text-lg font-semibold text-slate-900">Tambah Ujrah Baru</h2>
+            <button on:click={closeModals} class="btn btn-ghost btn-sm" aria-label="Tutup">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
 
-            <form
-                on:submit|preventDefault={createBungaOption}
-                class="space-y-4"
-            >
+        <form on:submit|preventDefault={createBungaOption}>
+            <div class="drawer-body space-y-5">
                 <div>
-                    <label class="block text-sm font-medium mb-1"
-                        >Nama Ujrah *</label
-                    >
+                    <label for="create-nama" class="input-label">Nama Ujrah *</label>
                     <input
+                        id="create-nama"
                         type="text"
                         bind:value={createForm.nama}
                         required
-                        class="w-full border border-gray-300 rounded px-3 py-2"
+                        class="input"
                         placeholder="e.g., Ujrah Standar"
                     />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1"
-                        >Persentase (%) *</label
-                    >
+                    <label for="create-persen" class="input-label">Persentase (%) *</label>
                     <input
+                        id="create-persen"
                         type="number"
                         step="0.1"
                         min="0"
                         max="100"
                         bind:value={createForm.persen}
                         required
-                        class="w-full border border-gray-300 rounded px-3 py-2"
+                        class="input font-tabular"
                         placeholder="e.g., 1.5"
                     />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1"
-                        >Deskripsi</label
-                    >
+                    <label for="create-deskripsi" class="input-label">Deskripsi</label>
                     <textarea
+                        id="create-deskripsi"
                         bind:value={createForm.deskripsi}
-                        rows="3"
-                        class="w-full border border-gray-300 rounded px-3 py-2"
+                        rows="4"
+                        class="input"
                         placeholder="Deskripsi opsional"
                     ></textarea>
                 </div>
+            </div>
 
-                <div class="flex gap-2 pt-4">
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                    >
-                        {isSubmitting ? "Menyimpan..." : "Simpan"}
-                    </button>
-                    <button
-                        type="button"
-                        on:click={closeModals}
-                        class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
-                    >
-                        Batal
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="drawer-footer">
+                <button
+                    type="button"
+                    on:click={closeModals}
+                    class="btn btn-secondary"
+                >
+                    Batal
+                </button>
+                <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    class="btn btn-primary"
+                >
+                    {#if isSubmitting}
+                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        Menyimpan...
+                    {:else}
+                        Simpan
+                    {/if}
+                </button>
+            </div>
+        </form>
     </div>
 {/if}
 
-<!-- Edit Bunga Modal -->
+<!-- Edit Bunga Drawer -->
 {#if showEditModal && selectedBunga}
     <div
-        class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
+        class="drawer-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-drawer-title"
+        on:click|self={closeModals}
+        on:keydown={(e) => e.key === 'Escape' && closeModals()}
     >
-        <div class="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
-            <h2 class="text-xl font-bold mb-4">
+    </div>
+    <div class="drawer-panel">
+        <div class="drawer-header">
+            <h2 id="edit-drawer-title" class="text-lg font-semibold text-slate-900">
                 Edit Ujrah: {selectedBunga?.nama || "Unknown"}
             </h2>
+            <button on:click={closeModals} class="btn btn-ghost btn-sm" aria-label="Tutup">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
 
-            <!-- Debug info in modal -->
-            <!-- <div
-                class="mb-4 p-2 bg-blue-50 border border-blue-200 rounded text-xs"
-            >
-                <strong>Debug - Modal Data:</strong>
-                <p>selectedBunga: {JSON.stringify(selectedBunga)}</p>
-                <p>editForm: {JSON.stringify(editForm)}</p>
-            </div> -->
-
-            <form
-                on:submit|preventDefault={updateBungaOption}
-                class="space-y-4"
-            >
+        <form on:submit|preventDefault={updateBungaOption}>
+            <div class="drawer-body space-y-5">
                 <div>
-                    <label class="block text-sm font-medium mb-1"
-                        >Nama Ujrah *</label
-                    >
+                    <label for="edit-nama" class="input-label">Nama Ujrah *</label>
                     <input
+                        id="edit-nama"
                         type="text"
                         bind:value={editForm.nama}
                         required
-                        class="w-full border border-gray-300 rounded px-3 py-2"
+                        class="input"
                         placeholder="e.g., Ujrah Standar"
                     />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1"
-                        >Persentase (%) *</label
-                    >
+                    <label for="edit-persen" class="input-label">Persentase (%) *</label>
                     <input
+                        id="edit-persen"
                         type="number"
                         step="0.1"
                         min="0"
                         max="100"
                         bind:value={editForm.persen}
                         required
-                        class="w-full border border-gray-300 rounded px-3 py-2"
+                        class="input font-tabular"
                         placeholder="e.g., 1.5"
                     />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium mb-1"
-                        >Deskripsi</label
-                    >
+                    <label for="edit-deskripsi" class="input-label">Deskripsi</label>
                     <textarea
+                        id="edit-deskripsi"
                         bind:value={editForm.deskripsi}
-                        rows="3"
-                        class="w-full border border-gray-300 rounded px-3 py-2"
+                        rows="4"
+                        class="input"
                         placeholder="Deskripsi opsional"
                     ></textarea>
                 </div>
+            </div>
 
-                <div class="flex gap-2 pt-4">
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                    >
-                        {isSubmitting ? "Menyimpan..." : "Perbarui"}
-                    </button>
-                    <button
-                        type="button"
-                        on:click={closeModals}
-                        class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
-                    >
-                        Batal
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="drawer-footer">
+                <button
+                    type="button"
+                    on:click={closeModals}
+                    class="btn btn-secondary"
+                >
+                    Batal
+                </button>
+                <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    class="btn btn-primary"
+                >
+                    {#if isSubmitting}
+                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        Menyimpan...
+                    {:else}
+                        Perbarui
+                    {/if}
+                </button>
+            </div>
+        </form>
     </div>
 {/if}
